@@ -6,6 +6,144 @@
     background-image: linear-gradient(#000 30%,#222, #000 30%);
 }
 
+.content {
+    color: #ddd;
+}
+
+.app-text {
+    font-size: 1.1rem;
+    margin: 1.3rem 0 .5rem 0;
+}
+
 .content-title-text {
-    
+    font-size: 2rem;
+}
+
+.content-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    border: .1rem solid #ddd;
+}
+
+.box-difficulty {
+    display: grid;
+    grid-template-columns: repeat(2, 5rem);
+    grid-template-rows: repeat(2, 5rem);
+    padding: .75rem;
+}
+
+.difficulty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: .2rem double hsl(144, 55%, 65%);
+    color:#333;
+    font-weight: 600;
+    padding: .4rem;
+    margin: .1rem;
+}
+
+.difficulty-easy {
+    background-image: linear-gradient(75deg, hsl(112, 40%, 60%), hsl(132, 50%, 70%));
+    border-color: hsl(142, 35%, 65%);
+}
+
+.difficulty-medium {
+    background-image: linear-gradient(75deg, hsl(46, 40%, 60%), hsl(66, 50%, 70%));
+    border-color: hsl(76, 35%, 65%);
+}
+
+.difficulty-hard {
+    background-image: linear-gradient(75deg, hsl(2, 40%, 60%), hsl(22, 50%, 70%));
+    border-color: hsl(32, 35%, 65%);
+}
+
+.difficulty-master {
+    background-image: linear-gradient(75deg, hsl(244, 40%, 60%), hsl(264, 50%, 70%));
+    border-color: hsl(274, 35%, 65%);
+}
+
+.box-items {
+    width: 40%;
+    padding: .4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.items-text {
+    display: block;
+    padding: .25rem .3rem;
+
+}
+
+.items-vis {
+    width: 3.3rem;
+    height: 1.1rem;
+    border: .15rem solid #ddd;
+    position: relative;
+    margin: .15rem;
+    border-radius: 20%;
+}
+
+.items-vis label {
+    display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    transition: all .8s ease;
+    cursor: pointer;
+    position: absolute;
+    top: -.2rem;
+    left: -.2rem;
+    border: .15rem solid #ddd;
+}
+
+.items-vis input[type=checkbox]:checked+label {
+    left: 2rem;
+    background: hsl(112, 40%, 60%);
+    border-radius: 20%;
+    border: .1rem solid hsl(112, 40%, 60%);    
+}
+
+.item-option {
+    background: #458;
+    color: #379;
+}
+
+input[type=checkbox] {
+    visibility: hidden;
+}
+
+input[type="checkbox"]:checked+input {
+    background:hsl(112, 40%, 60%);
+}
+
+.items-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: .1rem solid #ddd;
+    border-radius: 50%;
+    margin: .3rem;
+}
+
+.icon {
+    font-size: 1.5rem;
+}
+
+.start {  
+    /* Ivisible until player pick sudoku difficulty */
+    padding: 1rem;
+}
+
+.start-play {
+    height: 2rem;
+    width: 6rem;
+    font-size: 1.2rem;
+    font-weight: 550;
+    border-radius: 20%;
 }
