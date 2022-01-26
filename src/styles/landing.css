@@ -3,11 +3,13 @@
     top: 0%; left: 0%;
     width: 100%;
     height: 100%;
-    background-image: linear-gradient(#000 30%,#222, #000 30%);
+    /* background-image: linear-gradient(135deg, #000,#000, #000); */
+    background-color: #000;
+    color: #ddd;
 }
 
 .content {
-    color: #ddd;
+    
 }
 
 .app-text {
@@ -107,7 +109,7 @@
 
 .items-vis input[type=checkbox]:checked+label {
     left: 2rem;
-    background: hsl(112, 40%, 60%);
+    background-image: radial-gradient(hsl(112, 40%, 60%), hsl(133, 50%, 50%));
     border-radius: 20%;
     border: .1rem solid hsl(112, 40%, 60%);    
 }
