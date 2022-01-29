@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from "react";
 import App from './App';
 import './styles/landing.css';
+import PlayButton from './components/PlayButton.js';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 
@@ -45,7 +46,7 @@ const themeObject = {
     }
 }
 
-function Landing() {
+function Landing(props) {
 
     const [difficulty, setDifficulty] = useState(null); // string
     const [timer, setTimer] = useState(false);
@@ -60,8 +61,6 @@ function Landing() {
     const masterRef = useRef(null);
 
     const themesBoxRef = useRef(null);
-
-    const buttonMainRef = useRef(null);
 
     function changeVisuals(refEl, value) {
         //for(let prop in visualObject) {
@@ -129,18 +128,6 @@ function Landing() {
 
     }
 
-    function shouldButtonAppear(event) {
-        if((!difficulty) && (event.target.classList.contains('difficulty'))) {
-            // THIS IS NOT WORKING
-            anime({
-                targets: buttonMainRef.current,
-                duration: 2200,
-                opacity: 0,
-                easing: 'easeInCubic',
-            })
-        }
-    }
-
 
     return (
 
@@ -153,7 +140,7 @@ function Landing() {
                 <div className="app-text"> Choose a difficulty </div>
 
                 <div className="content-box">
-                    <div className="box-difficulty" onClick={(event) => {shouldButtonAppear(event)}}>
+                    <div className="box-difficulty">
                         <div className="difficulty difficulty-easy easy" ref={easyRef} onClick={() => {setDifficulty('easy')}}> EASY </div>
                         <div className="difficulty difficulty-medium medium" ref={mediumRef} onClick={() => {setDifficulty('medium')}}> MEDIUM </div>
                         <div className="difficulty difficulty-hard hard" ref={hardRef} onClick={() => {setDifficulty('hard')}}> HARD </div>
@@ -194,9 +181,7 @@ function Landing() {
                 </div>
 
                 {difficulty && (
-                    <div className="start" ref={buttonMainRef}>
-                        <button className="start-play"> Play </button>
-                    </div>
+                    <PlayButton playSudoku={props.playSudoku} />
                 )}
 
             </div>

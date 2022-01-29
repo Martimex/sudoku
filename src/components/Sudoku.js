@@ -1,5 +1,6 @@
 import react from "react";
 import App from '../App';
+import Landing from "../Landing";
 
 function Sudoku(props) {
 
@@ -8,10 +9,13 @@ function Sudoku(props) {
 
     const map = 9;
 
-    return (
+    console.log(props);
 
+    return (
         <div className="sudoku-map">
-            
+            Hej, to właśnie tu będzie Twoje sudoku
         </div>
     );
 }
+
+export default Sudoku;

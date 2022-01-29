@@ -1,11 +1,29 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import Landing from './Landing';
+import Sudoku from './components/Sudoku';
 import './App.css';
 
 function App() {
-  return (
+
+  const [state, setState] = useState('landing');
+
+  const triggerPlay = (...args) => {
+    setState('sudoku');
+  }
+
+  const triggerBack = () => {
+    setState('landing');
+  }
+
+  return(
     <div className="App">
-      <Landing />
+      {state === 'landing' && (
+        <Landing playSudoku={triggerPlay} />
+      )}
+
+      {state === 'sudoku' && (
+        <Sudoku backToLanding={triggerBack} />
+      )}
     </div>
   );
 }
