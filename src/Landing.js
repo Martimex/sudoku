@@ -48,10 +48,15 @@ const themeObject = {
 
 function Landing(props) {
 
-    const [difficulty, setDifficulty] = useState(null); // string
+/*     const [difficulty, setDifficulty] = useState(null); // string
     const [timer, setTimer] = useState(false);
     const [counter, setCounter] = useState(false);
-    const [theme, setTheme] = useState('night');
+    const [theme, setTheme] = useState('night'); */
+    
+    const [options, setOptions] = useState({
+        timer: false,
+        counter: false,
+    })
 
     const layoutRef = useRef(null);
 
@@ -82,15 +87,15 @@ function Landing(props) {
         let arr = [easyRef, mediumRef, hardRef, masterRef];
         for(let i=0; i<arr.length; i++) {
             let shouldUpdate = 0;
-            if(arr[i].current.classList[arr[i].current.classList.length - 1] === difficulty) {shouldUpdate++}
+            if(arr[i].current.classList[arr[i].current.classList.length - 1] === props.difficulty) {shouldUpdate++}
             changeVisuals(arr[i].current, shouldUpdate);
         }
 
-    }, [difficulty]);
+    }, [props.difficulty]);
 
     useEffect(() => {
         // Start from here
-        const newTheme = themesBoxRef.current.querySelector(`[data-theme=${theme}]`);
+        const newTheme = themesBoxRef.current.querySelector(`[data-theme=${props.theme}]`);
 
         const allContentBoxes = layoutRef.current.querySelectorAll('.content-box');
         const allInputs = layoutRef.current.querySelectorAll('.items-vis');
@@ -101,10 +106,10 @@ function Landing(props) {
         const modesArr = [...allModes];
 
         for(let i=0; i<allModes.length; i++) {
-            if(allModes[i] === newTheme) { modesArr.splice(i, 1); changeThemes(newTheme, modesArr, theme, allContentBoxes, allInputs, allLabels, playButton);}
+            if(allModes[i] === newTheme) { modesArr.splice(i, 1); changeThemes(newTheme, modesArr, props.theme, allContentBoxes, allInputs, allLabels, playButton);}
         }
 
-    }, [theme])
+    }, [props.theme])
 
     function changeThemes(newTheme, modesArr, theme, allContentBoxes, allInputs, allLabels, playButton) {
 
@@ -141,10 +146,10 @@ function Landing(props) {
 
                 <div className="content-box">
                     <div className="box-difficulty">
-                        <div className="difficulty difficulty-easy easy" ref={easyRef} onClick={() => {setDifficulty('easy')}}> EASY </div>
-                        <div className="difficulty difficulty-medium medium" ref={mediumRef} onClick={() => {setDifficulty('medium')}}> MEDIUM </div>
-                        <div className="difficulty difficulty-hard hard" ref={hardRef} onClick={() => {setDifficulty('hard')}}> HARD </div>
-                        <div className="difficulty difficulty-master master" ref={masterRef} onClick={() => {setDifficulty('master')}}> KOREA </div>
+                        <div className="difficulty difficulty-easy easy" ref={easyRef} onClick={() => {props.setDifficulty('easy')}}> EASY </div>
+                        <div className="difficulty difficulty-medium medium" ref={mediumRef} onClick={() => {props.setDifficulty('medium')}}> MEDIUM </div>
+                        <div className="difficulty difficulty-hard hard" ref={hardRef} onClick={() => {props.setDifficulty('hard')}}> HARD </div>
+                        <div className="difficulty difficulty-master master" ref={masterRef} onClick={() => {props.setDifficulty('master')}}> KOREA </div>
                     </div>
                 </div>
 
@@ -154,14 +159,14 @@ function Landing(props) {
                     <div className="box-items">
                         <div className="items-vis">
                             <input className="item-option" type="checkbox" value="false"  id="choose"/>
-                            <label htmlFor="choose" className="label-item" onClick={() => setTimer(!timer)}> </label>
+                            <label htmlFor="choose" className="label-item" onClick={() => props.setTimer(!props.timer)}> </label>
                         </div>
                         <span className="items-text"> Add timer </span>
                     </div>
                     <div className="box-items">
                         <div className="items-vis">
                             <input className="item-option" type="checkbox" value="false" id="choose2"/>
-                            <label htmlFor="choose2" className="label-item" onClick={() => setCounter(!counter)}> </label>
+                            <label htmlFor="choose2" className="label-item" onClick={() => props.setCounter(!props.counter)}> </label>
                         </div>
                         <span className="items-text"> Add counter </span>
                     </div>
@@ -171,16 +176,16 @@ function Landing(props) {
                 
                 <div className="content-box">
                     <div className="box-items" ref={themesBoxRef}> 
-                        <div className="items-icons" data-theme="day" onClick={() => {setTheme('day')}} >
+                        <div className="items-icons" data-theme="day" onClick={() => {props.setTheme('day')}} >
                             <FontAwesomeIcon icon={faSun}  className="icon"></FontAwesomeIcon>
                         </div>
-                        <div className="items-icons" data-theme="night" onClick={() => {setTheme('night')}} >
+                        <div className="items-icons" data-theme="night" onClick={() => {props.setTheme('night')}} >
                             <FontAwesomeIcon icon={faMoon} className="icon"></FontAwesomeIcon>
                         </div>
                     </div>
                 </div>
 
-                {difficulty && (
+                {props.difficulty && (
                     <PlayButton playSudoku={props.playSudoku} />
                 )}
 
