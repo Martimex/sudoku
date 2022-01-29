@@ -52,11 +52,7 @@ function Landing(props) {
     const [timer, setTimer] = useState(false);
     const [counter, setCounter] = useState(false);
     const [theme, setTheme] = useState('night'); */
-    
-    const [options, setOptions] = useState({
-        timer: false,
-        counter: false,
-    })
+
 
     const layoutRef = useRef(null);
 
@@ -159,14 +155,14 @@ function Landing(props) {
                     <div className="box-items">
                         <div className="items-vis">
                             <input className="item-option" type="checkbox" value="false"  id="choose"/>
-                            <label htmlFor="choose" className="label-item" onClick={() => props.setTimer(!props.timer)}> </label>
+                            <label htmlFor="choose" className="label-item" onClick={() => props.setOptions(options => ({...options, timer: !props.options.timer}))}> </label>
                         </div>
                         <span className="items-text"> Add timer </span>
                     </div>
                     <div className="box-items">
                         <div className="items-vis">
                             <input className="item-option" type="checkbox" value="false" id="choose2"/>
-                            <label htmlFor="choose2" className="label-item" onClick={() => props.setCounter(!props.counter)}> </label>
+                            <label htmlFor="choose2" className="label-item" onClick={() => props.setOptions(options => ({...options, counter: !props.options.counter}))}> </label>
                         </div>
                         <span className="items-text"> Add counter </span>
                     </div>

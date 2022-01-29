@@ -13,7 +13,7 @@ function Sudoku(props) {
 
     return (
         <div className="sudoku-map">
-            Hej, to właśnie tu będzie Twoje sudoku
+            Hej, to właśnie tu będzie Twoje sudoku {props.difficulty}
         </div>
     );
 }
