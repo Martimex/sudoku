@@ -1,0 +1,7 @@
+.square {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    border: .2rem solid #222;
+    color: #000;
+}

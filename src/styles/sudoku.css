@@ -1,0 +1,17 @@
+
+
+.sudoku-title {
+    padding: .6rem;
+    font-size: 2rem;
+}
+
+.sudoku-map {
+    padding:  2rem .2rem;
+}
+
+.sudoku-board {
+    display: grid;
+    min-width: 60%;
+    border: .2rem solid #000;
+    color: #000;
+}
