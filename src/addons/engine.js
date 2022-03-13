@@ -162,7 +162,7 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //console.log(this.con(ordered));
         console.log(ordered);
-        for(let currRow=0; currRow<1; currRow++) {  // current row // switch 3 to this.rows;
+        for(let currRow=0; currRow<9; currRow++) {  // current row // switch 3 to this.rows;
             //console.log(this.squareColumns); 
             let possibilitiesObj = {  // key means digit to use; arr of values refers to which row tile no. that digit could be assigned
                 1: [], // 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -180,10 +180,10 @@ const engine = {
                 let allDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                 let index = ((currRow * 9) + currTile_inRow); // this.rows;
                 let data_order = index + 1;
-                //this.checkColumnCompatibility1(allDigits, ordered[index], ordered);
-                //this.checkSquareCompatibility(allDigits, ordered[index], ordered, index); // ? not sure if that works correctly
-                this.checkColumnCompatibility2(data_order, allDigits);
-                this.checkSquareCompatibility2(currRow, currTile_inRow, allDigits);
+                this.checkColumnCompatibility1(allDigits, ordered[index], ordered);
+                this.checkSquareCompatibility(allDigits, ordered[index], ordered, index); // ? not sure if that works correctly
+                //this.checkColumnCompatibility2(data_order, allDigits);
+                //this.checkSquareCompatibility2(currRow, currTile_inRow, allDigits);
                 //console.log(allDigits);
                 for(let digit of allDigits) {
                     possibilitiesObj[digit].push(currTile_inRow + 1);
@@ -192,6 +192,7 @@ const engine = {
 
             //console.log(Object.values(possibilitiesObj));
             let usedDigits = [];
+            let usedTiles = [];
 
             for(let currColumn= 0; currColumn<this.columns; currColumn++) { // current tile no. in current row
                 
@@ -202,43 +203,61 @@ const engine = {
         
                 // What's the lowest array length ?
                 for(let key in possibilitiesObj) {
-                   if((possibilitiesObj[key].length < lowestArrLength) && (!(usedDigits.includes(key)))) {
+                   if((possibilitiesObj[key].length < lowestArrLength) && (!usedDigits.includes(parseInt(key)))) {
                        lowestArrLength = possibilitiesObj[key].length;
                    }
                 }
-        
+
                 // How many keys have the lowest array length ?
                 for(let key in possibilitiesObj) {
                     //console.warn(key);
-                    if((possibilitiesObj[key].length === lowestArrLength) && (!(usedDigits.includes(key)))) {
+                    if((possibilitiesObj[key].length === lowestArrLength) && (!usedDigits.includes(parseInt(key)))) {
                         dangerZoneDigits.push(key);
                     }
                 }
+
+                //console.log(Object.keys(possibilitiesObj).length);
 
                 let rand_digit = Math.floor(Math.random() * dangerZoneDigits.length);
                 let rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
                 let index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
 
-                console.log(dangerZoneDigits, rand_digit);
+                console.log(dangerZoneDigits, rand_digit, rand_tile);
 
                 console.log(dangerZoneDigits[rand_digit] + ' will be assigned into tile no ' + possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile], index);
-                ordered[index].textContent = dangerZoneDigits[rand_digit];
+                //ordered[index].textContent = dangerZoneDigits[rand_digit];
 
+                console.log(dangerZoneDigits[rand_digit]);
                 usedDigits.push(dangerZoneDigits[rand_digit]);
+                usedTiles.push(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
+                console.log('used Digits:  ', usedDigits);
+                console.log('used Tiles:  ', usedTiles);
+                console.log(ordered[index]);
+                console.log(index);
+                console.log(dangerZoneDigits[rand_digit]);
+                console.log(Object.keys(possibilitiesObj).length);
+                console.log(Object.keys(possibilitiesObj));
+                ordered[index].textContent = dangerZoneDigits[rand_digit];
 
                 // Remove a chosen key from an object (1) and the current tile number from all other arrays (2)
                 // availableNumbers[random_number] - here we have the digit (key) from an object
                 // 2
-                 for(let key in possibilitiesObj) {
-                    if(possibilitiesObj[key].includes(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile])) {
-                        let ind = possibilitiesObj[key].indexOf(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
-                        possibilitiesObj[key].splice(ind, 1);
+
+                for(let key in possibilitiesObj) {
+                    //console.log(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
+                    //console.log(parseInt(usedDigits[usedDigits.length - 1]));
+                    if(possibilitiesObj[key].includes(parseInt(usedTiles[usedTiles.length - 1]))) {
+                        //let ind = possibilitiesObj[key].indexOf(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
+                        let inde = possibilitiesObj[key].indexOf(parseInt(usedTiles[usedTiles.length - 1]));
+                        //console.log(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
+                        //console.log(possibilitiesObj[key].indexOf(parseInt(usedTiles[usedTiles.length - 1])), ind);
+                        possibilitiesObj[key].splice(inde, 1);
                     }
                 }
                 // 1
-                delete possibilitiesObj[dangerZoneDigits[rand_digit]];
+                delete possibilitiesObj[parseInt(usedDigits[usedDigits.length - 1])];
 
-                console.log(possibilitiesObj);
+                //console.log(possibilitiesObj);
 
 
                 /* let index = ((currRow * 9) + currColumn); // this.rows
