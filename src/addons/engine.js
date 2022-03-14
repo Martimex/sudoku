@@ -216,27 +216,84 @@ const engine = {
                     }
                 }
 
-                //console.log(Object.keys(possibilitiesObj).length);
+                let copy = dangerZoneDigits;
 
-                let rand_digit = Math.floor(Math.random() * dangerZoneDigits.length);
+                console.log('DGD COPY', dangerZoneDigits);
+
+                let rand_digit = Math.floor(Math.random() * dangerZoneDigits.length); // wybierz indeks tablicy (wybierz cyfrę)
                 let rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
                 let index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
+
+                // Jeżeli jest kratka, gdzie wylosowana cyfra to jedyna możliwa cyfra, wtedy wybierz tą kratkę, jeśli nie - możesz swobodnie losować
+                let isOnlyOne = []; // zawsze trafia 1 element, gdy  possibilitiesObj[dangerZoneDigits[rand_digit]].length === 1;
+                for(let x=0; x<possibilitiesObj[dangerZoneDigits[rand_digit]].length; x++) {
+                    for(let key in possibilitiesObj) {
+                        if((possibilitiesObj[key].includes(possibilitiesObj[dangerZoneDigits[rand_digit]][x])) && (possibilitiesObj[key].length === 1) && (possibilitiesObj[key] !== possibilitiesObj[dangerZoneDigits[rand_digit]])) {
+                            isOnlyOne.push(possibilitiesObj[dangerZoneDigits[rand_digit]][x]);
+                            console.log(possibilitiesObj[dangerZoneDigits[rand_digit]].length)
+                            console.log(possibilitiesObj[key], possibilitiesObj[dangerZoneDigits[rand_digit]])
+                        }
+                    }
+                }
+
+
+                console.log(isOnlyOne.length); // elementów w tej tablicy NIE WOLNO UŻYĆ
+                console.log(possibilitiesObj[dangerZoneDigits[rand_digit]].length); // Niestety ta linijka === linii 237, czyli żaden el nie działa
+                if(isOnlyOne.length > 0) {
+                    // isOnlyOne posiada wszystkie numery kafli, do których nie możemy dodać naszej wylosowanej cyfry (digit)
+                    const allowedArr = possibilitiesObj[dangerZoneDigits[rand_digit]].filter((el, index) => {
+                        if(!isOnlyOne.includes(possibilitiesObj[dangerZoneDigits[rand_digit]][index])) {
+                            return possibilitiesObj[dangerZoneDigits[rand_digit]][index];
+                        } 
+                    })
+                    console.warn('allowedArr ', allowedArr)
+                    rand_tile = Math.floor(Math.random() * allowedArr.length);
+                    index = (currRow * 9) + (parseInt(allowedArr[rand_tile] - 1));
+                    usedTiles.push(allowedArr[rand_tile]);
+                } else {
+                    rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
+                    index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
+                    usedTiles.push(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
+                } 
+
+
+
+                console.log(index);
 
                 console.log(dangerZoneDigits, rand_digit, rand_tile);
 
                 console.log(dangerZoneDigits[rand_digit] + ' will be assigned into tile no ' + possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile], index);
                 //ordered[index].textContent = dangerZoneDigits[rand_digit];
 
-                console.log(dangerZoneDigits[rand_digit]);
                 usedDigits.push(dangerZoneDigits[rand_digit]);
-                usedTiles.push(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
+
+                 /* if(!index) { // if equals NaN
+                    console.warn('NAN');
+                    let missingCount;
+                    for(let i = 1; i<=9; i++) {
+                        if(possibilitiesObj[parseInt(dangerZoneDigits[rand_digit])].includes(i)) {
+                            missingCount = i;
+                        }
+                    }
+
+                    index = ((currRow * 9) + (missingCount - 1));
+                    ordered[index].style.background = "lightblue";
+                } */
+ 
+                // PRZYCZYNA BŁĘDU:  possibilitiesObj[parseInt(dangerZoneDigits[rand_digit])].includes(i)  ZWRACA FALSE
+                // CZYLI KIEDY SYSTEM MA DO WYBORU TYLKO 1 CYFRĘ TYLKO W 1 MIEJSCU, ALE NIE MOŻE ONA ZOSTAĆ TAM WRZUCONA...
+                // OSTATNIE MIEJSCE (PASUJĄCY KAFELEK) DLA CYFRY ZOSTAŁO WYLOSOWANE I WZIĘTE PRZEZ INNĄ CYFRĘ
+
+                console.log(dangerZoneDigits[rand_digit]);
                 console.log('used Digits:  ', usedDigits);
                 console.log('used Tiles:  ', usedTiles);
                 console.log(ordered[index]);
+                //console.log(ordered);
                 console.log(index);
                 console.log(dangerZoneDigits[rand_digit]);
                 console.log(Object.keys(possibilitiesObj).length);
                 console.log(Object.keys(possibilitiesObj));
+
                 ordered[index].textContent = dangerZoneDigits[rand_digit];
 
                 // Remove a chosen key from an object (1) and the current tile number from all other arrays (2)
