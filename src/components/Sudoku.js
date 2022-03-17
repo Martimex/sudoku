@@ -35,6 +35,7 @@ function Sudoku(props) {
     // Perform engine operations
     useEffect(() => {
         engine.setBoard();
+        engine.fadeDigits(props);
     }, []);
 
 
@@ -45,7 +46,7 @@ function Sudoku(props) {
                 {engine.version}
             </div>
             <div className="sudoku-map">
-                <div className="sudoku-board" style={mainGridStyle}>
+                <div className="sudoku-board" style={mainGridStyle} difficulty={props.difficulty} theme={props.theme}>
                     {allSquares}
                 </div>
             </div>

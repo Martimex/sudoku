@@ -1,5 +1,3 @@
-
-
 .sudoku-title {
     padding: .6rem;
     font-size: 2rem;
@@ -7,6 +5,9 @@
 
 .sudoku-map {
     padding:  2rem .2rem;
+    display:  flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sudoku-board {

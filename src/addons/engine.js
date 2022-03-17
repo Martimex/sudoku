@@ -2,6 +2,21 @@ import  Sudoku from '../components/Sudoku.js';
 import Square from '../components/Square.js';
 import Tile from '../components/Tile.js';
 
+const rules = {
+    easy:  {
+        initialNumbers: 28,
+    },
+    medium: {
+        initialNumbers: 26,
+    },
+    hard: {
+        initialNumbers: 24,
+    },
+    master: {
+        initialNumbers: 21,
+    },
+}
+
 const engine = {
 
     version: '1.0.0',
@@ -40,21 +55,6 @@ const engine = {
         }
     },
 
-    checkColumnCompatibility: function(numbers_array, thisEl, ordered) {
-        const columnNo = ((thisEl.dataset.order - 1) % this.columns) + 1;
-        console.log(columnNo);
-        for(let c=columnNo; c<parseInt(thisEl.dataset.order); c=this.columns) {  // Check one column
-            let usedNumber = ordered[c].innerText; // here we store a number
-            for(let q=0; q<numbers_array.length; q++) {
-                if(parseInt(usedNumber) === numbers_array[q]) {
-                    numbers_array.splice(q, 1);
-                    q = q - 1;
-                }
-            } 
-        }
-        //console.log(columnNo);
-    },
-
     checkRowCompatibility: function(numbers_array, thisEl, ordered) {
         const squareRows = 3; const squareColumns = 3;
         const rowNo = (Math.floor(thisEl.dataset.order / (squareColumns * squareRows)));
@@ -67,7 +67,7 @@ const engine = {
         }
     },
 
-    checkColumnCompatibility1: function(numbers_array, thisEl, ordered) {  // Works perfectly
+    checkColumnCompatibility: function(numbers_array, thisEl, ordered) {  // Works perfectly
         const columnNo = ((thisEl.dataset.order - 1) % this.columns) + 1;
         for(let c=columnNo; c<=parseInt(thisEl.dataset.order); c = c + this.columns) {
             if(numbers_array.includes(parseInt(ordered[c-1].textContent))) {
@@ -78,8 +78,7 @@ const engine = {
         }
     },
 
-    checkSquareCompatibility: function(numbers_array, thisEl, ordered, elIndex) {  // Bugged
-        //console.log(numbers_array);  
+    checkSquareCompatibility: function(numbers_array, thisEl, ordered, elIndex) {  // Works fine
         const squareRows = 3; const squareColumns = 3;
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArr = [...allTiles];
@@ -95,75 +94,12 @@ const engine = {
         }
     },
 
-    checkColumnCompatibility2: function(data_order, allDigits) {
-        let numsToRemove = [];
-        const rest = (parseInt(data_order % 9)); // 0 to 8
-        for(let k = rest + 1; k<(parseInt(data_order)); k+=9) {
-            let tile = document.querySelector(`[data-order='${k}']`);
-            numsToRemove.push(parseInt(tile.textContent)); // number on tile
-        }
-        for(let g=0; g<numsToRemove.length; g++) {
-            if(allDigits.includes(numsToRemove[g])) {
-                let index = allDigits.indexOf(numsToRemove[g]);
-                allDigits.splice(index, 1);
-            }
-        }
-    },
-
-    checkSquareCompatibility2: function(currRow, currTile_inRow, allDigits) {
-        let numsToRemove = [];
-        let allTiles = document.querySelectorAll('.tile');
-        let currPos = (currRow * 9) + currTile_inRow; // with 0 index, just like for arrays
-        let squareNo = Math.floor(currPos / 9); // 0 to 8 - which square number on board
-        for(let f=(squareNo * 9); f<currPos; f++) {
-            numsToRemove.push(parseInt(allTiles[f].textContent)); // number on tile
-        }
-        for(let g=0; g<numsToRemove.length; g++) {
-            if(allDigits.includes(numsToRemove[g])) {
-                let index = allDigits.indexOf(numsToRemove[g]);
-                allDigits.splice(index, 1);
-            }
-        }
-
-    },
-
-    checkDangerZone: function(possibilitiesObj) {
-        let lowestArrLength = 10;
-        let keysWithLowestArrLength = 0;
-        let dangerZoneDigits = [];
-
-        // What's the lowest array length ?
-        for(let key in possibilitiesObj) {
-           if(possibilitiesObj[key].length < lowestArrLength) {
-               lowestArrLength = possibilitiesObj[key].length;
-           }
-        }
-
-        // How many keys have the lowest array length ?
-        for(let key in possibilitiesObj) {
-            if(possibilitiesObj[key].length === lowestArrLength) {
-                dangerZoneDigits.push(key);
-                keysWithLowestArrLength++;
-            }
-         }
-
-        // Condition
-        if(keysWithLowestArrLength === lowestArrLength) {
-            // It's Danger Zone !
-            return dangerZoneDigits;
-        } else {return false;}
-
-        //console.log(lowestArrLength, keysWithLowestArrLength);
-    },
-
     applyRow: function(currRow, ordered, possibilitiesObj) {
         let usedDigits = [];
         let usedTiles = [];
 
         for(let currColumn= 0; currColumn<this.columns; currColumn++) { // current tile no. in current row
-            
-            //console.log(Object.values(possibilitiesObj));
-            
+
             let lowestArrLength = 10;
             let dangerZoneDigits = [];
     
@@ -183,7 +119,7 @@ const engine = {
             }
 
 
-            let rand_digit = Math.floor(Math.random() * dangerZoneDigits.length); // wybierz indeks tablicy (wybierz cyfrę)
+            let rand_digit = Math.floor(Math.random() * dangerZoneDigits.length); // pick the array index (choose a digit)
             let rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
             let index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
 
@@ -211,12 +147,10 @@ const engine = {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
-        //console.log(this.con(ordered));
         console.log(ordered);
-        for(let currRow=0; currRow<9; currRow++) {  // current row // switch 3 to this.rows;
-            //console.log(this.squareColumns); 
+        for(let currRow=0; currRow<9; currRow++) {  // current row
             let possibilitiesObj = {  // key means digit to use; arr of values refers to which row tile no. that digit could be assigned
-                1: [], // 1, 2, 3, 4, 5, 6, 7, 8, 9
+                1: [],
                 2: [],
                 3: [],
                 4: [],
@@ -229,13 +163,9 @@ const engine = {
 
             for(let currTile_inRow = 0; currTile_inRow <this.columns; currTile_inRow++) { 
                 let allDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-                let index = ((currRow * 9) + currTile_inRow); // this.rows;
-                let data_order = index + 1;
-                this.checkColumnCompatibility1(allDigits, ordered[index], ordered);
-                this.checkSquareCompatibility(allDigits, ordered[index], ordered, index); // ? not sure if that works correctly
-                //this.checkColumnCompatibility2(data_order, allDigits);
-                //this.checkSquareCompatibility2(currRow, currTile_inRow, allDigits);
-                //console.log(allDigits);
+                let index = ((currRow * 9) + currTile_inRow);
+                this.checkColumnCompatibility(allDigits, ordered[index], ordered);
+                this.checkSquareCompatibility(allDigits, ordered[index], ordered, index);
                 for(let digit of allDigits) {
                     possibilitiesObj[digit].push(currTile_inRow + 1);
                 }
@@ -250,47 +180,13 @@ const engine = {
                 currRow = currRow - 2;
             }
 
-            //console.log(Object.values(possibilitiesObj));
-
-      /*           // Jeżeli jest kratka, gdzie wylosowana cyfra to jedyna możliwa cyfra, wtedy wybierz tą kratkę, jeśli nie - możesz swobodnie losować
-                let isOnlyOne = []; // zawsze trafia 1 element, gdy  possibilitiesObj[dangerZoneDigits[rand_digit]].length === 1;
-                for(let x=0; x<possibilitiesObj[dangerZoneDigits[rand_digit]].length; x++) {
-                    for(let key in possibilitiesObj) {
-                        if((possibilitiesObj[key].includes(possibilitiesObj[dangerZoneDigits[rand_digit]][x])) && (possibilitiesObj[key].length === 1) && (possibilitiesObj[key] !== possibilitiesObj[dangerZoneDigits[rand_digit]])) {
-                            isOnlyOne.push(possibilitiesObj[dangerZoneDigits[rand_digit]][x]);
-                            console.log(possibilitiesObj[dangerZoneDigits[rand_digit]].length)
-                            console.log(possibilitiesObj[key], possibilitiesObj[dangerZoneDigits[rand_digit]])
-                        }
-                    }
-                }
-
-
-                console.log(isOnlyOne.length); // elementów w tej tablicy NIE WOLNO UŻYĆ
-                console.log(possibilitiesObj[dangerZoneDigits[rand_digit]].length); // Niestety ta linijka === linii 237, czyli żaden el nie działa
-                if(isOnlyOne.length > 0) {
-                    // isOnlyOne posiada wszystkie numery kafli, do których nie możemy dodać naszej wylosowanej cyfry (digit)
-                    const allowedArr = possibilitiesObj[dangerZoneDigits[rand_digit]].filter((el, index) => {
-                        if(!isOnlyOne.includes(possibilitiesObj[dangerZoneDigits[rand_digit]][index])) {
-                            return possibilitiesObj[dangerZoneDigits[rand_digit]][index];
-                        } 
-                    })
-                    console.warn('allowedArr ', allowedArr)
-                    rand_tile = Math.floor(Math.random() * allowedArr.length);
-                    index = (currRow * 9) + (parseInt(allowedArr[rand_tile] - 1));
-                    usedTiles.push(allowedArr[rand_tile]);
-                } else {
-                    rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
-                    index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
-                    usedTiles.push(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
-                }  */
- 
-                // PRZYCZYNA BŁĘDU:  possibilitiesObj[parseInt(dangerZoneDigits[rand_digit])].includes(i)  ZWRACA FALSE
-                // CZYLI KIEDY SYSTEM MA DO WYBORU TYLKO 1 CYFRĘ TYLKO W 1 MIEJSCU, ALE NIE MOŻE ONA ZOSTAĆ TAM WRZUCONA...
-                // OSTATNIE MIEJSCE (PASUJĄCY KAFELEK) DLA CYFRY ZOSTAŁO WYLOSOWANE I WZIĘTE PRZEZ INNĄ CYFRĘ
-
-            
-
         }
+    },
+
+    fadeDigits: function({difficulty, theme, options}) {
+        console.log(difficulty, theme, options);
+        console.log(rules[difficulty]);
+
     },
  
 }
