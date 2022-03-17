@@ -156,6 +156,57 @@ const engine = {
         //console.log(lowestArrLength, keysWithLowestArrLength);
     },
 
+    applyRow: function(currRow, ordered, possibilitiesObj) {
+        let usedDigits = [];
+        let usedTiles = [];
+
+        for(let currColumn= 0; currColumn<this.columns; currColumn++) { // current tile no. in current row
+            
+            //console.log(Object.values(possibilitiesObj));
+            
+            let lowestArrLength = 10;
+            let dangerZoneDigits = [];
+    
+            // What's the lowest array length ?
+            for(let key in possibilitiesObj) {
+                if((possibilitiesObj[key].length < lowestArrLength) && (!usedDigits.includes(parseInt(key)))) {
+                    lowestArrLength = possibilitiesObj[key].length;
+                }
+            }
+
+            // How many keys have the lowest array length ?
+            for(let key in possibilitiesObj) {
+                //console.warn(key);
+                if((possibilitiesObj[key].length === lowestArrLength) && (!usedDigits.includes(parseInt(key)))) {
+                    dangerZoneDigits.push(key);
+                }
+            }
+
+
+            let rand_digit = Math.floor(Math.random() * dangerZoneDigits.length); // wybierz indeks tablicy (wybierz cyfrę)
+            let rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
+            let index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
+
+            usedTiles.push(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
+            usedDigits.push(dangerZoneDigits[rand_digit]);
+
+            if(!ordered[index]) { return false; }
+
+            ordered[index].textContent = dangerZoneDigits[rand_digit];
+
+            for(let key in possibilitiesObj) {
+                if(possibilitiesObj[key].includes(parseInt(usedTiles[usedTiles.length - 1]))) {
+                    let inde = possibilitiesObj[key].indexOf(parseInt(usedTiles[usedTiles.length - 1]));
+                    possibilitiesObj[key].splice(inde, 1);
+                }
+            }
+            // 1
+            delete possibilitiesObj[parseInt(usedDigits[usedDigits.length - 1])];
+        }
+
+        return true;
+    },
+
     setBoard: function() {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
@@ -190,41 +241,18 @@ const engine = {
                 }
             }
 
+            const isSuccess = this.applyRow(currRow, ordered, possibilitiesObj);
+
+            if(!isSuccess) {
+                for(let i=((currRow - 1) * this.columns); i<=(currRow * this.columns) + 9; i++) {
+                    ordered[i].textContent = '';
+                }
+                currRow = currRow - 2;
+            }
+
             //console.log(Object.values(possibilitiesObj));
-            let usedDigits = [];
-            let usedTiles = [];
 
-            for(let currColumn= 0; currColumn<this.columns; currColumn++) { // current tile no. in current row
-                
-                console.log(Object.values(possibilitiesObj));
-                
-                let lowestArrLength = 10;
-                let dangerZoneDigits = [];
-        
-                // What's the lowest array length ?
-                for(let key in possibilitiesObj) {
-                   if((possibilitiesObj[key].length < lowestArrLength) && (!usedDigits.includes(parseInt(key)))) {
-                       lowestArrLength = possibilitiesObj[key].length;
-                   }
-                }
-
-                // How many keys have the lowest array length ?
-                for(let key in possibilitiesObj) {
-                    //console.warn(key);
-                    if((possibilitiesObj[key].length === lowestArrLength) && (!usedDigits.includes(parseInt(key)))) {
-                        dangerZoneDigits.push(key);
-                    }
-                }
-
-                let copy = dangerZoneDigits;
-
-                console.log('DGD COPY', dangerZoneDigits);
-
-                let rand_digit = Math.floor(Math.random() * dangerZoneDigits.length); // wybierz indeks tablicy (wybierz cyfrę)
-                let rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
-                let index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
-
-                // Jeżeli jest kratka, gdzie wylosowana cyfra to jedyna możliwa cyfra, wtedy wybierz tą kratkę, jeśli nie - możesz swobodnie losować
+      /*           // Jeżeli jest kratka, gdzie wylosowana cyfra to jedyna możliwa cyfra, wtedy wybierz tą kratkę, jeśli nie - możesz swobodnie losować
                 let isOnlyOne = []; // zawsze trafia 1 element, gdy  possibilitiesObj[dangerZoneDigits[rand_digit]].length === 1;
                 for(let x=0; x<possibilitiesObj[dangerZoneDigits[rand_digit]].length; x++) {
                     for(let key in possibilitiesObj) {
@@ -254,100 +282,13 @@ const engine = {
                     rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
                     index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
                     usedTiles.push(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
-                } 
-
-
-
-                console.log(index);
-
-                console.log(dangerZoneDigits, rand_digit, rand_tile);
-
-                console.log(dangerZoneDigits[rand_digit] + ' will be assigned into tile no ' + possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile], index);
-                //ordered[index].textContent = dangerZoneDigits[rand_digit];
-
-                usedDigits.push(dangerZoneDigits[rand_digit]);
-
-                 /* if(!index) { // if equals NaN
-                    console.warn('NAN');
-                    let missingCount;
-                    for(let i = 1; i<=9; i++) {
-                        if(possibilitiesObj[parseInt(dangerZoneDigits[rand_digit])].includes(i)) {
-                            missingCount = i;
-                        }
-                    }
-
-                    index = ((currRow * 9) + (missingCount - 1));
-                    ordered[index].style.background = "lightblue";
-                } */
+                }  */
  
                 // PRZYCZYNA BŁĘDU:  possibilitiesObj[parseInt(dangerZoneDigits[rand_digit])].includes(i)  ZWRACA FALSE
                 // CZYLI KIEDY SYSTEM MA DO WYBORU TYLKO 1 CYFRĘ TYLKO W 1 MIEJSCU, ALE NIE MOŻE ONA ZOSTAĆ TAM WRZUCONA...
                 // OSTATNIE MIEJSCE (PASUJĄCY KAFELEK) DLA CYFRY ZOSTAŁO WYLOSOWANE I WZIĘTE PRZEZ INNĄ CYFRĘ
 
-                console.log(dangerZoneDigits[rand_digit]);
-                console.log('used Digits:  ', usedDigits);
-                console.log('used Tiles:  ', usedTiles);
-                console.log(ordered[index]);
-                //console.log(ordered);
-                console.log(index);
-                console.log(dangerZoneDigits[rand_digit]);
-                console.log(Object.keys(possibilitiesObj).length);
-                console.log(Object.keys(possibilitiesObj));
-
-                ordered[index].textContent = dangerZoneDigits[rand_digit];
-
-                // Remove a chosen key from an object (1) and the current tile number from all other arrays (2)
-                // availableNumbers[random_number] - here we have the digit (key) from an object
-                // 2
-
-                for(let key in possibilitiesObj) {
-                    //console.log(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
-                    //console.log(parseInt(usedDigits[usedDigits.length - 1]));
-                    if(possibilitiesObj[key].includes(parseInt(usedTiles[usedTiles.length - 1]))) {
-                        //let ind = possibilitiesObj[key].indexOf(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
-                        let inde = possibilitiesObj[key].indexOf(parseInt(usedTiles[usedTiles.length - 1]));
-                        //console.log(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
-                        //console.log(possibilitiesObj[key].indexOf(parseInt(usedTiles[usedTiles.length - 1])), ind);
-                        possibilitiesObj[key].splice(inde, 1);
-                    }
-                }
-                // 1
-                delete possibilitiesObj[parseInt(usedDigits[usedDigits.length - 1])];
-
-                //console.log(possibilitiesObj);
-
-
-                /* let index = ((currRow * 9) + currColumn); // this.rows
-                let isDanger = this.checkDangerZone(possibilitiesObj);
-                let availableNumbers = [];
-
-                if(isDanger) {
-                    console.log(`%c Danger zone`, 'color:red')
-                    availableNumbers = isDanger; // ? not sure if that works correctly
-                } else {
-                    for(let key in possibilitiesObj) {
-                        if(possibilitiesObj[key].includes((currColumn + 1))) {
-                            availableNumbers.push(key);
-                        }
-                    }
-                }
-
-                // Randomize and assign a value to the current tile
-
-                let random_number = Math.floor(Math.random() * availableNumbers.length);
-                ordered[index].textContent = availableNumbers[random_number];
-
-                // Remove a chosen key from an object (1) and the current tile number from all other arrays (2)
-                // availableNumbers[random_number] - here we have the digit (key) from an object
-                // 1
-                delete possibilitiesObj[availableNumbers[random_number]];
-                // 2
-                for(let key in possibilitiesObj) {
-                    if(possibilitiesObj[key].includes((currColumn + 1))) {
-                        possibilitiesObj[key].shift(); // might be improved lol
-                    }
-                } */
-            }
+            
 
         }
     },
