@@ -1,0 +1,22 @@
+.palette-box {
+    display: grid;
+    grid-template-rows: repeat(2, 3rem);
+    grid-template-columns: repeat(5, 3rem);
+    width:fit-content;
+    border: .2rem dotted hsl(177, 50%, 50%);
+    background: hsla(177, 60%, 80%, .8);
+    row-gap: .1rem;
+    column-gap: .1rem;
+    border-radius: 10%;
+}
+
+.palette-item {
+    display: flex;
+    align-items: center;
+    font-weight: 550;
+    color: hsl(199, 50%, 40%);
+    background: hsla(177, 70%, 80%, .8);
+    justify-content: center;
+    border: .15rem solid hsla(177, 40%, 60%, .8);
+    border-radius: 20%;
+}

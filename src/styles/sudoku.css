@@ -16,3 +16,9 @@
     border: .2rem solid #000;
     color: #000;
 }
+
+.initial {
+    font-weight: 700;
+    color:azure;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}

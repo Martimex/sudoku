@@ -147,7 +147,7 @@ const engine = {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
-        console.log(ordered);
+        //console.log(ordered);
         for(let currRow=0; currRow<9; currRow++) {  // current row
             let possibilitiesObj = {  // key means digit to use; arr of values refers to which row tile no. that digit could be assigned
                 1: [],
@@ -183,10 +183,50 @@ const engine = {
         }
     },
 
+    gatherTilesData: function(allTiles) {
+        const arr = [];
+
+        for(let a=0; a<this.rows; a++) {
+            arr.push([]);
+        }
+
+        for(let b=0; b<allTiles.length; b++) {
+            arr[Math.floor(b / this.rows)].push(allTiles[b]);
+        }
+        return arr;
+    },
+
     fadeDigits: function({difficulty, theme, options}) {
         console.log(difficulty, theme, options);
         console.log(rules[difficulty]);
 
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        // const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
+
+        const currentBoard = this.gatherTilesData(allTilesArray);
+
+        for(let i=(this.rows*this.columns); i>rules[difficulty].initialNumbers; i--) {
+            /* Perform engine operations */
+            let randSquare = Math.floor(Math.random() * currentBoard.length);
+            let randTile_inSquare = Math.floor(Math.random() * currentBoard[randSquare].length);
+
+            currentBoard[randSquare][randTile_inSquare].textContent = '';
+            currentBoard[randSquare].splice(randTile_inSquare, 1);
+            if(currentBoard[randSquare].length < 1) {currentBoard.splice(randSquare, 1)};
+        }
+
+        for(let square of currentBoard) {
+            for(let initial of square) {
+                initial.classList.add('initial');
+            }
+        }
+
+        console.log(currentBoard);
+    },
+
+    interact: function() {
+        console.log('clicked');
     },
  
 }
