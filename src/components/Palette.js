@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useEffect, createRef } from "react";
 import  Sudoku from './Sudoku.js';
 import '../styles/palette.css';
 
-function Palette(props) {
+const Palette = React.forwardRef((props, ref) => {
 
     return(
-        <div className="palette-box">
+        <div className="palette-box" ref={ref}>
             <div className="palette-item"> 1 </div>
             <div className="palette-item"> 2 </div>
             <div className="palette-item"> 3 </div>
@@ -19,6 +19,6 @@ function Palette(props) {
             <div className="palette-item"> x </div>
         </div>
     );
-}
+})
 
 export default Palette;

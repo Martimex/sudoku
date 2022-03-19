@@ -1,3 +1,7 @@
+.all {
+    width: 100vw;
+}
+
 .sudoku-title {
     padding: .6rem;
     font-size: 2rem;
@@ -12,7 +16,7 @@
 
 .sudoku-board {
     display: grid;
-    min-width: 60%;
+    /* min-width: 60%; */
     border: .2rem solid #000;
     color: #000;
 }
