@@ -26,3 +26,23 @@
     color:azure;
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
+
+.numbers-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+.option {
+    width: 9%;
+    font-weight: 600;
+    border: .2rem dotted hsl(124, 45%, 55%);
+}
+
+
+/* Chosen tile */
+
+.active {
+    border: .3rem dashed #5e8;
+}

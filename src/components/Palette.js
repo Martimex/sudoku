@@ -1,11 +1,32 @@
-import React, { useEffect, createRef } from "react";
+import React, { useEffect, createRef, useRef } from "react";
 import  Sudoku from './Sudoku.js';
 import '../styles/palette.css';
 
 const Palette = React.forwardRef((props, ref) => {
 
+    const shadow = useRef(null);
+    console.log(ref);
+
+    useEffect(() => {
+        shadow.current.addEventListener('click', hidePalette);
+
+        return () => {
+            shadow.current.removeEventListener('click', hidePalette);
+        }
+
+    }, [])
+
+    function hidePalette(e) {
+        if(e.target.classList.contains('shadow-bg')) {
+            shadow.current.style.display= "none";
+        } else if(e.target.classList.contains('palette-item')) {
+            console.log('Number to append: ', e.target.textContent);
+        }
+    }
+
     return(
-        <div className="palette-box" ref={ref}>
+        <div className="shadow-bg" ref={shadow}>
+            <div className="palette-box" ref={ref}>
             <div className="palette-item"> 1 </div>
             <div className="palette-item"> 2 </div>
             <div className="palette-item"> 3 </div>
@@ -17,6 +38,7 @@ const Palette = React.forwardRef((props, ref) => {
             <div className="palette-item"> 8 </div>
             <div className="palette-item"> 9 </div>
             <div className="palette-item"> x </div>
+        </div>
         </div>
     );
 })
