@@ -115,6 +115,9 @@ function Sudoku(props) {
 
     
     const appendNumber = (e) => {
+
+        if(e.target.classList.contains('numbers-box')) {return;}
+
         console.log(e.target.textContent);
         console.log(active);
         active.textContent = e.target.textContent;
