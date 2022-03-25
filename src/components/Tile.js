@@ -13,7 +13,7 @@ function Tile(props) {
     (props.id % 3) + 1
     
     return(
-        <div className="tile" data-order={pattern}>
+        <div className={`tile tile-${props.difficulty}`} data-order={pattern}>
             {value}
         </div>
     );

@@ -2,6 +2,12 @@
     display: grid;
     width: 100%;
     height: 100%;
+}
+
+.square-day {
     border: .2rem solid #222;
-    color: #000;
+}
+
+.square-night {
+    border: .2rem solid #ddd;
 }

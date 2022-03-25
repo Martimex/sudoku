@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Audiowide&effect=neon');
+
 .layout {
     position: absolute; 
     top: 0%; left: 0%;
@@ -9,7 +11,7 @@
 }
 
 .content {
-    
+    font-family: 'Audiowide', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .app-text {
@@ -152,4 +154,5 @@ input[type="checkbox"]:checked+input {
     font-size: 1.2rem;
     font-weight: 550;
     border-radius: 20%;
+    font-family: 'Audiowide', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

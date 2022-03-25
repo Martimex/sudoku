@@ -85,7 +85,7 @@ const engine = {
         const squaredBaseIndex = allTilesArr.indexOf(thisEl);
         const  start = (Math.floor(squaredBaseIndex / (squareRows * squareColumns)));
         for(let i=0; i<(squareRows * squareColumns); i++) {
-            allTiles[((start * (squareRows * squareColumns)) + i)].style.background = "tomato";
+            //allTiles[((start * (squareRows * squareColumns)) + i)].style.background = "tomato";
             if(numbers_array.includes(parseInt(allTiles[((start * (squareRows * squareColumns)) + i)].textContent))) {
                 // Usuń wartość z tablicy
                 const index = numbers_array.indexOf(parseInt(allTiles[((start * (squareRows * squareColumns)) + i)].textContent));
@@ -218,7 +218,7 @@ const engine = {
 
         for(let square of currentBoard) {
             for(let initial of square) {
-                initial.classList.add('initial');
+                initial.classList.add(`initial`, `initial-${theme}`);
             }
         }
 

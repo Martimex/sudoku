@@ -7,11 +7,30 @@ import Palette from "./Palette";
 import '../styles/sudoku.css';
 import engine from '../addons/engine.js';
 
+import anime from 'animejs/lib/anime.es.js';
+
 const basics = {
     squareRows: 3,
     squareColumns: 3,
     rows: 9,
     columns: 9,
+}
+
+const difficultyColors = {
+    day: {
+        easy: 'hsl(116, 35%, 45%)',
+        medium: 'hsl(55, 35%, 45%)',
+        hard: 'hsl(12, 35%, 45%)',
+        master: 'hsl(182, 35%, 45%)',
+    },
+    
+    night: {
+        easy: 'hsl(116, 65%, 45%)',
+        medium: 'hsl(55, 65%, 45%)',
+        hard: 'hsl(12, 65%, 45%)',
+        master: 'hsl(182, 65%, 45%)',
+    }
+
 }
 
 function Sudoku(props) {
@@ -38,7 +57,8 @@ function Sudoku(props) {
     }
 
     const allSquares = renderArray.map((square, index) => 
-        <Square key={index.toString()} id={index} mainRows={rows} mainColumns={columns} squareRows={squareRows} squareColumns={squareColumns} />
+        <Square key={index.toString()} id={index} theme={props.theme} difficulty={props.difficulty}
+         mainRows={rows} mainColumns={columns} squareRows={squareRows} squareColumns={squareColumns} />
     );
 
     function interact(e) {
@@ -98,6 +118,21 @@ function Sudoku(props) {
         console.log(e.target.textContent);
         console.log(active);
         active.textContent = e.target.textContent;
+
+        anime({
+            targets: e.target,
+            duration: 1100,
+            background: [`#0000`, `${difficultyColors[props.theme][props.difficulty]}`],
+            easing: 'easeOutSine',
+            direction: 'alternate',
+        })
+
+        anime({
+            targets: active,
+            duration: 1000,
+            color: [`#0000`, `${difficultyColors[props.theme][props.difficulty]}`],
+            easing: 'linear',
+        })
     }
 
     // Perform engine operations
@@ -118,8 +153,8 @@ function Sudoku(props) {
 
 
     return (
-        <div className="sudoku" ref={sudoku}>
-            <div className="all" ref={all}>
+        <div className={`sudoku-${props.theme}`} ref={sudoku}>
+            <div className={`all all-${props.theme}`} ref={all}>
                 <div className="sudoku-title">
                     Sudoku {props.difficulty} 
                     {engine.version}
@@ -130,7 +165,7 @@ function Sudoku(props) {
                     </div>
                 </div>
                 {/* <Palette ref={paletteRef} /> */}
-                <div className="numbers-box" ref={numbox} onClick={(e) => { if(active) appendNumber(e)}}>
+                <div className={`numbers-box numbers-${props.difficulty}`} ref={numbox} onClick={(e) => { if(active) appendNumber(e)}}>
                     <div className="option option-1"> 1 </div>
                     <div className="option option-2"> 2 </div>
                     <div className="option option-3"> 3 </div>

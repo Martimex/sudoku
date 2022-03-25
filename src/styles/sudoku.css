@@ -1,5 +1,19 @@
+@import url('https://fonts.googleapis.com/css?family=Audiowide|Sofia');
+
 .all {
     width: 100vw;
+    height: 100vh;
+    font-family: 'Audiowide', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.sudoku-day, .all-day {
+    background: #ddd;
+    color: #000;
+}
+
+.sudoku-night, .all-night {
+    background: #000;
+    color: #ddd;
 }
 
 .sudoku-title {
@@ -18,15 +32,22 @@
     display: grid;
     /* min-width: 60%; */
     border: .2rem solid #000;
-    color: #000;
+    /* color: #000; */
 }
 
 .initial {
-    font-weight: 700;
-    color:azure;
-    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight: 800;
+    font-family: 'Audiowide', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
+/* .initial-day {
+    color: #444;
+}
+
+.initial-night {
+    color: #bbb;
+}
+ */
 .numbers-box {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -34,7 +55,32 @@
     width: 80%;
     position: absolute; left: 10%;
     border-radius: 10%;
-    background-image: linear-gradient(135deg, hsl(66, 50%, 60%), hsl(23, 50%, 60%));
+}
+
+.numbers-easy {
+    /* background-image: linear-gradient(135deg, hsl(102, 50%, 60%), hsl(124, 50%, 60%)); */
+    border: .2rem solid hsl(116, 73%, 30%);
+}
+
+.numbers-medium {
+    /* background-image: linear-gradient(135deg, hsl(45, 50%, 60%), hsl(70, 50%, 60%)); */
+    border: .2rem solid hsl(55, 73%, 30%);
+}
+
+.numbers-hard {
+   /*  background-image: linear-gradient(135deg, hsl(3, 50%, 60%), hsl(33, 50%, 60%));
+    background-color: hsla(12, 65%, 45%, .85); */
+    border: .2rem solid hsl(12, 73%, 30%);
+}
+
+.numbers-master {
+    /* background-image: linear-gradient(135deg, hsl(177, 50%, 60%), hsl(222, 50%, 60%)); */
+    border: .2rem solid hsl(182, 73%, 30%);
+} 
+
+.numbers-box .option {
+    border: .1rem solid;
+    border-color: inherit;
 }
 
 .option {

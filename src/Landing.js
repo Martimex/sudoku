@@ -135,7 +135,7 @@ function Landing(props) {
         <div className="layout" ref={layoutRef} >
             <div className="content">
                 <div className="content-title">
-                    <p className="content-title-text"> Sudoku World </p>
+                    <p className="content-title-text font-effect-neon"> Sudoku World </p>
                 </div>
 
                 <div className="app-text"> Choose a difficulty </div>

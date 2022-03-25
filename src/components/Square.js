@@ -13,13 +13,13 @@ function Square(props) {
     }
 
     const allTiles = renderArray.map((tile, index) => 
-        <Tile key={index.toString()} id={index} parentId={props.id} 
+        <Tile key={index.toString()} id={index} parentId={props.id} difficulty={props.difficulty}
         squareRows={props.squareRows} squareColumns={props.squareColumns} mainRows={props.mainRows} mainColumns={props.mainColumns}
         />
     )
 
     return(
-        <div className="square" style={squareGridStyle}>
+        <div className={`square square-${props.theme}`} style={squareGridStyle}>
             {allTiles}
         </div>
     );
