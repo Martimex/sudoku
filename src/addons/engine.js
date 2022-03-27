@@ -245,6 +245,9 @@ const engine = {
         const allTilesArray = [...allTiles];
         // const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
 
+        let squares_min_filled = 0;
+        let add = 1;
+
         const currentBoard = this.gatherTilesData(allTilesArray);
         const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
         console.log(randInitial);
@@ -256,9 +259,31 @@ const engine = {
 
             currentBoard[randSquare][randTile_inSquare].textContent = '';
             currentBoard[randSquare].splice(randTile_inSquare, 1);
-            if(currentBoard[randSquare].length < 3) {currentBoard.splice(randSquare, 1)};
+            if(currentBoard[randSquare].length < (rules[difficulty].conditions.square_min_fill + add)) {
+                currentBoard.splice(randSquare, 1);
+                squares_min_filled++;
+
+                if(squares_min_filled === rules[difficulty].conditions.max_squares_min_filled) {
+                    add++;
+                    for(const [index, arr] of currentBoard.entries()) {
+                        if(arr.length < (rules[difficulty].conditions.square_min_fill + add)) {
+                            console.log('rem', index);
+                            currentBoard.splice(index, 1);
+                        }
+                    }
+                }
+            };
             // === if square has 2 available tiles, dont remove anything more from this square
             
+            /*
+                conditions: {
+                    square_min_fill: 0, // The least amount of initial digits that a square can have
+                    max_squares_min_filled: 1, // How much squares can be minimally filled ?
+                    //
+                    digit_shown_min: 1, // The least amount each digit can be shown on the board
+                    max_digits_min_shown: 2, // How much digits with least amount can be ?
+                },
+            */
         }
 
         for(let square of currentBoard) {
