@@ -4,16 +4,57 @@ import Tile from '../components/Tile.js';
 
 const rules = {
     easy:  {
-        initialNumbers: 28,
+        initialNumbers: {
+            min: 30,
+            max: 32,
+        }, 
+        conditions: {
+            square_min_fill: 2, // The least amount of initial digits that a square can have
+            max_squares_min_filled: 2, // How much squares can be minimally filled ?
+            //
+            digit_shown_min: 2,  // The least amount each digit can be shown on the board
+            max_digits_min_shown: 2, // How much digits with least amount can be ?
+        },
     },
     medium: {
-        initialNumbers: 26,
+        initialNumbers: {
+            min: 27,
+            max: 29,
+        },
+        conditions: {
+            square_min_fill: 1, // The least amount of initial digits that a square can have
+            max_squares_min_filled: 2, // How much squares can be minimally filled ?
+            //
+            digit_shown_min: 2, // The least amount each digit can be shown on the board
+            max_digits_min_shown: 3, // How much digits with least amount can be ?
+        },
     },
     hard: {
-        initialNumbers: 24,
+        initialNumbers: {
+            min: 24,
+            max: 26,
+        },
+        conditions: {
+            square_min_fill: 0, // The least amount of initial digits that a square can have
+            max_squares_min_filled: 1, // How much squares can be minimally filled ?
+            //
+            digit_shown_min: 1, // The least amount each digit can be shown on the board
+            max_digits_min_shown: 2, // How much digits with least amount can be ?
+        },
     },
     master: {
-        initialNumbers: 21,
+        initialNumbers: {
+            min: 21,
+            max: 23,
+        },
+        conditions: {
+            square_min_fill: 0, // The least amount of initial digits that a square can have
+            max_squares_min_filled: 3, // How much squares can be minimally filled ?
+            //
+            digit_shown_min: 1, // The least amount each digit can be shown on the board
+            max_digits_min_shown: 4, // How much digits with least amount can be ?
+
+        },
     },
 }
 
@@ -205,15 +246,19 @@ const engine = {
         // const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
 
         const currentBoard = this.gatherTilesData(allTilesArray);
+        const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
+        console.log(randInitial);
 
-        for(let i=(this.rows*this.columns); i>rules[difficulty].initialNumbers; i--) {
+        for(let i=(this.rows*this.columns); i>randInitial; i--) {
             /* Perform engine operations */
             let randSquare = Math.floor(Math.random() * currentBoard.length);
             let randTile_inSquare = Math.floor(Math.random() * currentBoard[randSquare].length);
 
             currentBoard[randSquare][randTile_inSquare].textContent = '';
             currentBoard[randSquare].splice(randTile_inSquare, 1);
-            if(currentBoard[randSquare].length < 1) {currentBoard.splice(randSquare, 1)};
+            if(currentBoard[randSquare].length < 3) {currentBoard.splice(randSquare, 1)};
+            // === if square has 2 available tiles, dont remove anything more from this square
+            
         }
 
         for(let square of currentBoard) {
