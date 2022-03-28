@@ -246,9 +246,16 @@ const engine = {
         // const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
 
         let squares_min_filled = 0;
+        let digits_min_shown = 0;
+
+        let all_digits_shown = [9, 9, 9, 9, 9, 9, 9, 9, 9]; // index + 1 refers to the digit name && value is the quanity
         let add = 1;
+        let substr = 0;
 
         const currentBoard = this.gatherTilesData(allTilesArray);
+        /* console.log(JSON.parse(JSON.stringify(currentBoard))); */
+        console.log(currentBoard);
+
         const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
         console.log(randInitial);
 
@@ -257,8 +264,47 @@ const engine = {
             let randSquare = Math.floor(Math.random() * currentBoard.length);
             let randTile_inSquare = Math.floor(Math.random() * currentBoard[randSquare].length);
 
+            all_digits_shown[(parseInt(currentBoard[randSquare][randTile_inSquare].textContent) - 1)]--;
+
+            if((all_digits_shown[(parseInt(currentBoard[randSquare][randTile_inSquare].textContent) - 1)]  - substr) <= rules[difficulty].conditions.digit_shown_min) {
+                console.log('violated ', currentBoard[randSquare][randTile_inSquare].textContent)
+                // Now remove all currentboard items, that has the same number attached, apart from the one we got now
+                for(let arr of currentBoard) {
+                    arr.forEach((elem, index) => {
+                        if((arr[index].textContent === currentBoard[randSquare][randTile_inSquare].textContent) && (arr[index] !== currentBoard[randSquare][randTile_inSquare])) {
+                            console.log(arr)
+                            arr.splice(index, 1);
+                        }
+                    })
+                }
+
+                digits_min_shown++;
+
+                console.log(digits_min_shown, rules[difficulty].conditions.max_digits_min_shown);
+                console.log(typeof(digits_min_shown), typeof(rules[difficulty].conditions.max_digits_min_shown));
+
+                if(digits_min_shown === rules[difficulty].conditions.max_digits_min_shown) {
+                    substr++;
+                    console.log('prevent');
+                    // If we are at limit, and we should increment minimal step by 1 \\ It fires just once
+                    for(let x=0; x<all_digits_shown.length; x++) {
+                        if((all_digits_shown[x] <= rules[difficulty].conditions.digit_shown_min + 1) && (x !== parseInt(currentBoard[randSquare][randTile_inSquare].textContent - 1))) {
+                            // Usuń taką liczbę z wszystkich tablic currentBoard
+                            for(let arr of currentBoard) {
+                                arr.forEach((elem, index) => {
+                                    if(parseInt(arr[index].textContent) === (x + 1)) {
+                                        arr.splice(index, 1);
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+            } 
+
             currentBoard[randSquare][randTile_inSquare].textContent = '';
             currentBoard[randSquare].splice(randTile_inSquare, 1);
+
             if(currentBoard[randSquare].length < (rules[difficulty].conditions.square_min_fill + add)) {
                 currentBoard.splice(randSquare, 1);
                 squares_min_filled++;
@@ -285,6 +331,8 @@ const engine = {
                 },
             */
         }
+
+        console.log(all_digits_shown);
 
         for(let square of currentBoard) {
             for(let initial of square) {
