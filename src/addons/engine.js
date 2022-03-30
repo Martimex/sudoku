@@ -270,11 +270,11 @@ const engine = {
 
        // console.log(engine_operations_vars.all_digits_shown);
 
-        for(let square of currentBoard) {
-            for(let initial of square) {
-                initial.classList.add(`initial`, `initial-${theme}`);
-            }
-        }
+        //console.log(currentBoard)
+
+        allTilesArray.forEach(tile => {
+            if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
+        })
 
         //console.log(currentBoard);
     },
