@@ -13,7 +13,7 @@ const rules = {
             max_squares_min_filled: 2, // How much squares can be minimally filled ?
             //
             digit_shown_min: 2,  // The least amount each digit can be shown on the board
-            max_digits_min_shown: 2, // How much digits with least amount can be ?
+            max_digits_min_shown: 3, // How much digits with least amount can be ?
         },
     },
     medium: {
@@ -26,7 +26,7 @@ const rules = {
             max_squares_min_filled: 2, // How much squares can be minimally filled ?
             //
             digit_shown_min: 2, // The least amount each digit can be shown on the board
-            max_digits_min_shown: 3, // How much digits with least amount can be ?
+            max_digits_min_shown: 4, // How much digits with least amount can be ?
         },
     },
     hard: {
@@ -245,54 +245,85 @@ const engine = {
         const allTilesArray = [...allTiles];
         // const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
 
-        let squares_min_filled = 0;
+        const engine_operations_vars = {
+            squares_min_filled: 0,
+            digits_min_shown: 0,
+            all_digits_shown: [9, 9, 9, 9, 9, 9, 9, 9, 9],
+            add: 1,
+            substr: 0,
+        }
+        /*let squares_min_filled = 0;
         let digits_min_shown = 0;
 
         let all_digits_shown = [9, 9, 9, 9, 9, 9, 9, 9, 9]; // index + 1 refers to the digit name && value is the quanity
         let add = 1;
         let substr = 0;
-
+        */
         const currentBoard = this.gatherTilesData(allTilesArray);
         /* console.log(JSON.parse(JSON.stringify(currentBoard))); */
-        console.log(currentBoard);
+        //console.log(currentBoard);
 
         const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
-        console.log(randInitial);
+        //console.log(randInitial);
 
+        this.performEngineOperations(engine_operations_vars, currentBoard, randInitial, difficulty);
+
+       // console.log(engine_operations_vars.all_digits_shown);
+
+        for(let square of currentBoard) {
+            for(let initial of square) {
+                initial.classList.add(`initial`, `initial-${theme}`);
+            }
+        }
+
+        //console.log(currentBoard);
+    },
+
+    performEngineOperations: function(eov, currentBoard, randInitial, difficulty) {
         for(let i=(this.rows*this.columns); i>randInitial; i--) {
             /* Perform engine operations */
+            if(!currentBoard.length) {console.warn('exhausted elems'); return;}
+
             let randSquare = Math.floor(Math.random() * currentBoard.length);
             let randTile_inSquare = Math.floor(Math.random() * currentBoard[randSquare].length);
 
-            all_digits_shown[(parseInt(currentBoard[randSquare][randTile_inSquare].textContent) - 1)]--;
+            eov.all_digits_shown[(parseInt(currentBoard[randSquare][randTile_inSquare].textContent) - 1)]--;
 
-            if((all_digits_shown[(parseInt(currentBoard[randSquare][randTile_inSquare].textContent) - 1)]  - substr) <= rules[difficulty].conditions.digit_shown_min) {
-                console.log('violated ', currentBoard[randSquare][randTile_inSquare].textContent)
+            const number_to_keep = parseInt(currentBoard[randSquare][randTile_inSquare].textContent);
+            currentBoard[randSquare][randTile_inSquare].textContent = '';
+            currentBoard[randSquare].splice(randTile_inSquare, 1);
+
+            if((eov.all_digits_shown[number_to_keep - 1]  - eov.substr) <= rules[difficulty].conditions.digit_shown_min) {
+                //console.log('violated ', number_to_keep.toString())
                 // Now remove all currentboard items, that has the same number attached, apart from the one we got now
                 for(let arr of currentBoard) {
                     arr.forEach((elem, index) => {
-                        if((arr[index].textContent === currentBoard[randSquare][randTile_inSquare].textContent) && (arr[index] !== currentBoard[randSquare][randTile_inSquare])) {
-                            console.log(arr)
+                        if((arr[index].textContent === number_to_keep.toString()) /* && (arr[index] !== currentBoard[randSquare][randTile_inSquare]) */) {
+                            //console.log(arr)
                             arr.splice(index, 1);
                         }
                     })
                 }
 
-                digits_min_shown++;
+                eov.digits_min_shown++;
 
-                console.log(digits_min_shown, rules[difficulty].conditions.max_digits_min_shown);
-                console.log(typeof(digits_min_shown), typeof(rules[difficulty].conditions.max_digits_min_shown));
+                //console.log(eov.digits_min_shown, rules[difficulty].conditions.max_digits_min_shown);
+                //console.log(typeof(eov.digits_min_shown), typeof(rules[difficulty].conditions.max_digits_min_shown));
 
-                if(digits_min_shown === rules[difficulty].conditions.max_digits_min_shown) {
-                    substr++;
-                    console.log('prevent');
+                if(eov.digits_min_shown === rules[difficulty].conditions.max_digits_min_shown) {
+                    eov.substr++;
+                    //console.log('prevent');
+                    //console.log('txtContent ', number_to_keep.toString())
                     // If we are at limit, and we should increment minimal step by 1 \\ It fires just once
-                    for(let x=0; x<all_digits_shown.length; x++) {
-                        if((all_digits_shown[x] <= rules[difficulty].conditions.digit_shown_min + 1) && (x !== parseInt(currentBoard[randSquare][randTile_inSquare].textContent - 1))) {
+                    for(let x=0; x<eov.all_digits_shown.length; x++) {
+                        if((eov.all_digits_shown[x] <= rules[difficulty].conditions.digit_shown_min + 1) && ((x + 1) !== number_to_keep)) {
                             // Usuń taką liczbę z wszystkich tablic currentBoard
+                            //console.log((x + 1), ' vs ', number_to_keep)
                             for(let arr of currentBoard) {
                                 arr.forEach((elem, index) => {
+                                    //console.log(arr[index].textContent);
                                     if(parseInt(arr[index].textContent) === (x + 1)) {
+                                       // console.log('REMOVE: ', arr[index].textContent);
                                         arr.splice(index, 1);
                                     }
                                 })
@@ -302,18 +333,18 @@ const engine = {
                 }
             } 
 
-            currentBoard[randSquare][randTile_inSquare].textContent = '';
-            currentBoard[randSquare].splice(randTile_inSquare, 1);
+            /* currentBoard[randSquare][randTile_inSquare].textContent = '';
+            currentBoard[randSquare].splice(randTile_inSquare, 1); */
 
-            if(currentBoard[randSquare].length < (rules[difficulty].conditions.square_min_fill + add)) {
+            if(currentBoard[randSquare].length < (rules[difficulty].conditions.square_min_fill + eov.add)) {
                 currentBoard.splice(randSquare, 1);
-                squares_min_filled++;
+                eov.squares_min_filled++;
 
-                if(squares_min_filled === rules[difficulty].conditions.max_squares_min_filled) {
-                    add++;
+                if(eov.squares_min_filled === rules[difficulty].conditions.max_squares_min_filled) {
+                    eov.add++;
                     for(const [index, arr] of currentBoard.entries()) {
-                        if(arr.length < (rules[difficulty].conditions.square_min_fill + add)) {
-                            console.log('rem', index);
+                        if(arr.length < (rules[difficulty].conditions.square_min_fill + eov.add)) {
+                            //console.log('rem', index);
                             currentBoard.splice(index, 1);
                         }
                     }
@@ -330,17 +361,9 @@ const engine = {
                     max_digits_min_shown: 2, // How much digits with least amount can be ?
                 },
             */
+
+            //console.log('remains: ', i, 'options: ', currentBoard);
         }
-
-        console.log(all_digits_shown);
-
-        for(let square of currentBoard) {
-            for(let initial of square) {
-                initial.classList.add(`initial`, `initial-${theme}`);
-            }
-        }
-
-        console.log(currentBoard);
     },
 
     interact: function() {
