@@ -142,6 +142,7 @@ function Sudoku(props) {
     useEffect(() => {
         engine.setBoard();
         engine.fadeDigits(props);
+        engine.backtrack();
         // ALWAYS INIT LAST
         //board.current.addEventListener('click', interact);
         //board.current.addEventListener('click', markTile);

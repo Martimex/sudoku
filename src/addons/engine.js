@@ -366,6 +366,71 @@ const engine = {
         }
     },
 
+    backtrack: function () {
+        console.log('tracking....');
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
+        //
+        const grid = [];
+
+        ordered.map((el, index) => { 
+            if(index % 9 === 0 ) {
+                grid.push([]);
+            }
+            el.textContent ? grid[grid.length -1].push(parseInt(el.textContent)) : grid[grid.length -1].push(0);
+        })
+
+        console.log(grid);
+
+        function initBackTrack(grid, [row, index_in_row], num) {
+            if(grid[row][index_in_row]) {
+                console.log(`it's not empty !`);
+                index_in_row++
+                if(index_in_row % 9 === 0) {
+                    index_in_row = 0;
+                    row++;
+                }
+                initBackTrack(grid, [row, index_in_row], num);
+            } else {
+                const isSafe = engine.testSafety.bind();
+                isSafe(grid, [row, index_in_row], num);
+
+                console.log(isSafe);
+                if(isSafe) {}
+                else {
+                    initBackTrack(grid, [row, index_in_row], num + 1);
+                }
+                // Jeżeli jest bezpieczny, przypnij cyfrę, jeśli nie - wywołaj funkcję jeszcze raz z wartością num + 1
+                //const isSafe = engine.testSafety.bind(testSafety(grid, [row, index_in_row], num));
+            }
+        }
+
+        initBackTrack(grid, [0, 0], 1);
+
+        //const isSafe = checkTileSafety()
+    },
+
+    testSafety: function(grid, [row, index_in_row], num) {
+        console.log('testSafety...');
+        // Check row & column first
+        for(let k=0; k<grid[row].length; k++) {
+            if(num === grid[row][k]) return false; // CHECK ROW || if False = We have this number in a row already
+            if(num === grid[k][index_in_row]) return false; // CHECK COLUMN || if False =  We have this number in a column already
+        }
+
+        // Check square at last
+
+        for(let square_row=0; square_row<3; square_row++) {
+            for(let square_column=0; square_column<3; square_column++) {
+                if(num === grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column]) return false; // CHECK SQUARE || if False = We have this number in a square already
+            }
+        }
+
+        return true;
+        
+    },
+
     interact: function() {
         console.log('clicked');
     },
