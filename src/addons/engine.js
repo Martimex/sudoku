@@ -245,6 +245,26 @@ const engine = {
         const allTilesArray = [...allTiles];
         // const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
 
+        // Lines inside quote are for TESTING ONLY
+            const ordered = this.orderTiles(allTilesArray);
+            const b = [];
+            ordered.map((el, index) => {
+                if(index % 9 === 0) {
+                    b.push([]);
+                }
+
+                if(el.classList.contains('initial')) {
+                    b[b.length - 1].push(el.textContent)
+                } else {
+                    b[b.length - 1].push(parseInt(el.textContent))
+                }
+            })
+
+            console.log(b);
+        //
+
+
+
         const engine_operations_vars = {
             squares_min_filled: 0,
             digits_min_shown: 0,
@@ -378,52 +398,91 @@ const engine = {
             if(index % 9 === 0 ) {
                 grid.push([]);
             }
-            el.textContent ? grid[grid.length -1].push(parseInt(el.textContent)) : grid[grid.length -1].push(0);
+            el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push(0);
         })
 
         console.log(grid);
 
-        function initBackTrack(grid, [row, index_in_row], num) {
-            if(grid[row][index_in_row]) {
-                console.log(`it's not empty !`);
-                index_in_row++
-                if(index_in_row % 9 === 0) {
-                    index_in_row = 0;
-                    row++;
-                }
-                initBackTrack(grid, [row, index_in_row], num);
-            } else {
-                const isSafe = engine.testSafety.bind();
-                isSafe(grid, [row, index_in_row], num);
+        function initBackTrack(grid) {
 
-                console.log(isSafe);
-                if(isSafe) {}
-                else {
-                    initBackTrack(grid, [row, index_in_row], num + 1);
-                }
-                // Jeżeli jest bezpieczny, przypnij cyfrę, jeśli nie - wywołaj funkcję jeszcze raz z wartością num + 1
-                //const isSafe = engine.testSafety.bind(testSafety(grid, [row, index_in_row], num));
+            let pos = {
+                row: null, 
+                index_in_row: null,
             }
+
+            const checkUnassignedTile = engine.findUnassignedTile.bind(); 
+            const isUnassigned = checkUnassignedTile(grid, pos);
+
+            if(!isUnassigned) { console.log(grid); return true; }
+
+            const checkSafety = engine.testSafety.bind();
+
+            //console.log(pos.row, pos.index_in_row);
+
+            for(let i=1; i<=9; i++) {
+                const isSafe = checkSafety(grid, pos, i);
+                
+                if(isSafe) {
+                    grid[pos.row][pos.index_in_row] = i;
+
+                    if(initBackTrack(grid)) { return true; }
+
+                    grid[pos.row][pos.index_in_row] = 0;
+                }
+            }
+
+            return false;
+
+            /* TO DO
+
+            1) Stwórz matrycę, która będzie bazowała na zmiennej 'grid', ale zamiast początkowych cyfr (initials) będzie posiadała znak
+            'x'. Ta matryca będzie edytowalną wersją 'grid', gdzie bez obaw będziemy mogli zmieniać wartości liczb nie podanych na początku
+            (non-initials), a przede wszystkim cofać się w razie gdy nie będzie już możliwych cyfr do wpisania w danej kratce
+
+            2) Stwórz mechanizm cofania się, czyli: "gdy w danej kratce nie pasuje już żadna liczba (num + 1 > 9), wtedy na podstawie matrycy
+            cofnij się wstecz o 1 pole, które nie jest znakiem 'x' i stamtąd od tej liczby, którą ta kratka posiada, próbuj zwiększać wartość
+            num (już od tej, którą posiada) w dawnej kratce dalej. Ponadto zaznacz, że gdy (index_in_row - 1 < 0) to wtedy ustaw index_in_row na 8,
+            a row = row - 1 !"
+
+            3) Możliwe rozwiązania zapisuj w nowo utworzonej tablicy rozwiązań, który w momencie, gdy sudoku zdoła ułożyć sudoku, to wtedy wpisze
+            do niej reprezentację mapy z rozwiązaniem (ustawionymi cyframi), a następnie od tego miejsca zacznie backtracking dalej w poszukiwaniu
+            dalszych rozwiązań, aż do momentu gdy cała iteracja planszy dobiegnie końca.
+
+            4) Na koniec wyświetl wynik - czy sudoku jest unikalne ??
+            
+            */
         }
 
-        initBackTrack(grid, [0, 0], 1);
+        initBackTrack(grid);
 
         //const isSafe = checkTileSafety()
     },
 
-    testSafety: function(grid, [row, index_in_row], num) {
-        console.log('testSafety...');
+    findUnassignedTile: function(grid, pos) {
+        for(let r=0; r<9; r++) {
+            for(let iir=0; iir<9; iir++) {
+                if(grid[r][iir] === 0) {
+                    pos.row = r; 
+                    pos.index_in_row = iir;
+                    return true;
+                }
+            }
+        }
+    },
+
+    testSafety: function(grid, {row, index_in_row}, num) {
+        //console.log('testSafety...');
         // Check row & column first
         for(let k=0; k<grid[row].length; k++) {
-            if(num === grid[row][k]) return false; // CHECK ROW || if False = We have this number in a row already
-            if(num === grid[k][index_in_row]) return false; // CHECK COLUMN || if False =  We have this number in a column already
+            if(num === parseInt(grid[row][k])) return false; // CHECK ROW || if False = We have this number in a row already
+            if(num === parseInt(grid[k][index_in_row])) return false; // CHECK COLUMN || if False =  We have this number in a column already
         }
 
         // Check square at last
 
         for(let square_row=0; square_row<3; square_row++) {
             for(let square_column=0; square_column<3; square_column++) {
-                if(num === grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column]) return false; // CHECK SQUARE || if False = We have this number in a square already
+                if(num === parseInt(grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column])) return false; // CHECK SQUARE || if False = We have this number in a square already
             }
         }
 
