@@ -237,6 +237,88 @@ const engine = {
         return arr;
     },
 
+    hideDigits: function({difficulty, theme, options}) {
+        console.log(difficulty, theme, options);
+        console.log(rules[difficulty]);
+
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+
+        const ordered = this.orderTiles(allTilesArray);
+
+        const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
+
+        console.log(ordered);
+
+        let substr = 4;
+        let multiRemove_stop = 33;
+
+        for(let i=this.rows * this.columns; i>multiRemove_stop; i = i - substr ) {
+           if(i >= 61 ) { substr = 4; }
+           if( i < 61) { substr = 2; }
+           
+            console.log(i);
+            let temp = [];
+
+            for(let x=0; x<substr; x++) {
+                let rand = Math.floor(Math.random() * ordered.length);
+                temp.push([]);
+                temp[temp.length - 1].push(ordered[rand], ordered[rand].textContent);
+                ordered[rand].textContent = '';
+                ordered.splice(rand, 1);
+            }
+
+            let isStillUnique = this.backtrack();
+            console.log('HAS SUDOKU JUST ONE SOLUTION ?', isStillUnique);
+
+            if(!isStillUnique) {
+                for(let x=0; x<temp.length; x++) {
+                    temp[x][0].textContent = temp[x][1];
+                    ordered.push(temp[x][0]);
+                }
+                i = i + substr;
+            }
+        }
+
+        this.singleRemoval(ordered, randInitial, multiRemove_stop); 
+
+    },
+
+    singleRemoval: function(ordered, randInitial, multiRemove_stop) {
+        console.log(ordered);
+        console.log(randInitial);
+
+        console.log(ordered);
+        let orderedCopy = [...ordered];
+
+        for(let x=multiRemove_stop; x>randInitial; x--) {
+            console.log(x);
+            if(orderedCopy.length === 0) { console.log('No more possibilites to remove! ', x, ' from ', randInitial, ' remain '); return;}
+
+            let rand = Math.floor(Math.random() * orderedCopy.length);
+            let num = orderedCopy[rand].textContent;
+            orderedCopy[rand].textContent = '';
+
+            let isStillUnique = this.backtrack();
+            //console.log('UNIQUE SUDOKU ?', isStillUnique);
+
+            if(!isStillUnique) {
+                orderedCopy[rand].textContent = num;
+                orderedCopy.splice(rand, 1);
+                x = x + 1;
+                console.log('nope');
+            } else {
+                const index = ordered.indexOf(ordered[rand]);
+                ordered[index].textContent = '';
+                ordered.splice(index, 1);
+                orderedCopy = [...ordered];
+                console.log('Length: ', orderedCopy.length);
+            }
+        }
+
+        console.log('DONE SUCCESSFULLY !!! ', randInitial, ' digits remain');
+    },
+
     fadeDigits: function({difficulty, theme, options}) {
         console.log(difficulty, theme, options);
         console.log(rules[difficulty]);
@@ -387,7 +469,7 @@ const engine = {
     },
 
     backtrack: function () {
-        console.log('tracking....');
+        //console.log('tracking....');
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
@@ -461,12 +543,14 @@ const engine = {
         const opt_1To9 =  initBackTrack(grid, 1, 9);
         const opt_9To1 =  initBackTrack(grid2, 9, 1);
 
-        console.log(opt_1To9);
-        console.log(opt_9To1);
+        //console.log(opt_1To9);
+        //console.log(opt_9To1);
         
         const isSudokuUnique = this.checkOneSolution(opt_1To9, opt_9To1);
 
-        console.log('HAS SUDOKU JUST ONE SOLUTION ?', isSudokuUnique);
+        //console.log('HAS SUDOKU JUST ONE SOLUTION ?', isSudokuUnique);
+
+        return isSudokuUnique;
         //const isSafe = checkTileSafety()
     },
 
