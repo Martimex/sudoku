@@ -393,17 +393,20 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         const grid = [];
+        const grid2 = [];
 
         ordered.map((el, index) => { 
             if(index % 9 === 0 ) {
                 grid.push([]);
+                grid2.push([]);
             }
             el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push(0);
+            el.textContent ? grid2[grid2.length -1].push(el.textContent) : grid2[grid2.length -1].push(0);
         })
 
-        console.log(grid);
+       //console.log(grid);
 
-        function initBackTrack(grid) {
+        function initBackTrack(grid, start_num, end_num) {
 
             let pos = {
                 row: null, 
@@ -413,19 +416,21 @@ const engine = {
             const checkUnassignedTile = engine.findUnassignedTile.bind(); 
             const isUnassigned = checkUnassignedTile(grid, pos);
 
-            if(!isUnassigned) { console.log(grid); return true; }
+            if(!isUnassigned) { /* console.log(grid); */ return grid; }
 
             const checkSafety = engine.testSafety.bind();
 
             //console.log(pos.row, pos.index_in_row);
 
-            for(let i=1; i<=9; i++) {
+            //console.log(start_num, end_num);
+
+            for(let i=start_num; (start_num < end_num) ? i<=end_num : i>=end_num; (start_num < end_num) ? i++ : i--) {
                 const isSafe = checkSafety(grid, pos, i);
                 
                 if(isSafe) {
                     grid[pos.row][pos.index_in_row] = i;
 
-                    if(initBackTrack(grid)) { return true; }
+                    if(initBackTrack(grid, start_num, end_num)) { return grid; }
 
                     grid[pos.row][pos.index_in_row] = 0;
                 }
@@ -453,9 +458,25 @@ const engine = {
             */
         }
 
-        initBackTrack(grid);
+        const opt_1To9 =  initBackTrack(grid, 1, 9);
+        const opt_9To1 =  initBackTrack(grid2, 9, 1);
 
+        console.log(opt_1To9);
+        console.log(opt_9To1);
+        
+        const isSudokuUnique = this.checkOneSolution(opt_1To9, opt_9To1);
+
+        console.log('HAS SUDOKU JUST ONE SOLUTION ?', isSudokuUnique);
         //const isSafe = checkTileSafety()
+    },
+
+    checkOneSolution: function(opt_1To9, opt_9To1) {
+        for(let r=0; r<9; r++) {
+            for(let c=0; c<9; c++) {
+                if(opt_1To9[r][c] !== opt_9To1[r][c]) return false;
+            }
+        }
+        return true;
     },
 
     findUnassignedTile: function(grid, pos) {
