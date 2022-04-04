@@ -143,7 +143,10 @@ function Sudoku(props) {
         engine.setBoard();
         engine.hideDigits(props);
         //engine.fadeDigits(props);
+        //engine.backtrack();
         engine.backtrack();
+        engine.solveSudoku();
+
         // ALWAYS INIT LAST
         //board.current.addEventListener('click', interact);
         //board.current.addEventListener('click', markTile);

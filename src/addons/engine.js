@@ -250,6 +250,30 @@ const engine = {
 
         console.log(ordered);
 
+        // Remove counterparts
+            // 1. First randomize, whether the middle tile in middle square should be hidden or not
+           /*  const randHide = Math.floor(Math.random() * 2);
+            console.log(randHide);
+            if(randHide) {ordered[Math.floor(ordered.length / 2)].textContent = ''; } //  + invoke score checking function
+            ordered.splice(Math.floor(ordered.length / 2), 1);
+
+            for(let c=0; c<15; c++) {
+                let rand = Math.floor(Math.random() * (ordered.length / 2));
+                let counterPart = ordered.length - (rand + 1);
+
+                ordered[rand].textContent = '';
+                ordered[counterPart].textContent = '';
+
+                // Order here is important !
+                ordered.splice(counterPart, 1);
+                ordered.splice(rand, 1);
+            }
+
+            let isStillUnique = this.backtrack();
+            console.log('UNIQUE SUDOKU ?', isStillUnique); */
+        //
+
+
         let substr = 4;
         let multiRemove_stop = 33;
 
@@ -278,9 +302,13 @@ const engine = {
                 }
                 i = i + substr;
             }
-        }
+        } 
 
         this.singleRemoval(ordered, randInitial, multiRemove_stop); 
+
+        allTilesArray.forEach(tile => {
+            if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
+        })
 
     },
 
@@ -317,6 +345,151 @@ const engine = {
         }
 
         console.log('DONE SUCCESSFULLY !!! ', randInitial, ' digits remain');
+    },
+
+    solveSudoku: function() {
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
+        //
+        const grid = [];
+
+        ordered.map((el, index) => { 
+            if(index % 9 === 0 ) {
+                grid.push([]);
+            }
+            el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push([]);
+        })
+
+        
+        console.log(grid);
+        // Single candidate checker !
+        for(let row=0; row<9; row++) {
+            for(let index_in_row=0;  index_in_row<9; index_in_row++) {
+                if(!grid[row][index_in_row].length) { // It's not initial
+                    for(let num=1; num<=9; num++) {
+                        const canBeMarked = testCandidate(grid, {row, index_in_row}, num);
+                        if(canBeMarked) grid[row][index_in_row].push(num);
+                    }
+                    if(grid[row][index_in_row].length <= 1) { 
+                        ordered[(row * 9) + index_in_row].style.color = 'tomato';
+                        ordered[(row * 9) + index_in_row].textContent = grid[row][index_in_row][0];
+                        grid[row][index_in_row] = grid[row][index_in_row][0];
+                    }
+                }
+            }
+        }
+
+        // Single position checker
+        // 1. Row && Column
+        for(let r=0; r<9; r++) {
+            let rowArr = []
+            let colArr = [];
+            for(let iir=0; iir<9; iir++) {
+                //console.log(typeof(grid[r][iir]))
+                if(typeof(grid[r][iir]) === 'object') {
+                    rowArr = [...rowArr, ...grid[r][iir]];
+                }
+                if(typeof(grid[iir][r]) === 'object') {
+                    colArr = [...colArr, ...grid[iir][r]];
+                }
+            }
+            let singPos_Row = occuredOnce(rowArr, rowArr.length);
+            let singPos_Col = occuredOnce(colArr, colArr.length);
+
+           // console.log(singPos_Row);
+           // console.log(singPos_Col);
+
+            for(let iir=0; iir<9; iir++) {
+                if((typeof(grid[r][iir]) === 'object') && (singPos_Row.length > 0)) {
+                    applyOnePosition(grid, r, iir, singPos_Row, 'r');
+                }
+                if((typeof(grid[iir][r]) === 'object') && (singPos_Col.length > 0)) {
+                    applyOnePosition(grid, iir, r, singPos_Col, 'c');
+                }
+            }
+        }
+
+        // 3. Square (3x3)
+        // THINK ABOUT SQUARES - HOW TO MAKE IT WORK
+        /* for(let x=0; x<9; x++) {
+                let squareArr = [];
+                for(let square_row = 0; square_row<3; square_row++) {
+                for(let square_column=0; square_column<3; square_column++) {
+                    if(typeof(grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column]) === 'object') {
+                        squareArr = [...squareArr, grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column]];
+                    }
+                }
+                let singPos_Square = occuredOnce(squareArr, squareArr.length);
+            }
+        } */
+        
+
+        function testCandidate(grid, {row, index_in_row}, num) {
+            for(let k=0; k<grid[row].length; k++) {
+                if(num === parseInt(grid[row][k]) && (grid[row][k].length <= 1)) return false; // CHECK ROW || if False = We have this number in a row already
+                if(num === parseInt(grid[k][index_in_row]) && (grid[k][index_in_row].length <= 1)) return false; // CHECK COLUMN || if False =  We have this number in a column already
+            }
+    
+            // Check square at last
+    
+            for(let square_row=0; square_row<3; square_row++) {
+                for(let square_column=0; square_column<3; square_column++) {
+                    if(num === parseInt(grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column]) && 
+                    (grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column].length <= 1)
+                    ) return false; // CHECK SQUARE || if False = We have this number in a square already
+                }
+            }
+
+            return true;
+        }
+
+        function occuredOnce(arr, length) {
+            let mp = new Map();
+
+            for(let i = 0; i < length; i++) {
+                if(mp.has(arr[i])) {
+                    mp.set(arr[i], 1 + mp.get(arr[i]));
+                } else {
+                    mp.set(arr[i], 1);
+                }
+
+            }
+            let onlyOnce = [];
+            for(let [key, value] of mp.entries()) {
+                if(value == 1) onlyOnce.push(parseInt(key));
+            }
+
+            return onlyOnce;
+        }
+
+        function applyOnePosition(grid, dim_1, dim_2, singPos, dim) {
+            for(let x=0; x<singPos.length; x++) {
+                //console.log(grid[dim_1][dim_2])
+                if(grid[dim_1][dim_2].includes(singPos[x])) {
+                    if(dim === 'r') {ordered[(dim_1 * 9) + dim_2].style.color = 'aqua'};
+                    if(dim === 'c') {ordered[(dim_1 * 9) + dim_2].style.color = 'green'};
+                    ordered[(dim_1 * 9) + dim_2].textContent = singPos[x];
+                    grid[dim_1][dim_2] = singPos[x];
+                    return;
+                }
+            }
+        }
+
+        console.log(grid);
+
+       /*  for(let k=0; k<grid[row].length; k++) {
+            if(num === parseInt(grid[row][k])) return false; // CHECK ROW || if False = We have this number in a row already
+            if(num === parseInt(grid[k][index_in_row])) return false; // CHECK COLUMN || if False =  We have this number in a column already
+        }
+
+        // Check square at last
+
+        for(let square_row=0; square_row<3; square_row++) {
+            for(let square_column=0; square_column<3; square_column++) {
+                if(num === parseInt(grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column])) return false; // CHECK SQUARE || if False = We have this number in a square already
+            }
+        } */
     },
 
     fadeDigits: function({difficulty, theme, options}) {
@@ -549,6 +722,8 @@ const engine = {
         const isSudokuUnique = this.checkOneSolution(opt_1To9, opt_9To1);
 
         //console.log('HAS SUDOKU JUST ONE SOLUTION ?', isSudokuUnique);
+
+        console.log(opt_1To9);
 
         return isSudokuUnique;
         //const isSafe = checkTileSafety()
