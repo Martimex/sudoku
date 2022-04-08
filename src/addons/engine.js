@@ -352,6 +352,9 @@ const engine = {
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
+        // Our array of methods
+        const methodsArr = [singleCandidate, singlePosition];
+
         const grid = [];
 
         ordered.map((el, index) => { 
@@ -363,25 +366,58 @@ const engine = {
 
         
         console.log(grid);
-        // Single candidate checker !
-        for(let row=0; row<9; row++) {
-            for(let index_in_row=0;  index_in_row<9; index_in_row++) {
-                if(!grid[row][index_in_row].length) { // It's not initial
-                    for(let num=1; num<=9; num++) {
-                        const canBeMarked = testCandidate(grid, {row, index_in_row}, num);
-                        if(canBeMarked) grid[row][index_in_row].push(num);
-                    }
-                    if(grid[row][index_in_row].length <= 1) { 
-                        ordered[(row * 9) + index_in_row].style.color = 'tomato';
-                        ordered[(row * 9) + index_in_row].textContent = grid[row][index_in_row][0];
-                        grid[row][index_in_row] = grid[row][index_in_row][0];
+        fillGrid(grid);
+
+        function fillGrid(grid) {
+            // Fill grid initially
+            for(let row=0; row<9; row++) {
+                for(let index_in_row=0;  index_in_row<9; index_in_row++) {
+                    if((!grid[row][index_in_row].length) && (typeof(grid[row][index_in_row]) === 'object')) { // It's not initial
+                        for(let num=1; num<=9; num++) {
+                            const canBeMarked = testCandidate(grid, {row, index_in_row}, num);
+                            if(canBeMarked) grid[row][index_in_row].push(num);
+                        }
                     }
                 }
             }
         }
 
+        function updateGrid(grid) {
+            for(let row=0; row<9; row++) {
+                for(let index_in_row=0; index_in_row<9; index_in_row++) {
+                    if(typeof(grid[row][index_in_row]) === 'object') {;
+                        for(let index_in_Arr = 0; index_in_Arr<grid[row][index_in_row].length; index_in_Arr = index_in_Arr) {
+                            const canOptionBeKept = testOrdered(ordered, {row, index_in_row}, grid[row][index_in_row][index_in_Arr]);
+                            if(!canOptionBeKept) {
+                                grid[row][index_in_row].splice(index_in_Arr, 1); 
+                            } else {
+                                index_in_Arr++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function singleCandidate() {
+            let helpedSolving = null;
+            // Single candidate checker !
+            for(let r=0; r<9; r++) {
+                for(let iir=0; iir<9; iir++) {
+                    if((grid[r][iir].length <= 1) && (typeof(grid[r][iir]) !== 'string')) { 
+                        ordered[(r * 9) + iir].style.color = 'tomato';
+                        ordered[(r * 9) + iir].textContent = grid[r][iir][0];
+                        grid[r][iir] = grid[r][iir][0];
+                        helpedSolving = true;
+                    }
+                }
+            }
+            return helpedSolving;
+        }
+
         // Single position checker
         function singlePosition() {
+            let helpedSolving = null;
             // 1. Row & column
             // Create column, row, square object
             const dimensionObject = {
@@ -440,19 +476,22 @@ const engine = {
 
                     if((typeof(grid[r][iir]) === 'object') && (singPos_Row.length > 0)) {
                         //console.log(singPos_Row);
-                        applyOnePosition(grid, r, iir, singPos_Row, 'r');
+                        let isUpd = applyOnePosition(grid, r, iir, singPos_Row, 'r');
+                        if(isUpd) {helpedSolving = true};
                         //console.log('upd  --- ', upd)
                         //grid[r][iir] = upd;
                     }
                     if((typeof(grid[iir][r]) === 'object') && (singPos_Col.length > 0)) {
                         //console.log(singPos_Col);
-                        applyOnePosition(grid, iir, r, singPos_Col, 'c');
+                        let isUpd = applyOnePosition(grid, iir, r, singPos_Col, 'c');
+                        if(isUpd) {helpedSolving = true};
                         //console.log('upd  --- ', upd)
                         //grid[iir][r] = upd;
                     }
                     if((typeof(grid[sq_r][sq_c]) === 'object') && (singPos_Sqr.length > 0)) {
                         //console.log(singPos_Sqr);
-                        applyOnePosition(grid, sq_r, sq_c, singPos_Sqr, 's');
+                        let isUpd = applyOnePosition(grid, sq_r, sq_c, singPos_Sqr, 's');
+                        if(isUpd) {helpedSolving = true};
                         //console.log('upd  --- ', upd)
                         //grid[sq_r][sq_c] = upd;
                     }
@@ -460,9 +499,22 @@ const engine = {
             }
 
             console.log(dimensionObject);
+            console.log(helpedSolving);
+            return helpedSolving;
         }
 
-        singlePosition();
+        // while kończy się, kiedy nasza ostatnia najtrudniejsza metoda zwróci false - wtedy już nie można bardziej rozwiązać sudoku zaimplementowanymi obecnie metodami
+        let currMethodNo = 0;
+        while(currMethodNo < methodsArr.length) {
+            let doesItHelp = methodsArr[currMethodNo]();
+            if(doesItHelp) {console.log('back to method first'); currMethodNo = 0}
+            else if(!doesItHelp) {
+                currMethodNo++;
+                console.log('need harder method');
+            }
+            updateGrid(grid);
+        }
+
 
         // Single position checker
         // 1. Row && Column
@@ -532,6 +584,25 @@ const engine = {
             return true;
         }
 
+        function testOrdered(ordered, {row, index_in_row}, num) {
+            for(let k=0; k<9; k++) {
+                if(num === parseInt(ordered[row * 9 + k].textContent) /* && (grid[row][k].length <= 1) */) return false; // CHECK ROW || if False = We have this number in a row already
+                if(num === parseInt(ordered[k * 9 + index_in_row].textContent) /* && (grid[k][index_in_row].length <= 1) */) return false; // CHECK COLUMN || if False =  We have this number in a column already
+            }
+    
+            // Check square at last
+    
+            for(let square_row=0; square_row<3; square_row++) {
+                for(let square_column=0; square_column<3; square_column++) {
+                    if(num === parseInt(ordered[(((Math.floor(row / 3) * 3) + square_row) * 9) + (Math.floor(index_in_row / 3) * 3) + square_column].textContent)
+                    /* &&  (grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column].length <= 1) */
+                    ) return false; // CHECK SQUARE || if False = We have this number in a square already
+                }
+            }
+
+            return true;
+        }
+
         function occuredOnce(arr, length, sign) {
             // Tu jest błąd (?)
             
@@ -539,9 +610,9 @@ const engine = {
 
             arr.sort(function(a, b) { return a - b; });
 
-            if(sign === 'r') {console.log('Row: ', arr);}
+            /* if(sign === 'r') {console.log('Row: ', arr);}
             else if(sign === 'c') {console.log('Column: ', arr);}
-            else {console.log('square: ', arr);}
+            else {console.log('square: ', arr);} */
 
 
             if(arr[0] != arr[1]) {
@@ -559,16 +630,16 @@ const engine = {
 
         function applyOnePosition(grid, dim_1, dim_2, singPos, dim) {
             for(let x=0; x<singPos.length; x++) {
-                //console.log(grid[dim_1][dim_2])
                 if(grid[dim_1][dim_2].includes(singPos[x])) {
                     if(dim === 'r') {ordered[(dim_1 * 9) + dim_2].style.color = 'aqua'};
                     if(dim === 'c') {ordered[(dim_1 * 9) + dim_2].style.color = 'green'};
                     if(dim === 's') {ordered[(dim_1 * 9) + dim_2].style.color = 'burlywood'};
                     ordered[(dim_1 * 9) + dim_2].textContent = singPos[x];
                     grid[dim_1][dim_2] = singPos[x];
-                    return;
+                    return true;
                 }
             }
+            return false;
         }
 
         console.log(grid);
