@@ -381,8 +381,92 @@ const engine = {
         }
 
         // Single position checker
+        function singlePosition() {
+            // 1. Row & column
+            // Create column, row, square object
+            const dimensionObject = {
+                row: [
+
+                ],
+
+                column: [
+
+                ],
+
+                square: [
+
+                ],
+            }
+
+            for(let r=0; r<9; r++) {
+                dimensionObject.row.push([]);
+                dimensionObject.column.push([]);
+                dimensionObject.square.push([]);
+
+                for(let iir=0; iir<9; iir++) {
+                    // For row
+                    if(typeof(grid[r][iir]) === 'object') {dimensionObject.row[dimensionObject.row.length - 1].push(...grid[r][iir])} // Extract array and only push elems
+                    else {dimensionObject.row[dimensionObject.row.length - 1].push(parseInt(grid[r][iir]))}
+
+                    // For column
+                    if(typeof(grid[iir][r]) === 'object') {dimensionObject.column[dimensionObject.column.length - 1].push(...grid[iir][r])} // Extract array and only push elems
+                    else {dimensionObject.column[dimensionObject.column.length - 1].push(parseInt(grid[iir][r]))}
+
+                    // For square - test if that works
+                    let sq_r_compressed = Math.floor(r / 3); // 0 to 2
+                    let sq_r_rest = r % 3; // 0 to 2
+                    let sq_c_compressed = Math.floor(iir / 3); // 0 to 2
+                    let sq_c_rest = iir % 3; // 0 to 2
+
+                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
+
+                    if(typeof(grid[sq_r][sq_c]) === 'object') {dimensionObject.square[dimensionObject.square.length - 1].push(...grid[sq_r][sq_c])} // Extract array and only push elems
+                    else {dimensionObject.square[dimensionObject.square.length - 1].push(parseInt(grid[sq_r][sq_c]))}
+                }
+
+                let singPos_Row = occuredOnce(dimensionObject.row[dimensionObject.row.length - 1], dimensionObject.row[dimensionObject.row.length - 1].length, 'r');
+                let singPos_Col = occuredOnce(dimensionObject.column[dimensionObject.column.length - 1], dimensionObject.column[dimensionObject.column.length - 1].length, 'c');
+                let singPos_Sqr = occuredOnce(dimensionObject.square[dimensionObject.square.length - 1], dimensionObject.square[dimensionObject.square.length - 1].length, 's');
+
+                for(let iir=0; iir<9; iir++) {
+                    let sq_r_compressed = Math.floor(r / 3); // 0 to 2
+                    let sq_r_rest = r % 3; // 0 to 2
+                    let sq_c_compressed = Math.floor(iir / 3); // 0 to 2
+                    let sq_c_rest = iir % 3; // 0 to 2
+
+                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
+
+                    if((typeof(grid[r][iir]) === 'object') && (singPos_Row.length > 0)) {
+                        //console.log(singPos_Row);
+                        applyOnePosition(grid, r, iir, singPos_Row, 'r');
+                        //console.log('upd  --- ', upd)
+                        //grid[r][iir] = upd;
+                    }
+                    if((typeof(grid[iir][r]) === 'object') && (singPos_Col.length > 0)) {
+                        //console.log(singPos_Col);
+                        applyOnePosition(grid, iir, r, singPos_Col, 'c');
+                        //console.log('upd  --- ', upd)
+                        //grid[iir][r] = upd;
+                    }
+                    if((typeof(grid[sq_r][sq_c]) === 'object') && (singPos_Sqr.length > 0)) {
+                        //console.log(singPos_Sqr);
+                        applyOnePosition(grid, sq_r, sq_c, singPos_Sqr, 's');
+                        //console.log('upd  --- ', upd)
+                        //grid[sq_r][sq_c] = upd;
+                    }
+                }
+            }
+
+            console.log(dimensionObject);
+        }
+
+        singlePosition();
+
+        // Single position checker
         // 1. Row && Column
-        for(let r=0; r<9; r++) {
+        /* for(let r=0; r<9; r++) {
             let rowArr = []
             let colArr = [];
             for(let iir=0; iir<9; iir++) {
@@ -394,21 +478,25 @@ const engine = {
                     colArr = [...colArr, ...grid[iir][r]];
                 }
             }
-            let singPos_Row = occuredOnce(rowArr, rowArr.length);
-            let singPos_Col = occuredOnce(colArr, colArr.length);
+            let singPos_Row = occuredOnce(rowArr, rowArr.length, 'r');
+            let singPos_Col = occuredOnce(colArr, colArr.length, 'c');
 
            // console.log(singPos_Row);
            // console.log(singPos_Col);
 
             for(let iir=0; iir<9; iir++) {
                 if((typeof(grid[r][iir]) === 'object') && (singPos_Row.length > 0)) {
-                    applyOnePosition(grid, r, iir, singPos_Row, 'r');
+                    //console.log(singPos_Row);
+                    const upd = applyOnePosition(grid, r, iir, singPos_Row, 'r');
+                    grid[r][iir] = upd;
                 }
                 if((typeof(grid[iir][r]) === 'object') && (singPos_Col.length > 0)) {
-                    applyOnePosition(grid, iir, r, singPos_Col, 'c');
+                    //console.log(singPos_Col);
+                    const upd = applyOnePosition(grid, iir, r, singPos_Col, 'c');
+                    grid[iir][r] = upd;
                 }
             }
-        }
+        } */
 
         // 3. Square (3x3)
         // THINK ABOUT SQUARES - HOW TO MAKE IT WORK
@@ -444,21 +532,27 @@ const engine = {
             return true;
         }
 
-        function occuredOnce(arr, length) {
-            let mp = new Map();
-
-            for(let i = 0; i < length; i++) {
-                if(mp.has(arr[i])) {
-                    mp.set(arr[i], 1 + mp.get(arr[i]));
-                } else {
-                    mp.set(arr[i], 1);
-                }
-
-            }
+        function occuredOnce(arr, length, sign) {
+            // Tu jest błąd (?)
+            
             let onlyOnce = [];
-            for(let [key, value] of mp.entries()) {
-                if(value == 1) onlyOnce.push(parseInt(key));
+
+            arr.sort(function(a, b) { return a - b; });
+
+            if(sign === 'r') {console.log('Row: ', arr);}
+            else if(sign === 'c') {console.log('Column: ', arr);}
+            else {console.log('square: ', arr);}
+
+
+            if(arr[0] != arr[1]) {
+                onlyOnce.push(arr[0]);
             }
+
+            for(let i= 1; i < length - 1; i++) {
+                if(arr[i] !== arr[i + 1] && arr[i] != arr[i - 1]) { onlyOnce.push(arr[i])}
+            }
+
+            if(arr[length - 2] != arr[length - 1]) { onlyOnce.push(arr[length - 1])}
 
             return onlyOnce;
         }
@@ -469,6 +563,7 @@ const engine = {
                 if(grid[dim_1][dim_2].includes(singPos[x])) {
                     if(dim === 'r') {ordered[(dim_1 * 9) + dim_2].style.color = 'aqua'};
                     if(dim === 'c') {ordered[(dim_1 * 9) + dim_2].style.color = 'green'};
+                    if(dim === 's') {ordered[(dim_1 * 9) + dim_2].style.color = 'burlywood'};
                     ordered[(dim_1 * 9) + dim_2].textContent = singPos[x];
                     grid[dim_1][dim_2] = singPos[x];
                     return;
