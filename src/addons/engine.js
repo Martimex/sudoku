@@ -353,7 +353,21 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         // Our array of methods
-        const methodsArr = [singleCandidate, singlePosition];
+        const methodsArr = [singleCandidate, singlePosition, candidateLines];
+
+        /* const dimensionObject = {
+            row: [
+
+            ],
+
+            column: [
+
+            ],
+
+            square: [
+
+            ],
+        } */
 
         const grid = [];
 
@@ -367,6 +381,80 @@ const engine = {
         
         console.log(grid);
         fillGrid(grid);
+        //fillDimensionObject(dimensionObject, grid);
+
+        function fillDimensionObject(dimensionObject, grid) {
+            for( let r=0; r<9; r++) {
+                dimensionObject.row.push([]);
+                dimensionObject.column.push([]);
+                dimensionObject.square.push([]);
+
+                for(let iir=0; iir<9; iir++) {
+                    // For row
+                    if(typeof(grid[r][iir]) === 'object') {dimensionObject.row[dimensionObject.row.length - 1].push(grid[r][iir])} // push elems
+                    else {dimensionObject.row[dimensionObject.row.length - 1].push(parseInt(grid[r][iir]))}
+
+                    // For column
+                    if(typeof(grid[iir][r]) === 'object') {dimensionObject.column[dimensionObject.column.length - 1].push(grid[iir][r])} // push elems
+                    else {dimensionObject.column[dimensionObject.column.length - 1].push(parseInt(grid[iir][r]))}
+
+                    // For square - test if that works
+                    let sq_r_compressed = Math.floor(r / 3); // 0 to 2
+                    let sq_r_rest = r % 3; // 0 to 2
+                    let sq_c_compressed = Math.floor(iir / 3); // 0 to 2
+                    let sq_c_rest = iir % 3; // 0 to 2
+
+                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
+
+                    if(typeof(grid[sq_r][sq_c]) === 'object') {dimensionObject.square[dimensionObject.square.length - 1].push(grid[sq_r][sq_c])} // push elems
+                    else {dimensionObject.square[dimensionObject.square.length - 1].push(parseInt(grid[sq_r][sq_c]))}
+                }
+            }
+            console.log(dimensionObject);
+        }
+
+        function updateDimensionObject(dimensionObject, grid) {
+            for( let r=0; r<9; r++) {
+                for(let iir=0; iir<9; iir++) {
+                    // For row
+                    if(typeof(grid[r][iir]) === 'object') { // Modify only what's not certain - arrays
+                        console.log(dimensionObject.row[r][iir], grid[r][iir])
+                        dimensionObject.row[r][iir] = grid[r][iir]
+                        if(dimensionObject.row[r][iir].length === 1) {
+                            dimensionObject.row[r][iir].splice(0, 1, grid[r][iir]);
+                        }
+                    } 
+
+                    // For column
+                    if(typeof(grid[iir][r]) === 'object') { // Modify only what's not certain - arrays
+                        console.log(dimensionObject.column[r][iir], grid[iir][r])
+                        dimensionObject.column[r][iir] = grid[iir][r]
+                        if(dimensionObject.column[r][iir].length === 1) {
+                            dimensionObject.column[r][iir].splice(0, 1, grid[iir][r]);
+                        }
+                    } 
+
+                    // For square - test if that works
+                    let sq_r_compressed = Math.floor(r / 3); // 0 to 2
+                    let sq_r_rest = r % 3; // 0 to 2
+                    let sq_c_compressed = Math.floor(iir / 3); // 0 to 2
+                    let sq_c_rest = iir % 3; // 0 to 2
+
+                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
+
+                    if(typeof(grid[sq_r][sq_c]) === 'object') { // Modify only what's not certain - arrays
+                        console.log(dimensionObject.square[r][iir], grid[sq_r][sq_c]);
+                        dimensionObject.square[r][iir] = grid[sq_r][sq_c]
+                        if(dimensionObject.square[r][iir].length === 1) {
+                            //dimensionObject[r][iir] = null;
+                            dimensionObject.square[r][iir].splice(0, 1, grid[sq_r][sq_c]);
+                        }
+                    } 
+                }
+            }
+        }
 
         function fillGrid(grid) {
             // Fill grid initially
@@ -397,6 +485,30 @@ const engine = {
                     }
                 }
             }
+        }
+
+        function getSquares(grid) {
+            const squaresArr = [];
+            for(let r=0; r<9; r++) {
+                squaresArr.push([]);
+                for(let iir=0; iir<9; iir++) {
+
+                    let sq_r_compressed = Math.floor(r / 3); // 0 to 2
+                    let sq_r_rest = r % 3; // 0 to 2
+                    let sq_c_compressed = Math.floor(iir / 3); // 0 to 2
+                    let sq_c_rest = iir % 3; // 0 to 2
+
+                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
+
+                    if(iir % 3 === 0) {squaresArr[squaresArr.length - 1].push([]);}
+
+                    if(typeof(grid[sq_r][sq_c]) === 'object') {squaresArr[squaresArr.length - 1][sq_c_compressed].push(grid[sq_r][sq_c])}
+                    else {squaresArr[squaresArr.length - 1][sq_c_compressed].push(parseInt(grid[sq_r][sq_c]))}
+
+                }
+            }
+            return squaresArr;
         }
 
         function singleCandidate() {
@@ -498,72 +610,123 @@ const engine = {
                 }
             }
 
-            console.log(dimensionObject);
+            //console.log(dimensionObject);
             console.log(helpedSolving);
             return helpedSolving;
+        }
+
+        function candidateLines() {
+            let helpedSolving = null;
+            const setSquares = getSquares(grid); // read-only, don't modify inside this function
+
+            for(let x=0; x<setSquares.length; x++) {
+                let arr = [];
+                for(let y=0; y<setSquares[x].length; y++) {
+                    if(typeof(setSquares[x][y]) === 'object') {
+                        arr.push(...setSquares[x][y]);
+                    }
+                }
+
+                console.log('arr: ', arr);
+                let set = [...new Set(arr)];
+
+                for(let z=0; z<set.length; z++) {
+                    console.log('set: ', set);
+                    checkBelonging(set[z], grid, setSquares[x], x);
+                  //checkBelonging(digit, grid, thisSquare, x) - dont activate that lol
+                }
+
+            }
+
+            function checkBelonging(digit, grid, thisSquare, square_no) {
+                console.log('CHECK BELONGING');
+                console.log(thisSquare); // We use it as a time-saver replacement for not-created Arr (see personal notes)
+                let cordArr = [];
+                for(let x=0; x<thisSquare.length; x++) { // expected: 0 to 2
+                    for(let y=0; y<thisSquare[0].length; y++) { // expected 0 to 2, but here as end condition put whatever is of length 3
+                            console.log(thisSquare[x][y], '  and digit is:  ', digit);
+                        if(typeof(thisSquare[x][y]) === 'object') {
+                            if(thisSquare[x][y].includes(digit)) {cordArr.push([x, y]);}
+                        }
+                    }
+                }
+                console.log(cordArr);
+
+                const isDigitInOnlyRow = testDigitInOnlyRow(cordArr);
+                const isDigitInOnlyColumn = testDigitInOnlyColumn(cordArr);
+
+                function testDigitInOnlyRow(cordArr) {
+                    // Check if x cord (row cord) is the same for all given digit 'duplicates'
+                    let x_cord_val = cordArr[0][0];
+                    for(let d=1; d<cordArr.length; d++) {
+                        if(x_cord_val !== cordArr[d][0]) {return false;}
+                    }
+                    return x_cord_val;
+                }
+
+                function testDigitInOnlyColumn(cordArr) {
+                    // Check if y cord (column cord) is the same for all given digit 'duplicates'
+                    let y_cord_val = cordArr[0][1];
+                    for(let d=1; d<cordArr.length; d++) {
+                        if(y_cord_val !== cordArr[d][1]) {return false;}
+                    }
+                    return y_cord_val;
+                }
+
+                if((isDigitInOnlyRow === false) && (isDigitInOnlyColumn === false)) { return false;}
+
+                if((isDigitInOnlyRow === 0) || (isDigitInOnlyRow)) {
+                    // Check if other non-current square tiles has also this digit (within current Sudoku row)
+                    let rowToDetect = (Math.floor(square_no / 3) * 3) + isDigitInOnlyRow;
+                    let currSquare_NoDetect = square_no % 3;
+                    for(let s=0; s<grid[rowToDetect].length; s++) {
+                        if((typeof(grid[rowToDetect][s]) === 'object') && ((s < (currSquare_NoDetect * 3)) || (s >= (currSquare_NoDetect * 3) + 3))) {
+                            if(grid[rowToDetect][s].includes(digit)) {
+                                let index = grid[rowToDetect][s].indexOf(digit);
+                                grid[rowToDetect][s].splice(index, 1);
+                                // MARK OUT THAT THIS METHOD ACTUALLY HELPS US SOLVING SUDOKU !
+                                helpedSolving = true;
+                            }
+                        }
+                    }
+                }
+
+                else if((isDigitInOnlyColumn === 0) || (isDigitInOnlyColumn)) {
+                    // Check if other non-current square tiles has also this digit (within current Sudoku column)
+                    let columnToDetect = (Math.floor(square_no / 3) * 3) + isDigitInOnlyColumn;
+                    let currSquare_NoDetect = square_no % 3;
+                    for(let s=0; s<grid.length; s++) {
+                        if((typeof(grid[s][columnToDetect]) === 'object') && ((s < (currSquare_NoDetect * 3)) || (s >= (currSquare_NoDetect * 3) + 3))) {
+                            let index = grid[s][columnToDetect].indexOf(digit);
+                            grid[s][columnToDetect].splice(index, 1);
+                            // MARK OUT THAT THIS METHOD ACTUALLY HELPS US SOLVING SUDOKU !
+                            helpedSolving = true;
+                        }
+                    }
+                }
+
+            }
         }
 
         // while kończy się, kiedy nasza ostatnia najtrudniejsza metoda zwróci false - wtedy już nie można bardziej rozwiązać sudoku zaimplementowanymi obecnie metodami
         let currMethodNo = 0;
         while(currMethodNo < methodsArr.length) {
             let doesItHelp = methodsArr[currMethodNo]();
-            if(doesItHelp) {console.log('back to method first'); currMethodNo = 0}
+            if(doesItHelp) {
+                if(currMethodNo === 2) {console.warn('Our new function has helped !')}
+                console.log('back to method first'); 
+                currMethodNo = 0; 
+                updateGrid(grid); 
+            }
             else if(!doesItHelp) {
                 currMethodNo++;
                 console.log('need harder method');
             }
-            updateGrid(grid);
+            //updateGrid(grid);
+            //updateDimensionObject(grid, dimensionObject);
         }
-
-
-        // Single position checker
-        // 1. Row && Column
-        /* for(let r=0; r<9; r++) {
-            let rowArr = []
-            let colArr = [];
-            for(let iir=0; iir<9; iir++) {
-                //console.log(typeof(grid[r][iir]))
-                if(typeof(grid[r][iir]) === 'object') {
-                    rowArr = [...rowArr, ...grid[r][iir]];
-                }
-                if(typeof(grid[iir][r]) === 'object') {
-                    colArr = [...colArr, ...grid[iir][r]];
-                }
-            }
-            let singPos_Row = occuredOnce(rowArr, rowArr.length, 'r');
-            let singPos_Col = occuredOnce(colArr, colArr.length, 'c');
-
-           // console.log(singPos_Row);
-           // console.log(singPos_Col);
-
-            for(let iir=0; iir<9; iir++) {
-                if((typeof(grid[r][iir]) === 'object') && (singPos_Row.length > 0)) {
-                    //console.log(singPos_Row);
-                    const upd = applyOnePosition(grid, r, iir, singPos_Row, 'r');
-                    grid[r][iir] = upd;
-                }
-                if((typeof(grid[iir][r]) === 'object') && (singPos_Col.length > 0)) {
-                    //console.log(singPos_Col);
-                    const upd = applyOnePosition(grid, iir, r, singPos_Col, 'c');
-                    grid[iir][r] = upd;
-                }
-            }
-        } */
-
-        // 3. Square (3x3)
-        // THINK ABOUT SQUARES - HOW TO MAKE IT WORK
-        /* for(let x=0; x<9; x++) {
-                let squareArr = [];
-                for(let square_row = 0; square_row<3; square_row++) {
-                for(let square_column=0; square_column<3; square_column++) {
-                    if(typeof(grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column]) === 'object') {
-                        squareArr = [...squareArr, grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column]];
-                    }
-                }
-                let singPos_Square = occuredOnce(squareArr, squareArr.length);
-            }
-        } */
         
+        //console.log(dimensionObject);
 
         function testCandidate(grid, {row, index_in_row}, num) {
             for(let k=0; k<grid[row].length; k++) {
