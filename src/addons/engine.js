@@ -310,6 +310,9 @@ const engine = {
             if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
         })
 
+        let isUnique = this.backtrack();
+        console.warn('isSudokuUnique? ', isUnique);
+
     },
 
     singleRemoval: function(ordered, randInitial, multiRemove_stop) {
@@ -353,7 +356,7 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         // Our array of methods
-        const methodsArr = [singleCandidate, singlePosition, candidateLines];
+        const methodsArr = [/* singleCandidate, singlePosition *//* , candidateLines */];
 
         /* const dimensionObject = {
             row: [
@@ -487,7 +490,7 @@ const engine = {
             }
         }
 
-        function getSquares(grid) {
+        function getSquares(grid, alreadyFoundNums) {
             const squaresArr = [];
             for(let r=0; r<9; r++) {
                 squaresArr.push([]);
@@ -503,7 +506,14 @@ const engine = {
 
                     if(iir % 3 === 0) {squaresArr[squaresArr.length - 1].push([]);}
 
-                    if(typeof(grid[sq_r][sq_c]) === 'object') {squaresArr[squaresArr.length - 1][sq_c_compressed].push(grid[sq_r][sq_c])}
+                    if(typeof(grid[sq_r][sq_c]) === 'object') {
+                        if(grid[sq_r][sq_c].length > 1) {
+                            {squaresArr[squaresArr.length - 1][sq_c_compressed].push(grid[sq_r][sq_c])}
+                        }
+                        else if(grid[sq_r][sq_c].length === 1) {
+                            alreadyFoundNums.push(grid[sq_r][sq_c]);
+                        }
+                    }
                     else {squaresArr[squaresArr.length - 1][sq_c_compressed].push(parseInt(grid[sq_r][sq_c]))}
 
                 }
@@ -514,6 +524,7 @@ const engine = {
         function singleCandidate() {
             let helpedSolving = null;
             // Single candidate checker !
+            console.log(grid);
             for(let r=0; r<9; r++) {
                 for(let iir=0; iir<9; iir++) {
                     if((grid[r][iir].length <= 1) && (typeof(grid[r][iir]) !== 'string')) { 
@@ -615,42 +626,60 @@ const engine = {
             return helpedSolving;
         }
 
-        function candidateLines() {
+        function candidateLines() { // Throws errors, please work on this stuff and then check if it works properly
             let helpedSolving = null;
-            const setSquares = getSquares(grid); // read-only, don't modify inside this function
+            let alreadyFoundNums = [];
+            const setSquares = getSquares(grid, alreadyFoundNums); // read-only, don't modify inside this function
 
             for(let x=0; x<setSquares.length; x++) {
                 let arr = [];
                 for(let y=0; y<setSquares[x].length; y++) {
-                    if(typeof(setSquares[x][y]) === 'object') {
-                        arr.push(...setSquares[x][y]);
+                    for(let z=0; z<setSquares[x][y].length; z++) {
+                        if(typeof(setSquares[x][y][z]) === 'object') {
+                            arr.push(...setSquares[x][y][z]);
+                        }
                     }
                 }
 
-                console.log('arr: ', arr);
+                //console.log('arr: ', arr);
                 let set = [...new Set(arr)];
 
-                for(let z=0; z<set.length; z++) {
-                    console.log('set: ', set);
-                    checkBelonging(set[z], grid, setSquares[x], x);
+                if(alreadyFoundNums.length > 0) {
+                    for(let v=0; v<alreadyFoundNums.length; v++) {
+                        set.delete(alreadyFoundNums[v]);
+                    }
+                }
+
+                for(let a=0; a<set.length; a++) {
+                    //console.log('set: ', set);
+                    const doesHelp = checkBelonging(set[a], grid, setSquares[x], x);
+                    if(doesHelp) {
+                        helpedSolving = true;
+                    }
                   //checkBelonging(digit, grid, thisSquare, x) - dont activate that lol
                 }
 
             }
 
+            return helpedSolving;
+
             function checkBelonging(digit, grid, thisSquare, square_no) {
                 console.log('CHECK BELONGING');
-                console.log(thisSquare); // We use it as a time-saver replacement for not-created Arr (see personal notes)
+                //console.log(thisSquare); // We use it as a time-saver replacement for not-created Arr (see personal notes)
                 let cordArr = [];
                 for(let x=0; x<thisSquare.length; x++) { // expected: 0 to 2
-                    for(let y=0; y<thisSquare[0].length; y++) { // expected 0 to 2, but here as end condition put whatever is of length 3
-                            console.log(thisSquare[x][y], '  and digit is:  ', digit);
+                    for(let y=0; y<thisSquare.length; y++) { // expected 0 to 2, but here as end condition put whatever is of length 3
+                           // console.log(thisSquare[x][y], '  and digit is:  ', digit);
                         if(typeof(thisSquare[x][y]) === 'object') {
                             if(thisSquare[x][y].includes(digit)) {cordArr.push([x, y]);}
                         }
                     }
                 }
-                console.log(cordArr);
+
+                const curr = grid;
+                console.log(curr);
+                console.log(thisSquare);
+                console.log('cords: ', cordArr, '  for digit: ', digit);
 
                 const isDigitInOnlyRow = testDigitInOnlyRow(cordArr);
                 const isDigitInOnlyColumn = testDigitInOnlyColumn(cordArr);
@@ -675,17 +704,19 @@ const engine = {
 
                 if((isDigitInOnlyRow === false) && (isDigitInOnlyColumn === false)) { return false;}
 
-                if((isDigitInOnlyRow === 0) || (isDigitInOnlyRow)) {
+                else if((isDigitInOnlyRow === 0) || (isDigitInOnlyRow)) {
                     // Check if other non-current square tiles has also this digit (within current Sudoku row)
                     let rowToDetect = (Math.floor(square_no / 3) * 3) + isDigitInOnlyRow;
                     let currSquare_NoDetect = square_no % 3;
                     for(let s=0; s<grid[rowToDetect].length; s++) {
                         if((typeof(grid[rowToDetect][s]) === 'object') && ((s < (currSquare_NoDetect * 3)) || (s >= (currSquare_NoDetect * 3) + 3))) {
-                            if(grid[rowToDetect][s].includes(digit)) {
+                            if(grid[rowToDetect][s].includes(digit) && (grid[rowToDetect][s].length > 1) ) {
+                                console.log(grid[rowToDetect][s], digit);
                                 let index = grid[rowToDetect][s].indexOf(digit);
                                 grid[rowToDetect][s].splice(index, 1);
                                 // MARK OUT THAT THIS METHOD ACTUALLY HELPS US SOLVING SUDOKU !
-                                helpedSolving = true;
+                                console.log('it helped !')
+                                return true;
                             }
                         }
                     }
@@ -697,10 +728,14 @@ const engine = {
                     let currSquare_NoDetect = square_no % 3;
                     for(let s=0; s<grid.length; s++) {
                         if((typeof(grid[s][columnToDetect]) === 'object') && ((s < (currSquare_NoDetect * 3)) || (s >= (currSquare_NoDetect * 3) + 3))) {
-                            let index = grid[s][columnToDetect].indexOf(digit);
-                            grid[s][columnToDetect].splice(index, 1);
-                            // MARK OUT THAT THIS METHOD ACTUALLY HELPS US SOLVING SUDOKU !
-                            helpedSolving = true;
+                            if(grid[s][columnToDetect].includes(digit) && (grid[s][columnToDetect].length > 1)) {
+                                console.log(grid[s][columnToDetect], digit);
+                                let index = grid[s][columnToDetect].indexOf(digit);
+                                grid[s][columnToDetect].splice(index, 1);
+                                // MARK OUT THAT THIS METHOD ACTUALLY HELPS US SOLVING SUDOKU !
+                                console.log('it helped !')
+                                return true;
+                            }
                         }
                     }
                 }
