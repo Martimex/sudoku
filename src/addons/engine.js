@@ -379,7 +379,7 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         // Our array of methods
-        const methodsArr = [/* singleCandidate, singlePosition *//* , candidateLines */];
+        const methodsArr = [singleCandidate, singlePosition, candidateLines];
 
         /* const dimensionObject = {
             row: [
@@ -513,36 +513,83 @@ const engine = {
             }
         }
 
-        function getSquares(grid, alreadyFoundNums) {
-            const squaresArr = [];
+        function getSquares() {
+            const squareArr = [];
             for(let r=0; r<9; r++) {
-                squaresArr.push([]);
-                for(let iir=0; iir<9; iir++) {
-
-                    let sq_r_compressed = Math.floor(r / 3); // 0 to 2
-                    let sq_r_rest = r % 3; // 0 to 2
-                    let sq_c_compressed = Math.floor(iir / 3); // 0 to 2
-                    let sq_c_rest = iir % 3; // 0 to 2
-
-                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
-                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
-
-                    if(iir % 3 === 0) {squaresArr[squaresArr.length - 1].push([]);}
-
-                    if(typeof(grid[sq_r][sq_c]) === 'object') {
-                        if(grid[sq_r][sq_c].length > 1) {
-                            {squaresArr[squaresArr.length - 1][sq_c_compressed].push(grid[sq_r][sq_c])}
-                        }
-                        else if(grid[sq_r][sq_c].length === 1) {
-                            alreadyFoundNums.push(grid[sq_r][sq_c]);
-                        }
+                let sq_r_compressed = Math.floor(r/3);
+                let sq_r_rest = r % 3;
+                squareArr.push([]);
+                for(let iir=0; iir<3; iir++) {
+                    squareArr[squareArr.length - 1].push([]);
+                    for(let c=0; c<3; c++) {
+                        let sq_r = (sq_r_compressed * 3) + iir;
+                        let sq_c = (sq_r_rest * 3) + c;
+                        squareArr[r][iir].push(grid[sq_r][sq_c]);
                     }
-                    else {squaresArr[squaresArr.length - 1][sq_c_compressed].push(parseInt(grid[sq_r][sq_c]))}
-
                 }
             }
-            return squaresArr;
+            return squareArr;
         }
+
+        function checkBelonging(num, grid, allSquares, squareNo) {
+            let cordArr = [];
+
+            for(let square_row=0; square_row<3; square_row++) {
+                for(let square_col=0; square_col<3; square_col++) {
+                    if(typeof(allSquares[squareNo][square_row][square_col]) === 'object') {
+                        if(allSquares[squareNo][square_row][square_col].includes(num)) {
+                            cordArr.push([square_row, square_col]);
+                        }
+                    }
+                }
+            }
+            const isOnlyInRowOrCol = testOnlyInRowOrCol(cordArr);
+            if(!isOnlyInRowOrCol) {return false;}
+            if(isOnlyInRowOrCol[0] === 'row') {
+                let didHelp = false;
+                const gridRow = (Math.floor(squareNo / 3) * 3) + isOnlyInRowOrCol[1]; // 0 to 8
+                for(let iir=0; iir<9; iir++) {
+                    if((typeof(grid[gridRow][iir]) === 'object') && (squareNo % 3 !== Math.floor(iir/3))) {
+                        if((grid[gridRow][iir].length > 1) && (grid[gridRow][iir].includes(num))) {
+                            let index = grid[gridRow][iir].indexOf(num);
+                            grid[gridRow][iir].splice(index, 1);
+                            console.warn(`Row checker has detected that number ${num} will not be in grid[${gridRow}][${iir}]`);
+                            didHelp = true;
+                        }
+                    }
+                }
+                return didHelp;
+            }
+            else if(isOnlyInRowOrCol[0] === 'column') {
+                let didHelp = false;
+                const gridCol = (Math.floor(squareNo % 3) * 3) + isOnlyInRowOrCol[1];
+                for(let iic=0; iic<9; iic++) {
+                    if((typeof(grid[iic][gridCol]) === 'object') && (Math.floor(squareNo / 3) !== Math.floor(iic / 3))) {
+                        if((grid[iic][gridCol].length > 1) && (grid[iic][gridCol].includes(num))) {
+                            let index = grid[iic][gridCol].indexOf(num);
+                            grid[iic][gridCol].splice(index, 1);
+                            console.warn(`Column checker has detected that number ${num} will not be in grid[${iic}][${gridCol}]`);
+                            didHelp = true;
+                        }
+                    }
+                }
+                return didHelp;
+            }
+
+            ///
+            function testOnlyInRowOrCol(cordArr) {
+                let x_isUnique = true;
+                let y_isUnique = true;
+                for(let digitCord = 1; digitCord<cordArr.length; digitCord++) {
+                    if(cordArr[0][0] !== cordArr[digitCord][0]) {x_isUnique = false;}
+                    if(cordArr[0][1] !== cordArr[digitCord][1]) {y_isUnique = false;}
+                    if((!x_isUnique) && (!y_isUnique)) {return false;}
+                }
+                if(x_isUnique) {return ['row', cordArr[0][0]];}
+                else {return ['column', cordArr[0][1]];}
+            }
+        }
+
 
         function singleCandidate() {
             let helpedSolving = null;
@@ -649,122 +696,39 @@ const engine = {
             return helpedSolving;
         }
 
-        function candidateLines() { // Throws errors, please work on this stuff and then check if it works properly
+        function candidateLines()  {
             let helpedSolving = null;
-            let alreadyFoundNums = [];
-            const setSquares = getSquares(grid, alreadyFoundNums); // read-only, don't modify inside this function
-
-            for(let x=0; x<setSquares.length; x++) {
-                let arr = [];
-                for(let y=0; y<setSquares[x].length; y++) {
-                    for(let z=0; z<setSquares[x][y].length; z++) {
-                        if(typeof(setSquares[x][y][z]) === 'object') {
-                            arr.push(...setSquares[x][y][z]);
+            const allSquares = getSquares();
+            //console.log(allSquares); Checked: Works correctly
+            for(let squareNo=0; squareNo<9; squareNo++) {
+                let exceptionDigits = new Set();
+                let digitsToCheck = new Set();
+                for(let rowNo=0; rowNo<3; rowNo++) {
+                    for(let columnNo=0; columnNo<3; columnNo++) {
+                        if(typeof(allSquares[squareNo][rowNo][columnNo]) === 'object') {
+                            if(allSquares[squareNo][rowNo][columnNo].length === 1) {
+                                exceptionDigits.add(allSquares[squareNo][rowNo][columnNo][0]);
+                            } else {
+                                digitsToCheck.add(...allSquares[squareNo][rowNo][columnNo]);
+                            }
                         }
                     }
                 }
-
-                //console.log('arr: ', arr);
-                let set = [...new Set(arr)];
-
-                if(alreadyFoundNums.length > 0) {
-                    for(let v=0; v<alreadyFoundNums.length; v++) {
-                        set.delete(alreadyFoundNums[v]);
+                //console.log('digitsToCheck  ', digitsToCheck);
+                //console.log('exceptionDigits  ', exceptionDigits);
+                for(let num = 1; num <= 9; num++) { // Verify if that cant be improved (time-wise)
+                    if((digitsToCheck.has(num)) && (!exceptionDigits.has(num))) {
+                        console.log('we are checking num-', num);
+                        const isBelonging = checkBelonging(num, grid, allSquares, squareNo);
+                        if(isBelonging) {
+                            helpedSolving = true;
+                        }
                     }
                 }
-
-                for(let a=0; a<set.length; a++) {
-                    //console.log('set: ', set);
-                    const doesHelp = checkBelonging(set[a], grid, setSquares[x], x);
-                    if(doesHelp) {
-                        helpedSolving = true;
-                    }
-                  //checkBelonging(digit, grid, thisSquare, x) - dont activate that lol
-                }
-
             }
-
             return helpedSolving;
-
-            function checkBelonging(digit, grid, thisSquare, square_no) {
-                console.log('CHECK BELONGING');
-                //console.log(thisSquare); // We use it as a time-saver replacement for not-created Arr (see personal notes)
-                let cordArr = [];
-                for(let x=0; x<thisSquare.length; x++) { // expected: 0 to 2
-                    for(let y=0; y<thisSquare.length; y++) { // expected 0 to 2, but here as end condition put whatever is of length 3
-                           // console.log(thisSquare[x][y], '  and digit is:  ', digit);
-                        if(typeof(thisSquare[x][y]) === 'object') {
-                            if(thisSquare[x][y].includes(digit)) {cordArr.push([x, y]);}
-                        }
-                    }
-                }
-
-                const curr = grid;
-                console.log(curr);
-                console.log(thisSquare);
-                console.log('cords: ', cordArr, '  for digit: ', digit);
-
-                const isDigitInOnlyRow = testDigitInOnlyRow(cordArr);
-                const isDigitInOnlyColumn = testDigitInOnlyColumn(cordArr);
-
-                function testDigitInOnlyRow(cordArr) {
-                    // Check if x cord (row cord) is the same for all given digit 'duplicates'
-                    let x_cord_val = cordArr[0][0];
-                    for(let d=1; d<cordArr.length; d++) {
-                        if(x_cord_val !== cordArr[d][0]) {return false;}
-                    }
-                    return x_cord_val;
-                }
-
-                function testDigitInOnlyColumn(cordArr) {
-                    // Check if y cord (column cord) is the same for all given digit 'duplicates'
-                    let y_cord_val = cordArr[0][1];
-                    for(let d=1; d<cordArr.length; d++) {
-                        if(y_cord_val !== cordArr[d][1]) {return false;}
-                    }
-                    return y_cord_val;
-                }
-
-                if((isDigitInOnlyRow === false) && (isDigitInOnlyColumn === false)) { return false;}
-
-                else if((isDigitInOnlyRow === 0) || (isDigitInOnlyRow)) {
-                    // Check if other non-current square tiles has also this digit (within current Sudoku row)
-                    let rowToDetect = (Math.floor(square_no / 3) * 3) + isDigitInOnlyRow;
-                    let currSquare_NoDetect = square_no % 3;
-                    for(let s=0; s<grid[rowToDetect].length; s++) {
-                        if((typeof(grid[rowToDetect][s]) === 'object') && ((s < (currSquare_NoDetect * 3)) || (s >= (currSquare_NoDetect * 3) + 3))) {
-                            if(grid[rowToDetect][s].includes(digit) && (grid[rowToDetect][s].length > 1) ) {
-                                console.log(grid[rowToDetect][s], digit);
-                                let index = grid[rowToDetect][s].indexOf(digit);
-                                grid[rowToDetect][s].splice(index, 1);
-                                // MARK OUT THAT THIS METHOD ACTUALLY HELPS US SOLVING SUDOKU !
-                                console.log('it helped !')
-                                return true;
-                            }
-                        }
-                    }
-                }
-
-                else if((isDigitInOnlyColumn === 0) || (isDigitInOnlyColumn)) {
-                    // Check if other non-current square tiles has also this digit (within current Sudoku column)
-                    let columnToDetect = (Math.floor(square_no / 3) * 3) + isDigitInOnlyColumn;
-                    let currSquare_NoDetect = square_no % 3;
-                    for(let s=0; s<grid.length; s++) {
-                        if((typeof(grid[s][columnToDetect]) === 'object') && ((s < (currSquare_NoDetect * 3)) || (s >= (currSquare_NoDetect * 3) + 3))) {
-                            if(grid[s][columnToDetect].includes(digit) && (grid[s][columnToDetect].length > 1)) {
-                                console.log(grid[s][columnToDetect], digit);
-                                let index = grid[s][columnToDetect].indexOf(digit);
-                                grid[s][columnToDetect].splice(index, 1);
-                                // MARK OUT THAT THIS METHOD ACTUALLY HELPS US SOLVING SUDOKU !
-                                console.log('it helped !')
-                                return true;
-                            }
-                        }
-                    }
-                }
-
-            }
         }
+
 
         // while kończy się, kiedy nasza ostatnia najtrudniejsza metoda zwróci false - wtedy już nie można bardziej rozwiązać sudoku zaimplementowanymi obecnie metodami
         let currMethodNo = 0;
