@@ -252,36 +252,51 @@ const engine = {
 
         // Remove counterparts
             // 1. First randomize, whether the middle tile in middle square should be hidden or not
-           /*  const randHide = Math.floor(Math.random() * 2);
+            const randHide = Math.floor(Math.random() * 2);
+            const initialCounterPartsRemove = 18;
             console.log(randHide);
             if(randHide) {ordered[Math.floor(ordered.length / 2)].textContent = ''; } //  + invoke score checking function
             ordered.splice(Math.floor(ordered.length / 2), 1);
 
-            for(let c=0; c<15; c++) {
+            for(let c=0; c<initialCounterPartsRemove; c++) {
                 let rand = Math.floor(Math.random() * (ordered.length / 2));
                 let counterPart = ordered.length - (rand + 1);
+
+                let partDigit = ordered[rand].textContent;
+                let counterPartDigit = ordered[counterPart].textContent;
 
                 ordered[rand].textContent = '';
                 ordered[counterPart].textContent = '';
 
-                // Order here is important !
-                ordered.splice(counterPart, 1);
-                ordered.splice(rand, 1);
+                let isStillUnique = this.backtrack();
+                console.log('UNIQUE SUDOKU ?', isStillUnique);
+                if(isStillUnique) {
+                    // Order here is important !
+                    ordered.splice(counterPart, 1);
+                    ordered.splice(rand, 1);
+                } else {
+                    c = c - 1;
+                    ordered[rand].textContent = partDigit;
+                    ordered[counterPart].textContent = counterPartDigit;
+                }  
+
+
+
             }
 
-            let isStillUnique = this.backtrack();
-            console.log('UNIQUE SUDOKU ?', isStillUnique); */
-        //
+            //. To this point Sudoku can be 100% solved with only Single Candidate and Single Position (36 - 37 digits already removed)
+        
 
 
-        let substr = 4;
-        let multiRemove_stop = 33;
+        let substr = 2;
+        let multiRemove_start = 81 - ((initialCounterPartsRemove * 2) + randHide);
+        console.log(multiRemove_start, randHide);
+        let multiRemove_stop = 34;
+        let i;
+        console.log(multiRemove_stop);
 
-        for(let i=this.rows * this.columns; i>multiRemove_stop; i = i - substr ) {
-           if(i >= 61 ) { substr = 4; }
-           if( i < 61) { substr = 2; }
-           
-            console.log(i);
+        for(i=multiRemove_start; i>multiRemove_stop - randHide; i = i - substr) {
+
             let temp = [];
 
             for(let x=0; x<substr; x++) {
@@ -304,7 +319,14 @@ const engine = {
             }
         } 
 
-        this.singleRemoval(ordered, randInitial, multiRemove_stop); 
+        let j = {j: 0 + randHide};
+        ordered.forEach(el => {
+            return j.j++;
+        })
+
+        console.log('our iterator is: ', i, '  tiles uncover count is: ', j.j);
+
+        this.singleRemoval(ordered, randInitial, i, randHide); 
 
         allTilesArray.forEach(tile => {
             if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
@@ -315,39 +337,40 @@ const engine = {
 
     },
 
-    singleRemoval: function(ordered, randInitial, multiRemove_stop) {
-        console.log(ordered);
-        console.log(randInitial);
-
-        console.log(ordered);
+    singleRemoval: function(ordered, randInitial, singleRemove_start, randHide) {
+        
         let orderedCopy = [...ordered];
+        let elAndDigit = [];
 
-        for(let x=multiRemove_stop; x>randInitial; x--) {
-            console.log(x);
-            if(orderedCopy.length === 0) { console.log('No more possibilites to remove! ', x, ' from ', randInitial, ' remain '); return;}
-
+        for(let x=singleRemove_start; x>randInitial + randHide; x--) {
+           
             let rand = Math.floor(Math.random() * orderedCopy.length);
-            let num = orderedCopy[rand].textContent;
+            elAndDigit.push([orderedCopy[rand], orderedCopy[rand].textContent]);
+
             orderedCopy[rand].textContent = '';
 
             let isStillUnique = this.backtrack();
-            //console.log('UNIQUE SUDOKU ?', isStillUnique);
 
-            if(!isStillUnique) {
-                orderedCopy[rand].textContent = num;
+            if(isStillUnique) { // it's unique Sudoku
+                ordered.splice(rand, 1);
+                orderedCopy = [...ordered];
+            } else { // not unique
+                elAndDigit[elAndDigit.length -1][0].textContent = elAndDigit[elAndDigit.length -1][1];
                 orderedCopy.splice(rand, 1);
                 x = x + 1;
-                console.log('nope');
-            } else {
-                const index = ordered.indexOf(ordered[rand]);
-                ordered[index].textContent = '';
-                ordered.splice(index, 1);
-                orderedCopy = [...ordered];
-                console.log('Length: ', orderedCopy.length);
+                console.log(orderedCopy.length);
+                if(orderedCopy.length <= (ordered.length / 2)) { // WE WANT TO SAVE TIME FOR RENDERING, THATS WHY IT LOOKS LIKE THAT
+                    //console.log(`CANNOT REMOVE MORE - ${x} from ${randInitial + randHide} remain`);
+                    return;
+                }
             }
+
+            elAndDigit.pop();
+            
         }
 
-        console.log('DONE SUCCESSFULLY !!! ', randInitial, ' digits remain');
+        //console.log(`DONE SUCCESSFULLY! with ${randInitial + randHide}`)
+
     },
 
     solveSudoku: function() {
