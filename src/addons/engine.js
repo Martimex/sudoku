@@ -379,7 +379,7 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         // Our array of methods
-        const methodsArr = [singleCandidate, singlePosition, candidateLines];
+        const methodsArr = [singleCandidate, singlePosition, candidateLines, doublePairs];
 
         /* const dimensionObject = {
             row: [
@@ -718,7 +718,7 @@ const engine = {
                 //console.log('exceptionDigits  ', exceptionDigits);
                 for(let num = 1; num <= 9; num++) { // Verify if that cant be improved (time-wise)
                     if((digitsToCheck.has(num)) && (!exceptionDigits.has(num))) {
-                        console.log('we are checking num-', num);
+                        //console.log('we are checking num-', num);
                         const isBelonging = checkBelonging(num, grid, allSquares, squareNo);
                         if(isBelonging) {
                             helpedSolving = true;
@@ -729,13 +729,85 @@ const engine = {
             return helpedSolving;
         }
 
+        function doublePairs() {
+            // Rzędy i kolumny możemy bezpiecznie pobierać z grida, a kwadraty ze specjalnej funkcji getSquares()
+            let helpedSolving = null;
+            console.log('When no other method helps...')
+            const allSquares = getSquares();
+            console.log(allSquares);
+            for(let square_in_line=0; square_in_line < 3; square_in_line++) {
+
+                // Set, z którego pobierzemy wszystkie liczby
+                let square_in_line_row_nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                let square_in_line_col_nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                let square_in_line_row_set = new Set();
+                let square_in_line_col_set = new Set();
+
+                // Create 2 pointers that changes their position over every iteration
+                /*  let pointer1 = tile_in_line;
+                let pointer2 = (tile_in_line + 1) % 3;
+                let not_detected = (tile_in_line + 2) %3;  */
+
+                /*    p1   p2    nd        nd   p1    p2       p2    nd    p1
+                    ////  ////  ////     ////  ////  ////     ////  ////  //// 
+                    /  /  /  /  /  / ->  /  /  /  /  /  /  -> /  /  /  /  /  /
+                    ////  ////  ////     ////  ////  ////     ////  ////  ////
+                */
+
+
+
+
+                for(let in_line = 0; in_line<3; in_line++) {
+                    for(let il=0; il<allSquares[(square_in_line * 3) + in_line].length; il++) {
+                        for(let el=0; el<allSquares[(square_in_line * 3) + in_line][il].length; el++) {
+                            if(typeof(allSquares[(square_in_line * 3) + in_line][il][el]) !== 'object') {
+                                square_in_line_row_set.add(parseInt(allSquares[(square_in_line * 3) + in_line][il][el]));
+                            }
+                            if(typeof(allSquares[(in_line * 3) + square_in_line][il][el]) !== 'object') {
+                                square_in_line_col_set.add(parseInt(allSquares[(in_line * 3) + square_in_line][il][el]));
+                            }
+                        }
+                    }
+                }
+
+
+                // Pobierasz rząd / kolumnę z pointer1 i pointer2 i sprawdzasz, czy występuje jako opcja w trzech
+                // kwadratach, przez które przechodzi. Jeśli tak to szukaj kwadratu, w którego kratkach (wewnątrz linii
+                // not_detected) ona nie występuje. Jeśli taki kwadrat jest, to dla jego pozostałych linii można wykluczyć
+                // z opcji sprawdzaną cyfrę
+
+                let square_in_line_row_set_values = square_in_line_row_set.entries();
+                let square_in_line_col_set_values = square_in_line_col_set.values();
+                console.warn(square_in_line_row_set_values)
+                console.warn(square_in_line_row_set_values[2])
+
+                for(let x=0; x<square_in_line_row_set.size; x++) {
+                    let index = square_in_line_row_nums.indexOf(square_in_line_row_set_values);
+                    console.log(index);
+                    square_in_line_row_nums.splice(index, 1);
+                }
+
+                for(let y=0; y<square_in_line_col_set.size; y++) {
+                    let index = square_in_line_col_nums.indexOf(square_in_line_col_set_values);
+                    square_in_line_col_nums.splice(index, 1);
+                }
+
+                console.log('sq_row', square_in_line_row_set);
+                console.log('sq_col', square_in_line_col_set);
+
+                console.log('nums_row', square_in_line_row_nums);
+                console.log('nums_col', square_in_line_col_nums);
+            }
+            return helpedSolving;
+        }
+
 
         // while kończy się, kiedy nasza ostatnia najtrudniejsza metoda zwróci false - wtedy już nie można bardziej rozwiązać sudoku zaimplementowanymi obecnie metodami
         let currMethodNo = 0;
         while(currMethodNo < methodsArr.length) {
             let doesItHelp = methodsArr[currMethodNo]();
             if(doesItHelp) {
-                if(currMethodNo === 2) {console.warn('Our new function has helped !')}
+                if(currMethodNo === 2) {console.warn(':)')}
                 console.log('back to method first'); 
                 currMethodNo = 0; 
                 updateGrid(grid); 
