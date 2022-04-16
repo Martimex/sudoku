@@ -776,20 +776,18 @@ const engine = {
                 // not_detected) ona nie występuje. Jeśli taki kwadrat jest, to dla jego pozostałych linii można wykluczyć
                 // z opcji sprawdzaną cyfrę
 
-                let square_in_line_row_set_values = square_in_line_row_set.entries();
-                let square_in_line_col_set_values = square_in_line_col_set.values();
-                console.warn(square_in_line_row_set_values)
-                console.warn(square_in_line_row_set_values[2])
-
-                for(let x=0; x<square_in_line_row_set.size; x++) {
-                    let index = square_in_line_row_nums.indexOf(square_in_line_row_set_values);
-                    console.log(index);
-                    square_in_line_row_nums.splice(index, 1);
+                for(let el of square_in_line_row_set) {
+                    if(square_in_line_row_nums.includes(el)) {
+                        let index = square_in_line_row_nums.indexOf(el);
+                        square_in_line_row_nums.splice(index, 1);
+                    }
                 }
 
-                for(let y=0; y<square_in_line_col_set.size; y++) {
-                    let index = square_in_line_col_nums.indexOf(square_in_line_col_set_values);
-                    square_in_line_col_nums.splice(index, 1);
+                for(let el of square_in_line_col_set) {
+                    if(square_in_line_col_nums.includes(el)) {
+                        let index = square_in_line_col_nums.indexOf(el);
+                        square_in_line_col_nums.splice(index, 1);
+                    }
                 }
 
                 console.log('sq_row', square_in_line_row_set);
@@ -797,6 +795,13 @@ const engine = {
 
                 console.log('nums_row', square_in_line_row_nums);
                 console.log('nums_col', square_in_line_col_nums);
+
+                for(let x=0; x<square_in_line_row_nums.length; x++) {
+                   const didHelp =  lookForDoublePairs(grid, allSquares, square_in_line_row_nums[x], square_in_line, 'row');
+                }
+                for(let y=0; y<square_in_line_col_nums.length; y++) {
+                    const didHelp = lookForDoublePairs(grid, allSquares, square_in_line_col_nums[y], square_in_line, 'column');
+                }
             }
             return helpedSolving;
         }
@@ -821,6 +826,134 @@ const engine = {
         }
         
         //console.log(dimensionObject);
+        function lookForDoublePairs(grid, allSquares, digit, line_no, dimension) {
+            let didHelp = null;
+            for(let tiles_in_line=0; tiles_in_line<3; tiles_in_line++) {
+                let pointer1 = (line_no * 3) + (tiles_in_line % 3);
+                let pointer2 = (line_no * 3) + ((tiles_in_line + 1) % 3);
+                let noDetect = (line_no * 3) + ((tiles_in_line + 2) % 3);
+
+                
+                // Cyfra "digit" z noDetect może wystąpić tylko i wyłącznie w ramach jednego kwadratu
+                // Row pattern is: grid[(square_no * 3) + tile_in_square_line][noDetect];
+                // Column pattern is: grid[noDetect][(square_no * 3) + tile_in_square_line];
+                let digitInSquareNo = [];
+                for(let square_no=0; square_no<3; square_no++) {
+                    for(let tile_in_square_line=0; tile_in_square_line<3; tile_in_square_line++) {
+                        let noDetect_checkedTile = dimension === 'row'? grid[noDetect][(square_no * 3) + tile_in_square_line] : grid[(square_no * 3) + tile_in_square_line][noDetect];
+                        if(typeof(noDetect_checkedTile === 'object')) {
+                            if(noDetect_checkedTile.includes(digit)) {
+                                digitInSquareNo.push(square_no);
+                                if(digitInSquareNo.length > 1) {
+                                    if(digitInSquareNo[0] !== digitInSquareNo[digitInSquareNo.length - 1]) {
+                                        //return false; Wróć na początek pętli
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if(digitInSquareNo.length < 1) {} //return false; Wróć na początek pętli
+
+                // Od tego momentu wiemy już, że noDetect spełnia swoje warunki - musimy sprawdzić, czy pointer1 i pointer2 również spełniają
+                // swoje warunki
+
+                // Teraz sprawdź, czy w kwadracie, w którym  nasz noDetect posiada cyfrę, czy w pozostałych liniach w ramach tego kwadratu
+                // znajduje się ta liczba. Jeśli nie, to znaczy, że ta funkcja nam nie pomoże, więc MOŻEMY WRÓCIĆ NA POCZĄTEK PĘTLI, jeśli
+                // tak, to przechodzimy dalej;
+
+                let isTargetSqaureContainingDigit = false;
+                
+                for(let targetSquareTile = 0; targetSquareTile < 3; targetSquareTile++) {
+                    let pointer1_checkedTile = dimension === 'row'? grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile] : grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1];
+                    let pointer2_checkedTile = dimension === 'row'? grid[pointer2][(digitInSquareNo[0] * 3) + targetSquareTile] : grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer2];
+
+                    if(typeof(pointer1_checkedTile) === 'object') {
+                        if(pointer1_checkedTile.includes(digit)) {
+                            isTargetSqaureContainingDigit = true;
+                        }
+                    }
+                    if(typeof(pointer2_checkedTile) === 'object') {
+                        if(pointer2_checkedTile.includes(digit)) {
+                            isTargetSqaureContainingDigit = true;
+                        }
+                    }
+                }
+
+                if(!isTargetSqaureContainingDigit) { } //return false; Wróć na początek pętli
+
+                // Na koniec sprawdzamy, czy ta cyfra występuje w pozostałych kwadratach dla linii, na które wskazują pointer1 i pointer2.
+                // Muszą pojawić się minimum 2 razy dla każdego z tych wskaźników - jedno wystąpienie w pierwszym, a drugie w drugim 
+                // kwadracie, w którym noDetect nie posiada cyfry. Jeśli nie, to znaczy, że ta funkcja nam nie pomoże, więc
+                // MOŻEMY WRÓCIĆ NA POCZĄTEK PĘTLI, jeśli tak:::
+
+                const remainSquareNo = [0, 1, 2].filter((value) => {
+                    return value !== digitInSquareNo[0]; // expected: should always remove 1 elem, so two remains
+                })
+
+                let areNonTargetsWithDigit = [false, false, false, false];
+
+                for(let nonTargetSquareCount = 0; nonTargetSquareCount < remainSquareNo.length; nonTargetSquareCount++) { // will go 2 times
+                    for(let nonTargetSquareTile = 0; nonTargetSquareTile < 3; nonTargetSquareTile++) {  
+                        let pointer1_checkedTile = dimension === 'row'? grid[pointer1][(remainSquareNo[nonTargetSquareCount] * 3) + nonTargetSquareTile] : grid[(remainSquareNo[nonTargetSquareCount] * 3) + nonTargetSquareTile][pointer1];
+                        let pointer2_checkedTile = dimension === 'row'? grid[pointer2][(remainSquareNo[nonTargetSquareCount] * 3) + nonTargetSquareTile] : grid[(remainSquareNo[nonTargetSquareCount] * 3) + nonTargetSquareTile][pointer2];
+
+                        if(typeof(pointer1_checkedTile) === 'object') {
+                            if(pointer1_checkedTile.includes(digit)) {
+                                areNonTargetsWithDigit[(nonTargetSquareCount * 2)] = true;
+                            }
+                        }
+                        if(typeof(pointer2_checkedTile) === 'object') {
+                            if(pointer2_checkedTile.includes(digit)) {
+                                areNonTargetsWithDigit[(nonTargetSquareCount * 2) + 1] = true;
+                            }
+                        }
+
+                    }
+                }
+
+                const isFinalConditionMet = areNonTargetsWithDigit.some(el => {
+                    if(el === true) {return el}; 
+                })
+
+                if(!isFinalConditionMet) {} //return false; Wróć na początek pętli
+
+
+                //::: to z kwadratu, gdzie noDetect posiada cyfry, z linii gdzie wskazują w tym kwadracie wskaźniki, usuwamy wszystkie wystąpienia
+                // tej cyfry. Zaznaczamy że funkcja pomogła nam znaleźć rozwiązanie. NIE USUWAMY ŻADNEJ CYFRY Z RZĘDU, GDZIE WSKAZUJE NODETECT.
+            
+                for(let targetSquareTile = 0; targetSquareTile < 3; targetSquareTile++) {
+                    let pointer1_checkedTile = dimension === 'row'? grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile] : grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1];
+                    let pointer2_checkedTile = dimension === 'row'? grid[pointer2][(digitInSquareNo[0] * 3) + targetSquareTile] : grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer2];
+
+                    if(typeof(pointer1_checkedTile) === 'object') {
+                        if(pointer1_checkedTile.includes(digit)) {
+                            if(dimension === 'row') {
+                                let index = grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile].indexOf(digit);
+                                grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile].splice(index, 1);
+                            } else {
+                                let index = grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1].indexOf(digit);
+                                grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1].splice(index, 1);
+                            }
+                            didHelp = true;
+                        }
+                    }
+                    if(typeof(pointer2_checkedTile) === 'object') {
+                        if(pointer2_checkedTile.includes(digit)) {
+                           if(dimension === 'row') {
+                                let index = grid[pointer2][(digitInSquareNo[0] * 3) + targetSquareTile].indexOf(digit);
+                                grid[pointer2][(digitInSquareNo[0] * 3) + targetSquareTile].splice(index, 1);
+                           } else {
+                                let index = grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer2].indexOf(digit);
+                                grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer2].splice(index, 1);
+                           }
+                           didHelp = true;
+                        }
+                    }
+                }
+
+            }
+        }
 
         function testCandidate(grid, {row, index_in_row}, num) {
             for(let k=0; k<grid[row].length; k++) {
