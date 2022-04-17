@@ -553,7 +553,7 @@ const engine = {
                         if((grid[gridRow][iir].length > 1) && (grid[gridRow][iir].includes(num))) {
                             let index = grid[gridRow][iir].indexOf(num);
                             grid[gridRow][iir].splice(index, 1);
-                            console.warn(`Row checker has detected that number ${num} will not be in grid[${gridRow}][${iir}]`);
+                            //console.warn(`Row checker has detected that number ${num} will not be in grid[${gridRow}][${iir}]`);
                             didHelp = true;
                         }
                     }
@@ -568,7 +568,7 @@ const engine = {
                         if((grid[iic][gridCol].length > 1) && (grid[iic][gridCol].includes(num))) {
                             let index = grid[iic][gridCol].indexOf(num);
                             grid[iic][gridCol].splice(index, 1);
-                            console.warn(`Column checker has detected that number ${num} will not be in grid[${iic}][${gridCol}]`);
+                            //console.warn(`Column checker has detected that number ${num} will not be in grid[${iic}][${gridCol}]`);
                             didHelp = true;
                         }
                     }
@@ -798,9 +798,11 @@ const engine = {
 
                 for(let x=0; x<square_in_line_row_nums.length; x++) {
                    const didHelp =  lookForDoublePairs(grid, allSquares, square_in_line_row_nums[x], square_in_line, 'row');
+                   if(didHelp) { helpedSolving = true;}
                 }
                 for(let y=0; y<square_in_line_col_nums.length; y++) {
                     const didHelp = lookForDoublePairs(grid, allSquares, square_in_line_col_nums[y], square_in_line, 'column');
+                    if(didHelp) { helpedSolving = true;}
                 }
             }
             return helpedSolving;
@@ -812,7 +814,7 @@ const engine = {
         while(currMethodNo < methodsArr.length) {
             let doesItHelp = methodsArr[currMethodNo]();
             if(doesItHelp) {
-                if(currMethodNo === 2) {console.warn(':)')}
+                /* if(currMethodNo === 2) {console.warn(':)')} */
                 console.log('back to method first'); 
                 currMethodNo = 0; 
                 updateGrid(grid); 
@@ -827,8 +829,16 @@ const engine = {
         
         //console.log(dimensionObject);
         function lookForDoublePairs(grid, allSquares, digit, line_no, dimension) {
-            let didHelp = null;
+            let didHelp = false;
             for(let tiles_in_line=0; tiles_in_line<3; tiles_in_line++) {
+                let isHelpful = checkDoublePairs(grid, allSquares, digit, line_no, dimension, tiles_in_line);
+                if(isHelpful) { didHelp = true; }
+            }
+
+            return didHelp;
+        
+            function checkDoublePairs(grid, allSquares, digit, line_no, dimension, tiles_in_line) {
+                let didHelp = false;
                 let pointer1 = (line_no * 3) + (tiles_in_line % 3);
                 let pointer2 = (line_no * 3) + ((tiles_in_line + 1) % 3);
                 let noDetect = (line_no * 3) + ((tiles_in_line + 2) % 3);
@@ -841,19 +851,19 @@ const engine = {
                 for(let square_no=0; square_no<3; square_no++) {
                     for(let tile_in_square_line=0; tile_in_square_line<3; tile_in_square_line++) {
                         let noDetect_checkedTile = dimension === 'row'? grid[noDetect][(square_no * 3) + tile_in_square_line] : grid[(square_no * 3) + tile_in_square_line][noDetect];
-                        if(typeof(noDetect_checkedTile === 'object')) {
+                        if(typeof(noDetect_checkedTile) === 'object') {
                             if(noDetect_checkedTile.includes(digit)) {
                                 digitInSquareNo.push(square_no);
                                 if(digitInSquareNo.length > 1) {
                                     if(digitInSquareNo[0] !== digitInSquareNo[digitInSquareNo.length - 1]) {
-                                        //return false; Wróć na początek pętli
+                                        return false; //return false; Wróć na początek pętli
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if(digitInSquareNo.length < 1) {} //return false; Wróć na początek pętli
+                if(digitInSquareNo.length < 1) { return false;} //return false; Wróć na początek pętli
 
                 // Od tego momentu wiemy już, że noDetect spełnia swoje warunki - musimy sprawdzić, czy pointer1 i pointer2 również spełniają
                 // swoje warunki
@@ -880,7 +890,7 @@ const engine = {
                     }
                 }
 
-                if(!isTargetSqaureContainingDigit) { } //return false; Wróć na początek pętli
+                if(!isTargetSqaureContainingDigit) { return false; } //return false; Wróć na początek pętli
 
                 // Na koniec sprawdzamy, czy ta cyfra występuje w pozostałych kwadratach dla linii, na które wskazują pointer1 i pointer2.
                 // Muszą pojawić się minimum 2 razy dla każdego z tych wskaźników - jedno wystąpienie w pierwszym, a drugie w drugim 
@@ -916,7 +926,7 @@ const engine = {
                     if(el === true) {return el}; 
                 })
 
-                if(!isFinalConditionMet) {} //return false; Wróć na początek pętli
+                if(!isFinalConditionMet) { return false; } //return false; Wróć na początek pętli
 
 
                 //::: to z kwadratu, gdzie noDetect posiada cyfry, z linii gdzie wskazują w tym kwadracie wskaźniki, usuwamy wszystkie wystąpienia
@@ -931,9 +941,11 @@ const engine = {
                             if(dimension === 'row') {
                                 let index = grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile].indexOf(digit);
                                 grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile].splice(index, 1);
+                                console.warn(dimension, ' helped us find Double Pairs - the digit is: ', digit, ` and the tile cords is: grid[${pointer1}][${(digitInSquareNo[0] * 3) + targetSquareTile}]`);
                             } else {
                                 let index = grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1].indexOf(digit);
                                 grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1].splice(index, 1);
+                                console.warn(dimension, ' helped us find Double Pairs - the digit is: ', digit, ` and the tile cords is: grid[${(digitInSquareNo[0] * 3) + targetSquareTile}][${pointer1}]`);
                             }
                             didHelp = true;
                         }
@@ -943,17 +955,24 @@ const engine = {
                            if(dimension === 'row') {
                                 let index = grid[pointer2][(digitInSquareNo[0] * 3) + targetSquareTile].indexOf(digit);
                                 grid[pointer2][(digitInSquareNo[0] * 3) + targetSquareTile].splice(index, 1);
+                                console.warn(dimension, ' helped us find Double Pairs - the digit is: ', digit, ` and the tile cords is: grid[${pointer2}][${(digitInSquareNo[0] * 3) + targetSquareTile}]`);
                            } else {
                                 let index = grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer2].indexOf(digit);
                                 grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer2].splice(index, 1);
+                                console.warn(dimension, ' helped us find Double Pairs - the digit is: ', digit, ` and the tile cords is: grid[${(digitInSquareNo[0] * 3) + targetSquareTile}][${pointer2}]`);
                            }
+                           
                            didHelp = true;
                         }
                     }
                 }
 
+                return didHelp;
             }
         }
+
+
+
 
         function testCandidate(grid, {row, index_in_row}, num) {
             for(let k=0; k<grid[row].length; k++) {
