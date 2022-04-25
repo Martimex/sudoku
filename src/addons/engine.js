@@ -1023,11 +1023,16 @@ const engine = {
 
             // 1)
             console.log(dimensionObj_dim_subset_l.dimArr[dimension_item]);
-            let isIncompleteTrippleSubset = checkIncompleteTrippleSubset(grid, dimensionObj_dim_subset_l.dimArr[dimension_item]);
+            let isIncompleteTrippleSubset = checkIncompleteTrippleSubset(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimension_item, dimensionObj_dim);
             
-            function checkIncompleteTrippleSubset(grid, thisDimOptions) {
-                const trippleInDimArr = dimensionObj_dim_subset_l.dimArr[dimension_item].filter((val, index) => {
-                    if(dimensionObj_dim_subset_l.dimArr[dimension_item][index].length === 3) return true;
+            if(isIncompleteTrippleSubset) {didHelp = true;}
+
+            // 2)
+
+            function checkIncompleteTrippleSubset(grid, thisDimOptions, dim_no, dim) {
+                let didHelp = false;
+                const trippleInDimArr = thisDimOptions.filter((val, index) => {
+                    if(thisDimOptions[index].length === 3) return true;
                 })
 
                 //console.log(trippleInDimArr);
@@ -1037,11 +1042,11 @@ const engine = {
                 for(let trippleCandidateNo = 0; trippleCandidateNo<trippleInDimArr.length; trippleCandidateNo++) {
                     let incompleteTrippleCandidates = [];
                     // For each tripple options elem in current dimension
-                    for(let trippleOptionsEl = 0; trippleOptionsEl<dimensionObj_dim_subset_l.dimArr[dimension_item].length; trippleOptionsEl++) {
+                    for(let trippleOptionsEl = 0; trippleOptionsEl<thisDimOptions.length; trippleOptionsEl++) {
                         // For each elem inside current dimension
-                        let doesContainsOnlyTheSameNumbers = checkContaisnOnlyTheSameNumbers(trippleInDimArr[trippleCandidateNo], dimensionObj_dim_subset_l.dimArr[dimension_item][trippleOptionsEl]);
+                        let doesContainsOnlyTheSameNumbers = checkContaisnOnlyTheSameNumbers(trippleInDimArr[trippleCandidateNo], thisDimOptions[trippleOptionsEl]);
                         if(doesContainsOnlyTheSameNumbers) {
-                            incompleteTrippleCandidates.push(dimensionObj_dim_subset_l.dimArr[dimension_item][trippleOptionsEl]);
+                            incompleteTrippleCandidates.push(thisDimOptions[trippleOptionsEl]);
                         }
                     }
 
@@ -1049,21 +1054,63 @@ const engine = {
                     console.log(incompleteTrippleCandidates);
                     if(incompleteTrippleCandidates.length === 3) {
                         // Yess, our function helps (probably) !!
-                        console.log('%c IT HELPS !', 'background: yellow; color: black; font-weight: 650');
-                        const incompleteTrippleCandidates_copy = [...incompleteTrippleCandidates];
 
                         // CONTINUE FROM HERE...
-
+                        //console.log(trippleInDimArr);
                         for(let dimension_tile = 0; dimension_tile<9; dimension_tile++) {
                             // For every tile in current dimension
+                            const detectedTileOptions_copy = [...thisDimOptions[dimension_tile]];
+                            //console.log(dimensionObj_dim_subset_l.dimArr[dimension_item][dimension_tile])
                             for(let candidate_no = 0; candidate_no<incompleteTrippleCandidates.length; candidate_no++) {
                                 // For each gathered digit from incompleteTrippleCandidates (we know its length equals 3)
+                                if(thisDimOptions[dimension_tile].includes(trippleInDimArr[trippleCandidateNo][candidate_no])) {
+                                    // If detected tile has the digit
+                                    let index = detectedTileOptions_copy.indexOf(trippleInDimArr[trippleCandidateNo][candidate_no]);
+                                    detectedTileOptions_copy.splice(index, 1);
+                                }
+                            }
+                            // Now check what's the final length of detected tile if we would remove the same digits as gathered
+                            // If length === 0 that means we were trying to modify a subset elem, which of course is not allowed
+                            if((detectedTileOptions_copy.length > 0) && ((thisDimOptions[dimension_tile]).length !== detectedTileOptions_copy.length)) {
+                                // If it is not a subset tile and our loops has actually removed at least one element
+
+                                console.log('remaining options, excluding: ',trippleInDimArr[trippleCandidateNo], '  would be: ', detectedTileOptions_copy);
+                                console.log('all options in tile: ', thisDimOptions[dimension_tile])
+                                console.log('%c IT HELPS !', 'background: yellow; color: black; font-weight: 650');
+
+                                // Now let's just update grid with what we've found there
+                                let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
+                                let sq_r_rest = dim_no % 3; // 0 to 2
+                                let sq_c_compressed = Math.floor(dimension_tile / 3); // 0 to 2
+                                let sq_c_rest = dimension_tile % 3; // 0 to 2
+                    
+                                let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                                let sq_c = (sq_r_rest * 3) + sq_c_rest;
+                                // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                                if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
+                                    if(grid[dim_no][dimension_tile].length > 1) {
+                                        grid[dim_no][dimension_tile] = detectedTileOptions_copy;
+                                        console.error(`Incomplete tripple subset =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
+                                        didHelp = true;
+                                    }
+                                } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
+                                    if(grid[dimension_tile][dim_no].length > 1) {
+                                        grid[dimension_tile][dim_no] = detectedTileOptions_copy;
+                                        console.error(`Incomplete tripple subset =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
+                                        didHelp = true;
+                                    }
+                                } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                                    if(grid[sq_r][sq_c].length > 1) {
+                                        grid[sq_r][sq_c] = detectedTileOptions_copy;
+                                        console.error(`Incomplete tripple subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
+                                        didHelp = true;
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
-
+                return didHelp;
             }
 
             function checkContaisnOnlyTheSameNumbers(thisTripple, detectedElem) {
