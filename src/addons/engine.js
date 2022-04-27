@@ -1019,7 +1019,7 @@ const engine = {
 
             // Now we can focus on subset methods that are length specific :
             // 1) Incomplete tripple subset -> {3, 6} {3, 6, 9} {3, 6, 9} || {2, 7} {2, 8} {2, 7, 8}
-            // 2) Tripple double subset -> {4, 9} {2, 4} {2, 9}
+            // 2) Three double subsets -> {4, 9} {2, 4} {2, 9}
 
             // 1)
             console.log(dimensionObj_dim_subset_l.dimArr[dimension_item]);
@@ -1028,6 +1028,154 @@ const engine = {
             if(isIncompleteTrippleSubset) {didHelp = true;}
 
             // 2)
+            let isThreeDoubleSubset = checkThreeDoubleSubsets(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimension_item, dimensionObj_dim);
+
+            if(isThreeDoubleSubset) {didHelp = true; }
+
+            function checkThreeDoubleSubsets(grid, thisDimOptions, dim_no, dim) {
+                let didHelp = false;
+                const doubleInDimArr = thisDimOptions.filter((val, index) => {
+                    if(thisDimOptions[index].length === 2) return true;
+                })
+
+                if(doubleInDimArr.length < 3) { return false;}
+
+                // Remove double subsets remains - which is {2, 4} and {2, 4} for example - they are not necessary
+                for(let checked_double_no = 0; checked_double_no<doubleInDimArr.length; checked_double_no++) {
+                    // Get first double elem
+                    for(let compared_double_no = checked_double_no + 1; compared_double_no < doubleInDimArr.length; compared_double_no++) {
+                        // Get second double elem (for comparison purposes)
+                        const areExactDuplicates = checkExactDuplicates(doubleInDimArr[checked_double_no], doubleInDimArr[compared_double_no]);
+
+                        if(areExactDuplicates) {
+                            // Remove those duplicates (splice order is important here!)
+                            // Firstly start with an elem with higher index (compared one), that go for a checked el
+                            doubleInDimArr.splice(compared_double_no, 1);
+                            doubleInDimArr.splice(checked_double_no, 1);
+
+                            // Finally set checkeddoubleno index properly
+                            compared_double_no = doubleInDimArr.length; // finish checking - it cannot happen more than once for doubles !
+                            checked_double_no--;
+
+                            console.log(`%c get rid of double subset exact dupliactes`, 'background: white; color: black;');
+                        }
+
+                        function checkExactDuplicates(checked_el, compared_el) {
+                            if(!compared_el) {return false;}
+                            let areExact = true;
+                            for(let index = 0; index < 2; index++) {
+                                // Compare indexes of those elems and check if those are not exast same duplicates
+                                //console.log(checked_el[index], compared_el[index])
+                                if(parseInt(checked_el[index]) !== parseInt(compared_el[index])) {
+                                    areExact = false;
+                                }
+                            }
+                            return areExact;
+                        }
+                    }
+                }
+
+                console.log('DoubleDim is now: ', doubleInDimArr);
+
+                if(doubleInDimArr.length < 3) { return false;}
+
+                // So now we have all double subset which are 100% not duplicative, and we have 3 or more of them
+
+                // 1. Gather  all numbers from remaining doubles
+                const doubleNums = {};
+
+                for(let doubleNo = 0; doubleNo <doubleInDimArr.length; doubleNo++) {
+                    for(let doubleNo_index = 0; doubleNo_index < 2; doubleNo_index++) {
+                        doubleNums[doubleInDimArr[doubleNo][doubleNo_index]] = (doubleNums[doubleInDimArr[doubleNo][doubleNo_index]]+1) || 1;
+                    }
+                }
+                
+                //console.log(doubleNums);
+
+                const copy = [...doubleInDimArr];
+
+                // 2. Remove doubles, which has num / nums that exists more or less than exactly 2 times && then check for 3 or above length
+                for(let key in doubleNums) {
+                    if(doubleNums[key] !== 2) {
+                        //console.log(doubleNums[key], '  but thats illegal');
+                        for(let doubleNo = 0 ; doubleNo < doubleInDimArr.length; doubleNo++) {
+                            if(doubleInDimArr[doubleNo].includes(parseInt(key))) {
+                                doubleInDimArr.splice(doubleNo, 1);
+                                doubleNo--;
+                            }
+                        }
+                    }
+                }
+
+
+
+                console.log('OBJ: ',doubleNums,  '  ||  Before: ', copy, '  -  After: ', doubleInDimArr);
+                (doubleInDimArr.length === 3)? console.log('WE GOT A THREE DOUBLE') : console.log('not enough, length is just ', doubleInDimArr.length)
+
+                if(doubleInDimArr.length === 3) {
+                    const uniqueDigits = new Set([].concat(...doubleInDimArr));
+                    if(uniqueDigits.size !== 3) { console.error('Saved from crashing - set: ', uniqueDigits); return false; } // In some specific cases set get a length of 4 - this line prevents from errors
+                    //console.log(uniqueDigits);
+                    // Yay, we have found three double subset ! Now just check if it helps removing anything
+
+                    for(let dimension_tile=0; dimension_tile<9; dimension_tile++) {
+                        
+                        // Now let's just update grid with what we've found there
+                        let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
+                        let sq_r_rest = dim_no % 3; // 0 to 2
+                        let sq_c_compressed = Math.floor(dimension_tile / 3); // 0 to 2
+                        let sq_c_rest = dimension_tile % 3; // 0 to 2
+            
+                        let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                        let sq_c = (sq_r_rest * 3) + sq_c_rest;
+                        // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                        if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
+                            const isNotaSubset = checkNotASubset(grid[dim_no][dimension_tile], uniqueDigits);
+                            if(isNotaSubset) {
+                                grid[dim_no][dimension_tile] = isNotaSubset;
+                                console.log('unique Digits: ', uniqueDigits);
+                                console.error(`Three doubles =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
+                                didHelp = true;
+                            }
+                        } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
+                            const isNotaSubset = checkNotASubset(grid[dimension_tile][dim_no], uniqueDigits);
+                            if(isNotaSubset) {
+                                grid[dimension_tile][dim_no] = isNotaSubset;
+                                console.log('unique Digits: ', uniqueDigits);
+                                console.error(`Three doubles =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
+                                didHelp = true;
+                            }
+                        } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                            const isNotaSubset = checkNotASubset(grid[sq_r][sq_c], uniqueDigits);
+                            if(isNotaSubset) {
+                                grid[sq_r][sq_c] = isNotaSubset;
+                                console.log('unique Digits: ', uniqueDigits);
+                                console.error(`Three doubles subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
+                                didHelp = true;
+                            }
+                        }
+                    }
+
+                }
+
+                function checkNotASubset(currTileOptions, numsToRemove) {
+                    if(currTileOptions.length < 1) { return false; }
+                    let currTileOptions_copy = [...currTileOptions];
+                    let didRemove = false;
+                    numsToRemove.forEach((num) => {
+                        if(currTileOptions_copy.includes(num)) {
+                            let index = currTileOptions_copy.indexOf(num);
+                            currTileOptions_copy.splice(index, 1);
+                            didRemove = true;
+                        }
+                    })
+                    if((didRemove) && (currTileOptions_copy.length > 0)) {
+                        return currTileOptions_copy;
+                    } else {return false; }
+                }
+
+                return didHelp;
+            }
 
             function checkIncompleteTrippleSubset(grid, thisDimOptions, dim_no, dim) {
                 let didHelp = false;
@@ -1090,19 +1238,19 @@ const engine = {
                                 if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
                                     if(grid[dim_no][dimension_tile].length > 1) {
                                         grid[dim_no][dimension_tile] = detectedTileOptions_copy;
-                                        console.error(`Incomplete tripple subset =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
+                                        //console.error(`Incomplete tripple subset =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
                                         didHelp = true;
                                     }
                                 } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
                                     if(grid[dimension_tile][dim_no].length > 1) {
                                         grid[dimension_tile][dim_no] = detectedTileOptions_copy;
-                                        console.error(`Incomplete tripple subset =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
+                                        //console.error(`Incomplete tripple subset =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
                                         didHelp = true;
                                     }
                                 } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
                                     if(grid[sq_r][sq_c].length > 1) {
                                         grid[sq_r][sq_c] = detectedTileOptions_copy;
-                                        console.error(`Incomplete tripple subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
+                                        //console.error(`Incomplete tripple subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
                                         didHelp = true;
                                     }
                                 }
