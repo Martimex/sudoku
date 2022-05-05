@@ -953,7 +953,19 @@ const engine = {
             [5, [3,8], 9, 6, [1,3,7,8], [1,7], 4, [2,7], [2,7,8]],
             [[6,7], [6,8], 4, 2, [5,7,8], [5,7], 9, 3, 1],
         ] WORKS, BUT UPDATE GRID NEEDS TO BE REMOVED, JUST BECAUSE FOR TESTING PURPOSES WE ARE NOT DEALING WITH SUDOKU PAINTINGS, WHICH
-          UPDATE GRID ACTUALLY DOES, AND AT THE VERY END, IT THROWS EROR, ONCE THE NEW METHOD FIND NEW DIGIT */
+          UPDATE GRID FUNCTION ACTUALLY DOES, AND AT THE VERY END, IT THROWS ERROR, ONCE THE NEW METHOD FIND NEW DIGIT */
+
+        /* grid = [
+            [2, [3,6], [3,5,6], [5,8], 4, [3,5,6,9], 1, [8,9], 7],
+            [9, [3,6,7], [1,3,5,6,7], [1,7], [5,6,8], [1,3,5,6], 2, 4, [3,8]],
+            [8, 4, [1,3,7], 2, [3,7], [1,3,9], 5, 6, [3,9]],
+            [7, 1, 2, 4, 9, 8, 3, 5, 6],
+            [6, [3,8], [3,8], [1,7], [2,5], [1,2,5], 4, [7,9], [1,9]],
+            [5, 9, 4, 6, [3,7], [1,3], [7,8], 2, [1,8]],
+            [4, 5, [6,8], 3, [6,8], 7, 9, 1, 2],
+            [1, [2,6,7,8], [6,7,8], 9, [2,6,8], 4, [6,7,8], 3, 5],
+            [3, [2,6,7,8], 9, [5,8], 1, [2,5,6], [6,7,8], [7,8], 4],
+        ] WE DIDN'T GET NOTICED BY CONSOLE MESSAGE, BUT IT WORKS AS EXPECTED */
 
         let currMethodNo = 0;
         while(currMethodNo < methodsArr.length) {
@@ -961,8 +973,8 @@ const engine = {
             if(doesItHelp) {
                 /* if(currMethodNo === 2) {console.warn(':)')} */
                 console.log('back to method first'); 
-                //const y = [...grid];
-                //console.log(y);
+                const y = [...grid];
+                console.log(y);
                 currMethodNo = 0; 
                 updateGrid(grid); 
             }
@@ -1100,18 +1112,125 @@ const engine = {
             let uniqueOptionsAsNaked_col = [];
             let uniqueOptionsAsNaked_square = []; */
 
-            //for(let subset_iter = 0; subset_iter< nakedSubset_size.length; subset_iter++) {
-            for(let no=0; no<9; no++) { // dla każdego elementu w danym dimension (9 el w linii / boxie)
-                // Test for each row || column || square
-                if(dimensionObj_dim_subset_l.dimArr[dimension_item][no].length === nakedSubset_l) {
-                    const isUniqueTileOptions = checkIfUnique(dimensionObj_dim_subset_l.dimArr[dimension_item], dimensionObj_dim_subset_l.dimArr[dimension_item][no], dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item], nakedSubset_l);
-                    //                                        wszystkie elementy linii / boxa                 , sprawdzany el. pod kątem subsetu(na 100% ma dobry length),  cały zestaw znalezionych subsetów                           , obecna długość subsetu
-                    if(isUniqueTileOptions) {
-                        dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item].push(dimensionObj_dim_subset_l.dimArr[dimension_item][no]);
-                        //console.log( dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item])
+            let numsObj = {};
+
+            if(isHidden) {
+                for(let tileNo = 0; tileNo <dimensionObj_dim_subset_l.dimArr[dimension_item].length; tileNo++) {
+                    for(let option_index = 0; option_index < dimensionObj_dim_subset_l.dimArr[dimension_item][tileNo].length; option_index++) {
+                        numsObj[dimensionObj_dim_subset_l.dimArr[dimension_item][tileNo][option_index]] = (numsObj[dimensionObj_dim_subset_l.dimArr[dimension_item][tileNo][option_index]]+1) || 1;
+                    }
+                } 
+            }
+            
+            //console.log(numsObj);
+
+            if(isHidden) { // Change it back to (isHidden) only !
+                // add there numsObj !
+                //WORK ON THIS FUNCTION AND DON'T WORRY ABOUT ERRORS CAUSED - IF THIS PART IS NOT FULLY FINISHED, THEN ERRORS WILL OCCUR
+                // modify checkIfUnique function or create new one, since we'll need different approach for hidden subset (comparing to naked one)
+                const allHiddenSubset_Digits = checkIfHiddenUnique(dimensionObj_dim_subset_l.dimArr[dimension_item], nakedSubset_l, numsObj);
+                //console.log(allHiddenSubset_Digits); // tablica tablic, w której znajdują się wszystkie elementy własnego subsetu
+
+                // Na podstawie allSubsetsHidden modyfikujemy grid
+                for(let hiddenSubsetsfound = 0; hiddenSubsetsfound<allHiddenSubset_Digits.length; hiddenSubsetsfound++) {
+                    // Dla każdego znalezionego hidden subsetu i jego 2 / 3 unikalnych cyfr (to zazwyczaj tylko 1 taki subset)
+                    for(let tile_in_dimension = 0; tile_in_dimension < 9; tile_in_dimension++) {
+                        let uniquesInTile = 0;
+                        for(let uniqueDigit = 0; uniqueDigit<allHiddenSubset_Digits[hiddenSubsetsfound].length; uniqueDigit++) {
+                            if(dimensionObj_dim_subset_l.dimArr[dimension_item][tile_in_dimension].includes(allHiddenSubset_Digits[hiddenSubsetsfound][uniqueDigit])) {
+                                uniquesInTile++;
+                            }
+                        }
+                        if(uniquesInTile === allHiddenSubset_Digits[hiddenSubsetsfound].length) {
+                            // Perfect, we found a subset elem
+                            const options_updated = [];
+                            options_updated.push(...allHiddenSubset_Digits[hiddenSubsetsfound]);
+
+                            let sq_r_compressed = Math.floor(dimension_item / 3); // 0 to 2
+                            let sq_r_rest = dimension_item % 3; // 0 to 2
+                            let sq_c_compressed = Math.floor(tile_in_dimension / 3); // 0 to 2
+                            let sq_c_rest = tile_in_dimension % 3; // 0 to 2
+                
+                            let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                            let sq_c = (sq_r_rest * 3) + sq_c_rest;
+                            // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                            if((dimensionObj_dim === 'row') && (typeof(grid[dimension_item][tile_in_dimension]) === 'object')) {
+                                if((grid[dimension_item][tile_in_dimension].length > 1) && (grid[dimension_item][tile_in_dimension].length !== options_updated.length)) {
+                                    let cp = [...grid[dimension_item][tile_in_dimension]]
+                                    grid[dimension_item][tile_in_dimension] = options_updated;
+                                    console.error(`HIDDEN tripple NORMAL subset =ROW= modifies nums ${cp} and grid[${dimension_item}][${tile_in_dimension}] is now: `, options_updated);
+                                    //console.error(`ROW:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
+                                    didHelp = true;
+                                }
+                            } else if((dimensionObj_dim === 'column') && (typeof(grid[tile_in_dimension][dimension_item]) === 'object'))  {
+                                if((grid[tile_in_dimension][dimension_item].length > 1) && (grid[tile_in_dimension][dimension_item].length !== options_updated.length)) {
+                                    let cp = [...grid[tile_in_dimension][dimension_item]];
+                                    grid[tile_in_dimension][dimension_item] = options_updated;
+                                    console.error(`HIDDEN tripple NORMAL subset =COLUMN= modifies nums ${cp} and grid[${dimension_item}][${tile_in_dimension}] is now: `, options_updated);
+                                    //console.error(`COLUMN:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
+                                    didHelp = true;
+                                }
+                            } else if((dimensionObj_dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                                if((grid[sq_r][sq_c].length > 1) && (grid[sq_r][sq_c].length !== options_updated.length)) {
+                                    let cp = [...grid[sq_r][sq_c]];
+                                    grid[sq_r][sq_c] = options_updated;
+                                    console.error(`HIDDEN tripple NORMAL subset =SQUARE= modifies nums ${cp} and grid[${sq_r}][${sq_c}] is now: `, options_updated);
+                                    //console.error(`SQUARE:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
+                                    didHelp = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+
+            else {
+                //for(let subset_iter = 0; subset_iter< nakedSubset_size.length; subset_iter++) {
+                for(let no=0; no<9; no++) { // dla każdego elementu w danym dimension (9 el w linii / boxie)
+                    // Test for each row || column || square
+                    //console.log(dimensionObj_dim_subset_l.dimArr[dimension_item]);
+                    //console.log(dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item]); // empty array when we invoke checkIfUnique
+                    if(dimensionObj_dim_subset_l.dimArr[dimension_item][no].length === nakedSubset_l) {
+                        const isUniqueTileOptions = checkIfUnique(dimensionObj_dim_subset_l.dimArr[dimension_item], dimensionObj_dim_subset_l.dimArr[dimension_item][no], dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item], nakedSubset_l);
+                        //                                        wszystkie elementy linii / boxa                 , sprawdzany el. pod kątem subsetu(na 100% ma dobry length),  cały zestaw znalezionych subsetów                           , obecna długość subsetu
+                        if(isUniqueTileOptions) {
+                            dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item].push(dimensionObj_dim_subset_l.dimArr[dimension_item][no]);
+                            //console.log( dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item])
+                        }
+                    }  
+                }
+
+
+                for(let found_subsets = 0; found_subsets < dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item].length;  found_subsets++) {
+                    // For every unique subset found (example is: [2, 4]) TEN SUBSET MUSI WYSTĄPIĆ 2 LUB 3 RAZY !!!
+                    let same_subset = 0;
+                    for(let tile_no = 0; tile_no < 9; tile_no++) {
+                        let same_digit = 0;
+                        if(dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item][found_subsets].length === dimensionObj_dim_subset_l.dimArr[dimension_item][tile_no].length) {
+                            for(let n=0; n<nakedSubset_l;  n++) {
+                                if(dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item][found_subsets][n] === dimensionObj_dim_subset_l.dimArr[dimension_item][tile_no][n]) {
+                                    same_digit++;
+                                    if(nakedSubset_l === same_digit) { // Jeśli mamy taki sam subset, który porównujemy z unikalną wersją (uniqueOptionsAsNaked_dim)
+                                        same_subset++;
+                                    }
+                                    if(nakedSubset_l < same_subset) {console.error('CANT GO IN')}
+                                    if(nakedSubset_l === same_subset) { // Jeśli ilość znalezionych (takich samych) subsetów jest równa ich długości (funkcja prawdopodobnie pomoże nam)
+                                        same_subset++; // WE HAVE TO ENSURE THAT IT HAPPENS JUST ONCE !!!
+                                        // It means we found legit subset pair / tripple ! So function *probably* help + just remove subset numbers
+                                        // from other (non-subset pair/tripple) tiles (if those exists - that's why *probably*).
+                                        //console.log('All subsets for dim ', dimensionObj_dim, '  no  ', dimension_item , " : ", dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item]);
+                                        const didItRemoved = removeSubsetDigits(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item][found_subsets], dimension_item, tile_no, dimensionObj_dim);
+                                        //                                      grid, cały rz/kol/kw obecnie badany - jako linia / box   cały subset, który ma swój odpowiednik(/i), np: [2, 4]                   nr rz/kol/kw 0 do 8 | nr kafelka,  | "rząd" / "kol" / "kw"
+                                        if(didItRemoved) {didHelp = true;}
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
+            
             /* // Test for each column
             if(colArr[no].length === nakedSubset_size[subset_iter]) {
                 const isUniqueTileOptions_col = checkIfUnique(colArr, colArr[no], uniqueOptionsAsNaked_col, nakedSubset_size[no]);
@@ -1131,51 +1250,28 @@ const engine = {
             // Sprawdźmy teraz czy dla całego row odszukamy więcej niż 1 wystąpienie. Jeśli znajdziem
 
             // For row || column || square
-            for(let found_subsets = 0; found_subsets < dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item].length;  found_subsets++) {
-                // For every unique subset found (example is: [2, 4]) TEN SUBSET MUSI WYSTĄPIĆ 2 LUB 3 RAZY !!!
-                let same_subset = 0;
-                for(let tile_no = 0; tile_no < 9; tile_no++) {
-                    let same_digit = 0;
-                    if(dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item][found_subsets].length === dimensionObj_dim_subset_l.dimArr[dimension_item][tile_no].length) {
-                        for(let n=0; n<nakedSubset_l;  n++) {
-                            if(dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item][found_subsets][n] === dimensionObj_dim_subset_l.dimArr[dimension_item][tile_no][n]) {
-                                same_digit++;
-                                if(nakedSubset_l === same_digit) { // Jeśli mamy taki sam subset, który porównujemy z unikalną wersją (uniqueOptionsAsNaked_dim)
-                                    same_subset++;
-                                }
-                                if(nakedSubset_l < same_subset) {console.error('CANT GO IN')}
-                                if(nakedSubset_l === same_subset) { // Jeśli ilość znalezionych (takich samych) subsetów jest równa ich długości (funkcja prawdopodobnie pomoże nam)
-                                    same_subset++; // WE HAVE TO ENSURE THAT IT HAPPENS JUST ONCE !!!
-                                    // It means we found legit subset pair / tripple ! So function *probably* help + just remove subset numbers
-                                    // from other (non-subset pair/tripple) tiles (if those exists - that's why *probably*).
-                                    //console.log('All subsets for dim ', dimensionObj_dim, '  no  ', dimension_item , " : ", dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item]);
-                                    const didItRemoved = removeSubsetDigits(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item][found_subsets], dimension_item, tile_no, dimensionObj_dim);
-                                    //                                      grid, cały rz/kol/kw obecnie badany - jako linia / box   cały subset, który ma swój odpowiednik(/i), np: [2, 4]                   nr rz/kol/kw 0 do 8 | nr kafelka,  | "rząd" / "kol" / "kw"
-                                    if(didItRemoved) {didHelp = true;}
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+           
 
             // Now we can focus on subset methods that are length specific :
             // 1) Incomplete tripple subset -> {3, 6} {3, 6, 9} {3, 6, 9} || {2, 7} {2, 8} {2, 7, 8}
             // 2) Three double subsets -> {4, 9} {2, 4} {2, 9}
 
             // 1)
-            console.log(dimensionObj_dim_subset_l.dimArr[dimension_item]);
-            let isIncompleteTrippleSubset = checkIncompleteTrippleSubset(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimension_item, dimensionObj_dim, isHidden);
-            
-            if(isIncompleteTrippleSubset) {didHelp = true;}
+            //console.log(dimensionObj_dim_subset_l.dimArr[dimension_item]);
+            if(nakedSubset_l === 3) {
+                let isIncompleteTrippleSubset = checkIncompleteTrippleSubset(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimension_item, dimensionObj_dim, isHidden);
+                if(isIncompleteTrippleSubset) {didHelp = true;}
+            }
+
 
             // 2)
-            let isThreeDoubleSubset = checkThreeDoubleSubsets(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimension_item, dimensionObj_dim, isHidden);
-
-            if(isThreeDoubleSubset) {didHelp = true; }
+            if(nakedSubset_l === 2) {
+                let isThreeDoubleSubset = checkThreeDoubleSubsets(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimension_item, dimensionObj_dim, isHidden);
+                if(isThreeDoubleSubset) {didHelp = true; }
+            }
 
             function checkThreeDoubleSubsets(grid, thisDimOptions, dim_no, dim, isHidden) {
-                if(isHidden) return;
+                //if(isHidden) return;
                 // isHidden - check if we are looking for hidden subsets. If so, in this case we don't care about subsets lengths anymore,
                 //            since some numbers might 'hide' actual subset digits
 
@@ -1539,19 +1635,19 @@ const engine = {
                                         // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
                                         if((dim === 'row') && (typeof(grid[dim_no][uniqueTiles[uniqueTile]]) === 'object')) {
                                             if((grid[dim_no][uniqueTiles[uniqueTile]].length > 1) && (grid[dim_no][uniqueTiles[uniqueTile]].length !== onlyUniques_confirmed[uniqueTile].length)) {
-                                                console.error(`HIDDEN tripple subset =ROW= modifies nums ${grid[dim_no][uniqueTiles[uniqueTile]]} and grid[${dim_no}][${uniqueTiles[uniqueTile]}] is now: `, onlyUniques_confirmed[uniqueTile]);
+                                                console.warn(`HIDDEN tripple subset =ROW= modifies nums ${grid[dim_no][uniqueTiles[uniqueTile]]} and grid[${dim_no}][${uniqueTiles[uniqueTile]}] is now: `, onlyUniques_confirmed[uniqueTile]);
                                                 grid[dim_no][uniqueTiles[uniqueTile]] = onlyUniques_confirmed[uniqueTile];
                                                 didHelp = true;
                                             }
                                         } else if((dim === 'column') && (typeof(grid[uniqueTiles[uniqueTile]][dim_no]) === 'object'))  {
                                             if((grid[uniqueTiles[uniqueTile]][dim_no].length > 1) && (grid[uniqueTiles[uniqueTile]][dim_no].length !== onlyUniques_confirmed[uniqueTile].length)) {
-                                                console.error(`HIDDEN tripple subset =COLUMN= modifies nums ${grid[uniqueTiles[uniqueTile]][dim_no]} and grid[${dim_no}][${uniqueTiles[uniqueTile]}] is now: `, onlyUniques_confirmed[uniqueTile]);
+                                                console.warn(`HIDDEN tripple subset =COLUMN= modifies nums ${grid[uniqueTiles[uniqueTile]][dim_no]} and grid[${dim_no}][${uniqueTiles[uniqueTile]}] is now: `, onlyUniques_confirmed[uniqueTile]);
                                                 grid[uniqueTiles[uniqueTile]][dim_no] = onlyUniques_confirmed[uniqueTile];
                                                 didHelp = true;
                                             }
                                         } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
                                             if((grid[sq_r][sq_c].length > 1) && (grid[sq_r][sq_c].length !== onlyUniques_confirmed[uniqueTile])) {
-                                                console.error(`HIDDEN tripple subset =SQUARE= modifies nums ${grid[sq_r][sq_c]} and grid [${sq_r}][${sq_c}] is now: `, onlyUniques_confirmed[uniqueTile]);
+                                                console.warn(`HIDDEN tripple subset =SQUARE= modifies nums ${grid[sq_r][sq_c]} and grid [${sq_r}][${sq_c}] is now: `, onlyUniques_confirmed[uniqueTile]);
                                                 grid[sq_r][sq_c] = onlyUniques_confirmed[uniqueTile];
                                                 didHelp = true;
                                             }
@@ -1740,11 +1836,66 @@ const engine = {
                 return true;
             }
 
+            function checkIfHiddenUnique(ourArr, subset_size, numsObj) {
+                // ourArr = allTiles options in current line / box (please don't modify it there - keep it as it is)
+                // subset_size = current subset size we take into account (we only work for subset that is two-length or three-length) any length elems 
+                // numsObj = object that indicates how many times each digit happens in current tile
+                const hiddenSubsetDigits = [];            
+                const ourArr_copy = [...ourArr];
+
+                for(let el_no = 0; el_no<ourArr_copy.length; el_no++) {
+                    // For each element inside current line / box 
+                    let uniquesContained = [];
+                    for(let option_no = 0; option_no<ourArr_copy[el_no].length; option_no++) {
+                        // For each option digit inside -> check if the given digits happens the same times as subset_size current length
+                        if(numsObj[ourArr_copy[el_no][option_no]] === subset_size) {
+                            uniquesContained.push(ourArr_copy[el_no][option_no]);
+                        }
+                    }
+
+                    if(uniquesContained.length === subset_size) {
+                        // Czyli jeśli posiadamy 3 cyfry, które występują tylko 3 razy w danej linii / boxie
+                        // Teraz szukamy dalej dwóch pozostałych el, które też posiadają te 3 cyfry
+                        // Najpierw jednak określimy tablicę, która będzie pushować całe kafelki które są potencjalnymi subsetami
+                        let potentialSubsetElems = [ourArr_copy[el_no]];
+                        let potentialSubsetElems_indexes = [el_no];
+
+                        for(let el_to_check = el_no+1; el_to_check<ourArr_copy.length; el_to_check++) {
+                            let sameUniquesCount = 0;
+                            for(let digit=0; digit<uniquesContained.length; digit++) {
+                                if(ourArr_copy[el_to_check].includes(uniquesContained[digit])) {
+                                    sameUniquesCount++;
+                                }
+                            }
+
+                            if(sameUniquesCount === subset_size) {
+                                potentialSubsetElems.push(ourArr_copy[el_to_check]);
+                                potentialSubsetElems_indexes.push(el_to_check);
+                            }
+                        }
+
+                        if(potentialSubsetElems.length === subset_size) {
+                            // Tak, mamy gotowy hidden subset !
+                            hiddenSubsetDigits.push([]);
+                            hiddenSubsetDigits[hiddenSubsetDigits.length - 1].push(...uniquesContained);
+                            // Teraz usuń indeksy znalezionych elementów z KOPII ourArray,
+                            // Użyj odwróconej pętli, aby poprawnie splice'ować elementy !
+                            for(let index = (potentialSubsetElems_indexes.length - 1); index >= 0; index--) {
+                                ourArr_copy.splice(potentialSubsetElems_indexes[index], 1);
+                            }
+                        }
+
+                    }
+                }
+                return hiddenSubsetDigits;
+            }
+
             function checkIfUnique(ourArr, el, uOAN, subset_size) {
                 // ourArr - wszystkie elementy linii / boxa
                 // el - sprawdzany el. pod kątem subsetu(na 100% ma dobry length) 
                 // uOAN - cały zestaw znalezionych subsetów
                 // subset_size - obecna długość subsetu
+                // isHidden - czy robimy checkout dla nakedSubset czy dla hiddenSubset
                 if(uOAN.length < 1) {return true; }
                 for(let x=0; x<uOAN.length; x++) {
                     for(let y=0; y<subset_size; y++) {
@@ -1753,7 +1904,7 @@ const engine = {
                         }
                     }
                 }
-                return true;
+                return true;  
             }
 
             function removeSubsetDigits(grid, thisdimension, subset, row, iir, dim) {
