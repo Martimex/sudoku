@@ -380,7 +380,7 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         // Our array of methods
-        const methodsArr = [singleCandidate, singlePosition, candidateLines, doublePairs, nakedSubset, hiddenSubset];
+        const methodsArr = [singleCandidate, singlePosition, candidateLines, doublePairs,  nakedSubset, hiddenSubset];
 
         /* const dimensionObject = {
             row: [
@@ -967,6 +967,19 @@ const engine = {
             [3, [2,6,7,8], 9, [5,8], 1, [2,5,6], [6,7,8], [7,8], 4],
         ] WE DIDN'T GET NOTICED BY CONSOLE MESSAGE, BUT IT WORKS AS EXPECTED */
 
+        /* grid = [
+            [8, [2,5], 1, [2,7], [3,5], 6, [3,7], 9, 4],
+            [3, [2,5], [4,6], [2,4,7], [1,5], 9, [1,6,7], 8, [1,2,7] ],
+            [9, 7, [4,6], [2,4], 8, [1,3], 5, [2,6], [1,2,3]],
+            [5, 4, 7, [8,9], 6, 2, [1,8], 3, [1,9]],
+            [6, 3, 2, [8,9], [1,4], [1,4], [7,8], 5, [7,9]],
+            [1, 9, 8, 3, 7, 5, 2, 4, 6],
+            [[4,7], 8, 3, 6, 2, [4,7], 9, 1, 5],
+            [[4,7], 6, 5, 1, 9, 8, [3,4,7], [2,7], [2,3,7]],
+            [2, 1, 9, 5, [3,4], [3,4,7], [4,6,7], [6,7], 8],
+        ] IT WORKS, BUT INSTEAD OF THREE DOUBLE HIDDEN SUBSET THE REMOVAL, THE HIDDEN NORMAL SUBSET DOES, SO WE DO NOT KNOW THE
+        EXACT BEHAVIOUR OF THREE DOUBLE HIDDEN SUBSET - IT EITHER WOULD NEVER BE USEFUL OR ONLY USEFUL FOR VERY RARE, SPECIFIC CASES*/
+
         let currMethodNo = 0;
         while(currMethodNo < methodsArr.length) {
             let doesItHelp = methodsArr[currMethodNo]();
@@ -1278,11 +1291,39 @@ const engine = {
 
                 let didHelp = false;
 
-                const doubleInDimArr = thisDimOptions.filter((val, index) => {
-                    if(thisDimOptions[index].length === 2) return true;
-                })
+                let doubleInDimArr;
+                let indexArr = [];
+                const numsObj = {};
+
+                for(let doubleNo = 0; doubleNo <thisDimOptions.length; doubleNo++) {
+                    for(let doubleNo_index = 0; doubleNo_index <thisDimOptions[doubleNo].length; doubleNo_index++) {
+                        numsObj[thisDimOptions[doubleNo][doubleNo_index]] = (numsObj[thisDimOptions[doubleNo][doubleNo_index]]+1) || 1;
+                    }
+                }
+
+                if(isHidden) {
+                    doubleInDimArr = thisDimOptions.filter((val, index) => {
+                        let uniquesCount = 0;
+                        for(let val_ind = 0; val_ind < val.length; val_ind++) {
+                            if(numsObj[val[val_ind]] === 2) {
+                                uniquesCount++;
+                            }
+                        }
+                        if(uniquesCount === 2) { 
+                            indexArr.push(index);
+                            return true; 
+                        }
+                    })
+                } else {
+                    doubleInDimArr = thisDimOptions.filter((val, index) => {
+                        if(thisDimOptions[index].length === 2) return true;
+                    })
+                }
+            
+                console.log(isHidden, doubleInDimArr);
 
                 if(doubleInDimArr.length < 3) { return false;}
+
 
                 // Remove double subsets remains - which is {2, 4} and {2, 4} for example - they are not necessary
                 for(let checked_double_no = 0; checked_double_no<doubleInDimArr.length; checked_double_no++) {
@@ -1297,6 +1338,11 @@ const engine = {
                             doubleInDimArr.splice(compared_double_no, 1);
                             doubleInDimArr.splice(checked_double_no, 1);
 
+                            if(isHidden) { 
+                                indexArr.splice(compared_double_no, 1); 
+                                indexArr.splice(checked_double_no, 1);
+                            }
+
                             // Finally set checkeddoubleno index properly
                             compared_double_no = doubleInDimArr.length; // finish checking - it cannot happen more than once for doubles !
                             checked_double_no--;
@@ -1306,14 +1352,18 @@ const engine = {
 
                         function checkExactDuplicates(checked_el, compared_el) {
                             if(!compared_el) {return false;}
-                            let areExact = true;
-                            for(let index = 0; index < 2; index++) {
-                                // Compare indexes of those elems and check if those are not exast same duplicates
-                                //console.log(checked_el[index], compared_el[index])
-                                if(parseInt(checked_el[index]) !== parseInt(compared_el[index])) {
-                                    areExact = false;
+                            let areExact = false;
+                            if((checked_el.length === 2) && (compared_el.length === 2)) {
+                                areExact = true;
+                                for(let index = 0; index < 2; index++) {
+                                    // Compare indexes of those elems and check if those are not exast same duplicates
+                                    //console.log(checked_el[index], compared_el[index])
+                                    if(parseInt(checked_el[index]) !== parseInt(compared_el[index])) {
+                                        areExact = false;
+                                    }
                                 }
                             }
+                            
                             return areExact;
                         }
                     }
@@ -1329,80 +1379,179 @@ const engine = {
                 const doubleNums = {};
 
                 for(let doubleNo = 0; doubleNo <doubleInDimArr.length; doubleNo++) {
-                    for(let doubleNo_index = 0; doubleNo_index < 2; doubleNo_index++) {
+                    for(let doubleNo_index = 0; doubleNo_index < doubleInDimArr[doubleNo].length; doubleNo_index++) {
                         doubleNums[doubleInDimArr[doubleNo][doubleNo_index]] = (doubleNums[doubleInDimArr[doubleNo][doubleNo_index]]+1) || 1;
                     }
                 }
                 
                 //console.log(doubleNums);
 
-                const copy = [...doubleInDimArr];
-
                 // 2. Remove doubles, which has num / nums that exists more or less than exactly 2 times && then check for 3 or above length
-                for(let key in doubleNums) {
-                    if(doubleNums[key] !== 2) {
-                        //console.log(doubleNums[key], '  but thats illegal');
-                        for(let doubleNo = 0 ; doubleNo < doubleInDimArr.length; doubleNo++) {
-                            if(doubleInDimArr[doubleNo].includes(parseInt(key))) {
-                                doubleInDimArr.splice(doubleNo, 1);
-                                doubleNo--;
+                // (only for naked subset) - hidden has its own version
+                if(isHidden) {
+                    for(let double_el = 0; double_el<doubleInDimArr.length; double_el++) {
+                        let twiceInDim = 0;
+                        for(let digit_as_option = 0; digit_as_option<doubleInDimArr[double_el].length; digit_as_option++) {
+                            if(doubleNums[doubleInDimArr[double_el][digit_as_option]] === 2) {
+                                twiceInDim++;
                             }
+                        }
+                        if(twiceInDim !== 2) {
+                            //console.warn('REMOVED AND PREVENT')
+                            doubleInDimArr.splice(double_el, 1);
+                            indexArr.splice(double_el, 1);
+                            double_el--;
                         }
                     }
                 }
+                else {
+                    for(let key in doubleNums) {
+                        if(doubleNums[key] !== 2) {
+                            //console.log(doubleNums[key], '  but thats illegal');
+                            for(let doubleNo = 0 ; doubleNo < doubleInDimArr.length; doubleNo++) {
+                                if(doubleInDimArr[doubleNo].includes(parseInt(key))) {
+                                    doubleInDimArr.splice(doubleNo, 1);
+                                    doubleNo--;
+                                }
+                            }
+                        }
+                    }
+                }    
 
-
-
+                const copy = [...doubleInDimArr];
+                console.log(isHidden, copy);
                 //console.log('OBJ: ',doubleNums,  '  ||  Before: ', copy, '  -  After: ', doubleInDimArr);
                 //(doubleInDimArr.length === 3)? console.log('WE GOT A THREE DOUBLE') : console.log('not enough, length is just ', doubleInDimArr.length)
 
                 if(doubleInDimArr.length === 3) {
-                    const uniqueDigits = new Set([].concat(...doubleInDimArr));
-                    if(uniqueDigits.size !== 3) { console.error('Saved from crashing - set: ', uniqueDigits); return false; } // In some specific cases set get a length of 4 - this line prevents from errors
+                    let uniqueDigits;
+
+                    if(isHidden) {
+                        uniqueDigits = new Set();
+                        for(let doubleInDimArr_ind = 0; doubleInDimArr_ind < doubleInDimArr.length; doubleInDimArr_ind++) {
+                            for(let digit = 0; digit < doubleInDimArr[doubleInDimArr_ind].length; digit++) {
+                                if(doubleNums[doubleInDimArr[doubleInDimArr_ind][digit]] === 2) {
+                                    uniqueDigits.add(doubleInDimArr[doubleInDimArr_ind][digit]);
+                                }
+                            }
+                        }
+                        console.log(doubleNums)
+                        console.log(uniqueDigits, uniqueDigits.size);
+                        if(uniqueDigits.size !== 3) { console.error('Saved from HIDDEN crashing - set: ', uniqueDigits); return false; } // In some specific cases set get a length of 4 - this line prevents from errors
+
+                    } else {
+                        uniqueDigits = new Set([].concat(...doubleInDimArr));
+                        if(uniqueDigits.size !== 3) { console.error('Saved from crashing - set: ', uniqueDigits); return false; } // In some specific cases set get a length of 4 - this line prevents from errors
+                    }
+                   
                     //console.log(uniqueDigits);
                     // Yay, we have found three double subset ! Now just check if it helps removing anything
+                    if(isHidden) {
+                        for(let indexArr_no=0; indexArr_no<indexArr.length; indexArr_no++) {
+                            let dimension_tile = indexArr[indexArr_no];
+                            // Now let's just update grid with what we've found there
+                            let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
+                            let sq_r_rest = dim_no % 3; // 0 to 2
+                            let sq_c_compressed = Math.floor(dimension_tile / 3); // 0 to 2
+                            let sq_c_rest = dimension_tile % 3; // 0 to 2
+                
+                            let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                            let sq_c = (sq_r_rest * 3) + sq_c_rest;
+                            // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                            if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
+                                const isHiddenSubset = checkHiddenSubset(grid[dim_no][dimension_tile], uniqueDigits);
+                                if(isHiddenSubset) {
+                                    grid[dim_no][dimension_tile] = isHiddenSubset;
+                                    //console.log('unique Digits: ', uniqueDigits);
+                                    console.error(`Three HIDDEN doubles =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
+                                    didHelp = true;
+                                }
+                            } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
+                                const isHiddenSubset = checkHiddenSubset(grid[dimension_tile][dim_no], uniqueDigits);
+                                if(isHiddenSubset) {
+                                    grid[dimension_tile][dim_no] = isHiddenSubset;
+                                    //console.log('unique Digits: ', uniqueDigits);
+                                    console.error(`Three HIDDEN doubles =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
+                                    didHelp = true;
+                                }
+                            } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                                const isHiddenSubset = checkHiddenSubset(grid[sq_r][sq_c], uniqueDigits);
+                                if(isHiddenSubset) {
+                                    grid[sq_r][sq_c] = isHiddenSubset;
+                                    //console.log('unique Digits: ', uniqueDigits);
+                                    console.error(`Three HIDDEN doubles subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
+                                    didHelp = true;
+                                }
+                            }
+                        }
+                    }
 
-                    for(let dimension_tile=0; dimension_tile<9; dimension_tile++) {
-                        
-                        // Now let's just update grid with what we've found there
-                        let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
-                        let sq_r_rest = dim_no % 3; // 0 to 2
-                        let sq_c_compressed = Math.floor(dimension_tile / 3); // 0 to 2
-                        let sq_c_rest = dimension_tile % 3; // 0 to 2
-            
-                        let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
-                        let sq_c = (sq_r_rest * 3) + sq_c_rest;
-                        // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
-                        if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
-                            const isNotaSubset = checkNotASubset(grid[dim_no][dimension_tile], uniqueDigits);
-                            if(isNotaSubset) {
-                                grid[dim_no][dimension_tile] = isNotaSubset;
-                                console.log('unique Digits: ', uniqueDigits);
-                                //console.error(`Three doubles =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
-                                didHelp = true;
-                            }
-                        } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
-                            const isNotaSubset = checkNotASubset(grid[dimension_tile][dim_no], uniqueDigits);
-                            if(isNotaSubset) {
-                                grid[dimension_tile][dim_no] = isNotaSubset;
-                                console.log('unique Digits: ', uniqueDigits);
-                                //console.error(`Three doubles =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
-                                didHelp = true;
-                            }
-                        } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
-                            const isNotaSubset = checkNotASubset(grid[sq_r][sq_c], uniqueDigits);
-                            if(isNotaSubset) {
-                                grid[sq_r][sq_c] = isNotaSubset;
-                                console.log('unique Digits: ', uniqueDigits);
-                                //console.error(`Three doubles subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
-                                didHelp = true;
+                    else{
+                        for(let dimension_tile=0; dimension_tile<9; dimension_tile++) {
+                            // Now let's just update grid with what we've found there
+                            let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
+                            let sq_r_rest = dim_no % 3; // 0 to 2
+                            let sq_c_compressed = Math.floor(dimension_tile / 3); // 0 to 2
+                            let sq_c_rest = dimension_tile % 3; // 0 to 2
+                
+                            let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                            let sq_c = (sq_r_rest * 3) + sq_c_rest;
+                            // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                            if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
+                                const isNotaSubset = checkNotASubset(grid[dim_no][dimension_tile], uniqueDigits);
+                                if(isNotaSubset) {
+                                    grid[dim_no][dimension_tile] = isNotaSubset;
+                                    console.log('unique Digits: ', uniqueDigits);
+                                    //console.error(`Three doubles =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
+                                    didHelp = true;
+                                }
+                            } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
+                                const isNotaSubset = checkNotASubset(grid[dimension_tile][dim_no], uniqueDigits);
+                                if(isNotaSubset) {
+                                    grid[dimension_tile][dim_no] = isNotaSubset;
+                                    console.log('unique Digits: ', uniqueDigits);
+                                    //console.error(`Three doubles =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
+                                    didHelp = true;
+                                }
+                            } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                                const isNotaSubset = checkNotASubset(grid[sq_r][sq_c], uniqueDigits);
+                                if(isNotaSubset) {
+                                    grid[sq_r][sq_c] = isNotaSubset;
+                                    console.log('unique Digits: ', uniqueDigits);
+                                    //console.error(`Three doubles subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
+                                    didHelp = true;
+                                }
                             }
                         }
                     }
 
                 }
 
+                function checkHiddenSubset(currTileOptions, numsToKeep) {
+                    if(currTileOptions.length < 1) { return false; }
+                    let currTileOptions_copy = [...currTileOptions];
+                    let didRemove = false;
+                    /* let contains = 0;
+                    numsToKeep.forEach((num) => {
+                        if(currTileOptions_copy.includes(num)) {
+                            contains++;
+                        }
+                    }) */
 
+                    //if(contains === 2) {
+                        for(let x=0; x<currTileOptions_copy.length; x++) {
+                            if(!numsToKeep.has(currTileOptions_copy[x])) {
+                                currTileOptions_copy.splice(x, 1);
+                                x--;
+                                didRemove = true;
+                            }
+                        }
+                    // }
+
+                    if((didRemove) && (currTileOptions_copy.length > 0)) {
+                        return currTileOptions_copy;
+                    } else {return false; }
+                }
 
                 function checkNotASubset(currTileOptions, numsToRemove) {
                     if(currTileOptions.length < 1) { return false; }
