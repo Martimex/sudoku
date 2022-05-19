@@ -380,7 +380,7 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         // Our array of methods
-        const methodsArr = [singleCandidate, singlePosition, candidateLines, doublePairs,  nakedSubset, hiddenSubset];
+        const methodsArr = [singleCandidate, singlePosition, candidateLines, doublePairs,  nakedSubset, hiddenSubset, xWings];
 
         /* const dimensionObject = {
             row: [
@@ -408,7 +408,7 @@ const engine = {
         
         console.log(grid);
         fillGrid(grid);
-        //fillDimensionObject(dimensionObject, grid);
+        //fillDimensionObject(dimensionObject, grid); // too much time consuming, remove it later on
 
         function fillDimensionObject(dimensionObject, grid) {
             for( let r=0; r<9; r++) {
@@ -923,6 +923,101 @@ const engine = {
                     }
                 }
             } */
+
+            return helpedSolving;
+        }
+
+        function xWings() {
+            let helpedSolving = null;
+            console.log(`%c xWings needed...`, 'background: hsla(55, 60%, 65%, 50%); color: hsl(166, 70%, 70%);');
+
+            const dimensionObj = {
+                row: {
+                    numsTwiceInDim: [],
+                    numsTwiceInDim_Indexes: [],
+                },
+
+                column: {
+                    numsTwiceInDim: [],
+                    numsTwiceInDim_Indexes: [],
+                },
+            }
+
+            const detectedDimensions = ['row', 'column'];
+            // Fill dimensionObj with values 
+
+            for(let currentDimension_no = 0; currentDimension_no < detectedDimensions.length; currentDimension_no++) {
+                // For each dimension (row , column)
+                for(let currentLine_no = 0; currentLine_no < 9; currentLine_no++) {
+                    // For each line in chosen dimension (line in row, line in column)
+                    const twiceInDimNums = {
+
+                    }               
+                    for(let tileInLine_no = 0; tileInLine_no < 9; tileInLine_no ++) {
+                        // For each tile in line ( tile in line ... in row, tile in line ... in column)
+                        if(detectedDimensions[currentDimension_no] === 'row') {
+                            if(typeof(grid[currentLine_no][tileInLine_no]) === 'object') {
+                                // We can surmise it's length is two or more
+                                //dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim'][currentLine_no].push([...grid[currentLine_no][tileInLine_no]]);
+                                if(grid[currentLine_no][tileInLine_no].length > 1) {
+                                    //twiceInDimNums[grid[currentLine_no][tileInLine_no]] = [];
+                                    for(let no = 0; no<grid[currentLine_no][tileInLine_no].length; no++) {
+                                        if(!twiceInDimNums.hasOwnProperty(grid[currentLine_no][tileInLine_no][no])) {
+                                            twiceInDimNums[grid[currentLine_no][tileInLine_no][no]] = [tileInLine_no];
+                                        } else {
+                                            twiceInDimNums[grid[currentLine_no][tileInLine_no][no]].push(tileInLine_no);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            // detectedDimensions[currentDimension_no] === 'column'
+                            if(typeof(grid[tileInLine_no][currentLine_no]) === 'object') {
+                                // We can surmise it's length is two or more
+                                if(grid[tileInLine_no][currentLine_no].length > 1) {
+                                    //twiceInDimNums[grid[tileInLine_no][currentLine_no]] = [];
+                                    for(let no = 0; no<grid[tileInLine_no][currentLine_no].length; no++) {
+                                        if(!twiceInDimNums.hasOwnProperty(grid[tileInLine_no][currentLine_no][no])) {
+                                            twiceInDimNums[grid[tileInLine_no][currentLine_no][no]] = [tileInLine_no];
+                                        } else {
+                                            twiceInDimNums[grid[tileInLine_no][currentLine_no][no]].push(tileInLine_no);
+                                        }
+                                    }
+                                }
+                            }
+                            /* if(typeof(grid[tileInLine_no][currentLine_no]) === 'object') {
+                                dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim'][currentLine_no].push([...grid[tileInLine_no][currentLine_no]]);
+                            } else {
+                                dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim'][currentLine_no].push([]);
+                            } */
+
+                        }
+                    }
+                    //console.log(twiceInDimNums);
+
+                    dimensionObj[detectedDimensions[currentDimension_no]].numsTwiceInDim.push([]);
+                    dimensionObj[detectedDimensions[currentDimension_no]].numsTwiceInDim_Indexes.push([]);
+
+                    for(let num in twiceInDimNums) {
+                        if(twiceInDimNums[num].length === 2) {
+                            //console.log('num is present exactly twice in this line');
+                            dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim'][currentLine_no].push(parseInt(num));
+                            dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim_Indexes'][currentLine_no].push(twiceInDimNums[num]);
+                        }
+                    }
+                }
+            }
+
+            console.log(dimensionObj);
+
+            /* 
+                RULES:
+                - DIMENSIONS: ROW && COLUMN || 
+                - 
+            */
+
+
 
             return helpedSolving;
         }
@@ -1447,40 +1542,44 @@ const engine = {
                     //console.log(uniqueDigits);
                     // Yay, we have found three double subset ! Now just check if it helps removing anything
                     if(isHidden) {
-                        for(let indexArr_no=0; indexArr_no<indexArr.length; indexArr_no++) {
-                            let dimension_tile = indexArr[indexArr_no];
-                            // Now let's just update grid with what we've found there
-                            let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
-                            let sq_r_rest = dim_no % 3; // 0 to 2
-                            let sq_c_compressed = Math.floor(dimension_tile / 3); // 0 to 2
-                            let sq_c_rest = dimension_tile % 3; // 0 to 2
-                
-                            let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
-                            let sq_c = (sq_r_rest * 3) + sq_c_rest;
-                            // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
-                            if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
-                                const isHiddenSubset = checkHiddenSubset(grid[dim_no][dimension_tile], uniqueDigits);
-                                if(isHiddenSubset) {
-                                    grid[dim_no][dimension_tile] = isHiddenSubset;
-                                    //console.log('unique Digits: ', uniqueDigits);
-                                    console.error(`Three HIDDEN doubles =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
-                                    didHelp = true;
-                                }
-                            } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
-                                const isHiddenSubset = checkHiddenSubset(grid[dimension_tile][dim_no], uniqueDigits);
-                                if(isHiddenSubset) {
-                                    grid[dimension_tile][dim_no] = isHiddenSubset;
-                                    //console.log('unique Digits: ', uniqueDigits);
-                                    console.error(`Three HIDDEN doubles =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
-                                    didHelp = true;
-                                }
-                            } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
-                                const isHiddenSubset = checkHiddenSubset(grid[sq_r][sq_c], uniqueDigits);
-                                if(isHiddenSubset) {
-                                    grid[sq_r][sq_c] = isHiddenSubset;
-                                    //console.log('unique Digits: ', uniqueDigits);
-                                    console.error(`Three HIDDEN doubles subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
-                                    didHelp = true;
+                        // CAN THROW ERRORS, SO DON'T LET IT GO (FOR NOW) !
+                        // Three HIDDEN doubles CAN THROW ERRORS, BEWARE OF THAT
+                        if(!isHidden) {
+                            for(let indexArr_no=0; indexArr_no<indexArr.length; indexArr_no++) {
+                                let dimension_tile = indexArr[indexArr_no];
+                                // Now let's just update grid with what we've found there
+                                let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
+                                let sq_r_rest = dim_no % 3; // 0 to 2
+                                let sq_c_compressed = Math.floor(dimension_tile / 3); // 0 to 2
+                                let sq_c_rest = dimension_tile % 3; // 0 to 2
+                    
+                                let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
+                                let sq_c = (sq_r_rest * 3) + sq_c_rest;
+                                // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                                if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
+                                    const isHiddenSubset = checkHiddenSubset(grid[dim_no][dimension_tile], uniqueDigits);
+                                    if(isHiddenSubset) {
+                                        grid[dim_no][dimension_tile] = isHiddenSubset;
+                                        //console.log('unique Digits: ', uniqueDigits);
+                                        console.error(`Three HIDDEN doubles =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
+                                        didHelp = true;
+                                    }
+                                } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
+                                    const isHiddenSubset = checkHiddenSubset(grid[dimension_tile][dim_no], uniqueDigits);
+                                    if(isHiddenSubset) {
+                                        grid[dimension_tile][dim_no] = isHiddenSubset;
+                                        //console.log('unique Digits: ', uniqueDigits);
+                                        console.error(`Three HIDDEN doubles =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
+                                        didHelp = true;
+                                    }
+                                } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                                    const isHiddenSubset = checkHiddenSubset(grid[sq_r][sq_c], uniqueDigits);
+                                    if(isHiddenSubset) {
+                                        grid[sq_r][sq_c] = isHiddenSubset;
+                                        //console.log('unique Digits: ', uniqueDigits);
+                                        console.error(`Three HIDDEN doubles subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
+                                        didHelp = true;
+                                    }
                                 }
                             }
                         }
