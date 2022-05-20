@@ -927,7 +927,7 @@ const engine = {
             return helpedSolving;
         }
 
-        function xWings() {
+        function xWings(isSwordfish) {
             let helpedSolving = null;
             console.log(`%c xWings needed...`, 'background: hsla(55, 60%, 65%, 50%); color: hsl(166, 70%, 70%);');
 
@@ -1007,9 +1007,14 @@ const engine = {
                         }
                     }
                 }
+
+                let testIfHelps = checkForXWingsOrSwordfish(grid, dimensionObj, detectedDimensions[currentDimension_no], isSwordfish);
             }
 
             console.log(dimensionObj);
+
+            // Now we got initial (necessary) data items covered in dimension Obj
+            // Therefore we can init helper - solver function (it will happen exaclty twice: for row, and for column)
 
             /* 
                 RULES:
@@ -1074,6 +1079,18 @@ const engine = {
             [2, 1, 9, 5, [3,4], [3,4,7], [4,6,7], [6,7], 8],
         ] IT WORKS, BUT INSTEAD OF THREE DOUBLE HIDDEN SUBSET THE REMOVAL, THE HIDDEN NORMAL SUBSET DOES, SO WE DO NOT KNOW THE
         EXACT BEHAVIOUR OF THREE DOUBLE HIDDEN SUBSET - IT EITHER WOULD NEVER BE USEFUL OR ONLY USEFUL FOR VERY RARE, SPECIFIC CASES*/
+
+        /* grid = [
+            [9, [6,8], [2,4], [2,4], 5, 1, 7, 3, [6,8]],
+            [1, [4,6], 7, 3, 9, 8, 2, [4,6], 5],
+            [5, [3,4,8], [2,3,4], [2,4], 7, 6, [4,8], 9, 1],
+            [8, 1, [6,9], 7, 2, 4, 3, 5, [6,9]],
+            [2, [3,4], [3,4,9], 1, 6, 5, [4,8,9], [4,8], 7],
+            [[4,6], 7, 5, 9, 8, 3, [4,6], 1, 2],
+            [[4,6], 2, 1, 5, 3, 7, [4,6,8,9], [4,6,8], [4,6,8,9]],
+            [7, 5, 8, 6, 4, 9, 1, 2, 3],
+            [3, 9, [4,6], 8, 1, 2, 5, 7, [4,6]],
+        ]  UNCOMMENT FOR TESTING PURPOSES - IT NEEDS SOME DEEPER CHECKINGS*/ 
 
         let currMethodNo = 0;
         while(currMethodNo < methodsArr.length) {
@@ -1150,6 +1167,62 @@ const engine = {
             console.log(digitsToCheck);
 
         } */
+
+        function checkForXWingsOrSwordfish(grid, dimensionObj, currentDim, isSwordfish) {
+            let pointersCount = 2;
+            if(isSwordfish) {
+                pointersCount = 3;
+                console.warn('its Swordfish');
+            } else {
+                console.warn('NOT SWORDFISH')
+            }
+
+            // Below loop is for X-wings only (it has to be conditional separated)
+            for(let pointer_static_pos = 0; pointer_static_pos < (9 - (pointersCount - 1)); pointer_static_pos++) {
+                for(let pointer_dynamic_pos = pointer_static_pos + 1; pointer_dynamic_pos < (9 - (pointersCount - 2)); pointer_dynamic_pos++) {
+                    for(let allPointerDoubles = 0; allPointerDoubles< dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos].length; allPointerDoubles++) {
+                        if(dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos].includes(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles])) {
+                            let staticInd = dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos].indexOf(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles]);
+                            let sameIndexCount = 0;
+                            for(let indexNoToCompare = 0; indexNoToCompare<dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles].length; indexNoToCompare++) {
+                                // It's always of length 2
+                                if(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd].includes(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles][indexNoToCompare])) {
+                                    sameIndexCount++;
+                                }
+                            }
+
+                            if(sameIndexCount === dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles].length) {
+                                // X-wing applies ! Check counterpart dimension for the digit found as an X-wing and remove those
+                                let didHelp = checkCounterpartRemoval();
+                                // Do tej funkcji jako argumentów potrzebujemy:
+                                // Dimension - czy to rząd, czy kolumna
+                                // Nr indeksów wszystkich wskaźników, tworzących X-wing (2 wskaźniki) lub swordfish (3 wskaźniki)
+                                // Cyfrę, dla której znaleźliśmy x-wings / swordfish
+                                // Indeksy wystąpienia tej cyfry we wskaźnikach
+                            }
+                        }
+                    }
+
+                    /* const dimensionObj = {
+                        row: {
+                            numsTwiceInDim: [],
+                            numsTwiceInDim_Indexes: [],
+                        },
+        
+                        column: {
+                            numsTwiceInDim: [],
+                            numsTwiceInDim_Indexes: [],
+                        },
+                    } */
+                }
+            }
+
+        }
+
+        function checkCounterpartRemoval() {
+            // Now let's finish things off with potential removals
+            console.error('X-wing is theeere')
+        }
         
         function testNakedSubset(grid, allSquares, dimensionObj_dim, dimensionObj_dim_subset_l,  nakedSubset_l, dimension_no, dimension_item, isHidden) {
             //console.log(dimensionObj_dim);
@@ -1415,7 +1488,7 @@ const engine = {
                     })
                 }
             
-                console.log(isHidden, doubleInDimArr);
+                //console.log(isHidden, doubleInDimArr);
 
                 if(doubleInDimArr.length < 3) { return false;}
 
