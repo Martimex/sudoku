@@ -1090,7 +1090,19 @@ const engine = {
             [[4,6], 2, 1, 5, 3, 7, [4,6,8,9], [4,6,8], [4,6,8,9]],
             [7, 5, 8, 6, 4, 9, 1, 2, 3],
             [3, 9, [4,6], 8, 1, 2, 5, 7, [4,6]],
-        ]  UNCOMMENT FOR TESTING PURPOSES - IT NEEDS SOME DEEPER CHECKINGS*/ 
+        ]  //UNCOMMENT FOR TESTING PURPOSES - IT NEEDS SOME DEEPER CHECKINGS - edit: Works cool ! */
+
+       /*  grid = [
+            [7, [2,5], 3, 8, [1,5], 6, [1,2,4], 9, [2,4]],
+            [6, 1, 4, 9, 2, 3, 7, [5,8], [5,8]],
+            [9, 8, [2,5], [1,5], 7, 4, [1,2], 6, 3],
+            [[2,5], 3, [6,8], [1,6], [1,4,8], [8,9], [2,4,5,8], 7, [2,4,5,8,9]],
+            [1, 7, 9, 2, [4,8], 5, 6, 3, [4,8]],
+            [[2,5], 4, [6,8], [6,7], 3, [7,8,9], [2,5,8], 1, [2,5,8,9]],
+            [8, [2,5], 1, [4,5,7], 9, [2,7], 3, [2,4,5], 6],
+            [3, 9, 7, [4,5], 6, [2,8], [2,4,5,8], [2,4,5,8], 1],
+            [4, 6, [2,5], 3, [5,8], 1, 9, [2,5,8], 7],
+        ] // if you comment all methods besides x-wings, it's actually finding the right number ! */
 
         let currMethodNo = 0;
         while(currMethodNo < methodsArr.length) {
@@ -1193,7 +1205,10 @@ const engine = {
 
                             if(sameIndexCount === dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles].length) {
                                 // X-wing applies ! Check counterpart dimension for the digit found as an X-wing and remove those
-                                let didHelp = checkCounterpartRemoval();
+                                let pointersIndexes_arr = [pointer_static_pos, pointer_dynamic_pos]; // for swordfish, this var would have 3 elems - all pointer indexes
+
+
+                                let didHelp = checkCounterpartRemoval(dimensionObj, currentDim, pointersIndexes_arr, dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos][staticInd], dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd], pointersCount);
                                 // Do tej funkcji jako argumentów potrzebujemy:
                                 // Dimension - czy to rząd, czy kolumna
                                 // Nr indeksów wszystkich wskaźników, tworzących X-wing (2 wskaźniki) lub swordfish (3 wskaźniki)
@@ -1219,9 +1234,50 @@ const engine = {
 
         }
 
-        function checkCounterpartRemoval() {
+        function checkCounterpartRemoval(dimensionObj, currentDim, pointersIndexes_arr, digit, digitIndexes_arr, pointersCount) {
+            let isHelpful = false;
+            console.log(`current dim is: `, currentDim, ' pointers indexes are: ', pointersIndexes_arr, ' digit is: ', digit, ' and digit indexes are: ', digitIndexes_arr);
             // Now let's finish things off with potential removals
-            console.error('X-wing is theeere')
+            
+
+            if(currentDim === 'row') {
+                //const counterPartDim = 'column';
+                for(let pointer_no_counterpart = 0; pointer_no_counterpart <  pointersCount; pointer_no_counterpart++) {
+                    // For each pointer counterpart
+                    for(let tile_in_counterpart = 0; tile_in_counterpart < 9; tile_in_counterpart++) {
+                        // For each tile in chosen counterpart
+                        // Jeżeli sprawdzany kafelek posiada tą cyfrę jako opcję i nie jest ona częścią x-wings
+                        if(typeof(grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]]) === 'object') {
+                            if((grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].includes(digit)) && (!pointersIndexes_arr.includes(tile_in_counterpart))) {
+                                let index = grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].indexOf(digit);
+                                grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].splice(index, 1);
+                                console.error('X-wing is theeere in row and removed number: ', digit, ` from grid[${tile_in_counterpart}][${digitIndexes_arr[pointer_no_counterpart]}]`);
+                                isHelpful = true;
+                            }
+                        }
+                    }
+                    /* for(let pointers_index_no = 0; pointers_index_no < pointersIndexes_arr.length; pointers_index_no++) {
+                        // For pointers indexes
+
+                    } */
+                }
+            } else {
+                // if currentDim === 'column'
+                for(let pointer_no_counterpart = 0; pointer_no_counterpart < pointersCount; pointer_no_counterpart++) {
+                    for(let tile_in_counterpart = 0; tile_in_counterpart < 9; tile_in_counterpart++) {
+                        if(typeof(grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart]) === 'object') {
+                            if((grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].includes(digit)) && (!pointersIndexes_arr.includes(tile_in_counterpart))) {
+                                let index = grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].indexOf(digit);
+                                grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].splice(index, 1);
+                                console.error(`X-wing is theeere in column and removed number `, digit, ` from grid[${digitIndexes_arr[pointer_no_counterpart]}][${tile_in_counterpart}]`);
+                                isHelpful = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return isHelpful;
         }
         
         function testNakedSubset(grid, allSquares, dimensionObj_dim, dimensionObj_dim_subset_l,  nakedSubset_l, dimension_no, dimension_item, isHidden) {
