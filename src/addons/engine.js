@@ -380,7 +380,7 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         // Our array of methods
-        const methodsArr = [singleCandidate, singlePosition, candidateLines, doublePairs,  nakedSubset, hiddenSubset, xWings];
+        const methodsArr = [singleCandidate, singlePosition, candidateLines, doublePairs,  nakedSubset, hiddenSubset, xWings, swordFish];
 
         /* const dimensionObject = {
             row: [
@@ -931,6 +931,10 @@ const engine = {
             let helpedSolving = null;
             console.log(`%c xWings needed...`, 'background: hsla(55, 60%, 65%, 50%); color: hsl(166, 70%, 70%);');
 
+            if(isSwordfish) {
+                console.log(`%c Welcome to Swordfish !`, 'background: hsla(12, 60%, 50%); color: #000;');
+            }
+
             const dimensionObj = {
                 row: {
                     numsTwiceInDim: [],
@@ -1009,6 +1013,7 @@ const engine = {
                 }
 
                 let testIfHelps = checkForXWingsOrSwordfish(grid, dimensionObj, detectedDimensions[currentDimension_no], isSwordfish);
+                if(testIfHelps) {helpedSolving = true;}
             }
 
             console.log(dimensionObj);
@@ -1023,6 +1028,15 @@ const engine = {
             */
 
 
+
+            return helpedSolving;
+        }
+
+        function swordFish() {
+            let helpedSolving = null;
+            const s = xWings('swordfish');
+
+            if(s) { helpedSolving = true; }
 
             return helpedSolving;
         }
@@ -1090,7 +1104,7 @@ const engine = {
             [[4,6], 2, 1, 5, 3, 7, [4,6,8,9], [4,6,8], [4,6,8,9]],
             [7, 5, 8, 6, 4, 9, 1, 2, 3],
             [3, 9, [4,6], 8, 1, 2, 5, 7, [4,6]],
-        ]  //UNCOMMENT FOR TESTING PURPOSES - IT NEEDS SOME DEEPER CHECKINGS - edit: Works cool ! */
+        ]  //UNCOMMENT FOR TESTING PURPOSES - IT NEEDS SOME DEEPER CHECKINGS - edit: Works cool as for x-wings ! */
 
        /*  grid = [
             [7, [2,5], 3, 8, [1,5], 6, [1,2,4], 9, [2,4]],
@@ -1103,6 +1117,30 @@ const engine = {
             [3, 9, 7, [4,5], 6, [2,8], [2,4,5,8], [2,4,5,8], 1],
             [4, 6, [2,5], 3, [5,8], 1, 9, [2,5,8], 7],
         ] // if you comment all methods besides x-wings, it's actually finding the right number ! */
+
+        /* grid = [
+            [1, 9, 5, 3, 6, 7, 2, 4, 8],
+            [[2,4], 7, 8, [1,2,4], 5, [1,4], 3, 6, 9],
+            [3, [2,4], 6, [2,4], 9, 8, 1, 5, 7],
+            [[2,6], [1,2,6], 3, 7, 8, [1,4], 5, 9, [2,4]],
+            [7, [1,2], 9, [1,4], [2,3], 5, [4,8], [3,8], 6],
+            [5, 8, 4, 9, [2,3], 6, 7, 1, [2,3]],
+            [8, 3, 2, 5, 4, 9, 6, 7, 1],
+            [9, [4,6], 7, [6,8], 1, 3, [4,8], 2, 5],
+            [[4,6], 5, 1, [6,8], 7, 2, 9, [3,8], [3,4]],
+        ] // for Swordfish - IT WORKS PERFECTLY FINE ! */
+
+        /* grid = [
+            [5, 6, 3, [1,2,4,7], [4,7], [1,2], 9, 8, [1,4]],
+            [1, 8, 4, 9, 5, 3, 2, 6, 7],
+            [[2,9], [2,9], 7, [1,4], 6, 8, [1,5], [4,5], 3],
+            [[2,7,9], [1,2,5,7,9], [1,2], 6, [1,9], [2,5], 4, 3, 8],
+            [4, [1,5], 6, 8, 3, 7, [1,5], 9, 2],
+            [3, [1,2,5,9], 8, [2,5], [1,9], 4, 6, 7, [1, 5]],
+            [6, 4, [1,5], 3, 8, [1,5], 7, 2, 9],
+            [8, [1,7], 9, [1,7], 2, 6, 3, [4,5], [4,5]],
+            [[2,7], 3, [2,5], [4,5,7], [4,7], 9, 8, 1, 6],
+        ] // For Swordfish - Perfect ! It gathered all 3 unnecessary numbers ! */
 
         let currMethodNo = 0;
         while(currMethodNo < methodsArr.length) {
@@ -1181,62 +1219,127 @@ const engine = {
         } */
 
         function checkForXWingsOrSwordfish(grid, dimensionObj, currentDim, isSwordfish) {
+            let isHelpful = null;
             let pointersCount = 2;
             if(isSwordfish) {
                 pointersCount = 3;
-                console.warn('its Swordfish');
-            } else {
-                console.warn('NOT SWORDFISH')
+                //console.warn('its Swordfish');
             }
 
-            // Below loop is for X-wings only (it has to be conditional separated)
-            for(let pointer_static_pos = 0; pointer_static_pos < (9 - (pointersCount - 1)); pointer_static_pos++) {
-                for(let pointer_dynamic_pos = pointer_static_pos + 1; pointer_dynamic_pos < (9 - (pointersCount - 2)); pointer_dynamic_pos++) {
-                    for(let allPointerDoubles = 0; allPointerDoubles< dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos].length; allPointerDoubles++) {
-                        if(dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos].includes(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles])) {
-                            let staticInd = dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos].indexOf(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles]);
-                            let sameIndexCount = 0;
-                            for(let indexNoToCompare = 0; indexNoToCompare<dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles].length; indexNoToCompare++) {
-                                // It's always of length 2
-                                if(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd].includes(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles][indexNoToCompare])) {
-                                    sameIndexCount++;
+            if(!isSwordfish) {
+                // Below loop is for X-wings only (it has to be conditional separated)
+                for(let pointer_static_pos = 0; pointer_static_pos < (9 - (pointersCount - 1)); pointer_static_pos++) {
+                    for(let pointer_dynamic_pos = pointer_static_pos + 1; pointer_dynamic_pos < (9 - (pointersCount - 2)); pointer_dynamic_pos++) {
+                        for(let allPointerDoubles = 0; allPointerDoubles< dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos].length; allPointerDoubles++) {
+                            if(dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos].includes(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles])) {
+                                let staticInd = dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos].indexOf(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles]);
+                                let sameIndexCount = 0;
+                                for(let indexNoToCompare = 0; indexNoToCompare<dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles].length; indexNoToCompare++) {
+                                    // It's always of length 2
+                                    if(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd].includes(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles][indexNoToCompare])) {
+                                        sameIndexCount++;
+                                    }
                                 }
-                            }
 
-                            if(sameIndexCount === dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles].length) {
-                                // X-wing applies ! Check counterpart dimension for the digit found as an X-wing and remove those
-                                let pointersIndexes_arr = [pointer_static_pos, pointer_dynamic_pos]; // for swordfish, this var would have 3 elems - all pointer indexes
+                                if(sameIndexCount === dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles].length) {
+                                    // X-wing applies ! Check counterpart dimension for the digit found as an X-wing and remove those
+                                    let pointersIndexes_arr = [pointer_static_pos, pointer_dynamic_pos]; // for swordfish, this var would have 3 elems - all pointer indexes
 
 
-                                let didHelp = checkCounterpartRemoval(dimensionObj, currentDim, pointersIndexes_arr, dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos][staticInd], dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd], pointersCount);
-                                // Do tej funkcji jako argumentów potrzebujemy:
-                                // Dimension - czy to rząd, czy kolumna
-                                // Nr indeksów wszystkich wskaźników, tworzących X-wing (2 wskaźniki) lub swordfish (3 wskaźniki)
-                                // Cyfrę, dla której znaleźliśmy x-wings / swordfish
-                                // Indeksy wystąpienia tej cyfry we wskaźnikach
+                                    let didHelp = checkCounterpartRemoval(currentDim, pointersIndexes_arr, dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos][staticInd], dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd], pointersCount);
+                                    if(didHelp) {isHelpful = true;}
+                                    // Do tej funkcji jako argumentów potrzebujemy:
+                                    // Dimension - czy to rząd, czy kolumna
+                                    // Nr indeksów wszystkich wskaźników, tworzących X-wing (2 wskaźniki) lub swordfish (3 wskaźniki)
+                                    // Cyfrę, dla której znaleźliśmy x-wings / swordfish
+                                    // Indeksy wystąpienia tej cyfry we wskaźnikach
+                                }
                             }
                         }
                     }
+                }
+            } 
+            
+            else {
+                // For Swordfish method
+                for(let pointer_static_pos = 0; pointer_static_pos < (9 - (pointersCount - 1)); pointer_static_pos++) {
+                    for(let pointer_dynamic_pos = pointer_static_pos + 1; pointer_dynamic_pos < (9 - (pointersCount - 2)); pointer_dynamic_pos++) {
+                        for(let pointer_conditional_pos = pointer_dynamic_pos + 1; pointer_conditional_pos < (9 - (pointersCount - 3)); pointer_conditional_pos++) {
+                            for(let allPointerDoubles = 0; allPointerDoubles< dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos].length; allPointerDoubles++) {
+                                if(dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos].includes(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles])) {
+                                    let staticInd = dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos].indexOf(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles]);
+                                    let sameIndexCount = 0;
+                                    for(let indexNoToCompare = 0; indexNoToCompare<dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles].length; indexNoToCompare++) {
+                                        // It's always of length 2
+                                        if(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd].includes(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][allPointerDoubles][indexNoToCompare])) {
+                                            sameIndexCount++;
+                                        }
+                                    }
 
-                    /* const dimensionObj = {
-                        row: {
-                            numsTwiceInDim: [],
-                            numsTwiceInDim_Indexes: [],
-                        },
-        
-                        column: {
-                            numsTwiceInDim: [],
-                            numsTwiceInDim_Indexes: [],
-                        },
-                    } */
+                                    if(sameIndexCount === 1) {
+                                        // Pobierz unikalne indeksy wskaźników static i dynamic, dla których występuje ta cyfra - i sprawdź
+                                        // czy wskaźnik conditional zawiera je wszystkie
+                                        let dynamicInd = dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos].indexOf(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles]);
+                                        let conditionalInd = dimensionObj[currentDim]['numsTwiceInDim'][pointer_conditional_pos].indexOf(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles]);
+
+                                        if((dynamicInd >= 0) && (conditionalInd >= 0)) {  
+                                            // If we don't have elem, indexOf() method would return -1 as a response
+                                            let conditionalPointerIndexes = dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_conditional_pos][conditionalInd];
+                                            
+                                            let noDuplicatesDynamicArr = dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][dynamicInd].filter((el, index) => {
+                                                if(!dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd].includes(el)) {return true;}
+                                            })
+                                            let noDuplicatesStaticArr = dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd].filter((el, index) => {
+                                                if(!dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][dynamicInd].includes(el)) {return true;}
+                                            })
+
+                                            let staticAndDynamicUniqueIndexes = [...noDuplicatesDynamicArr, ...noDuplicatesStaticArr]
+                                            
+                                            //console.log(staticAndDynamicUniqueIndexes, 'versus: ', conditionalPointerIndexes);
+
+                                            let sameCount = 0;
+
+                                            for(let ind=0; ind<staticAndDynamicUniqueIndexes.length; ind++) {
+                                                // NOTE: staticAndDynamicUniqueIndexes and conditionalPointerIndexes has 100% same length !
+                                                if(conditionalPointerIndexes.includes(staticAndDynamicUniqueIndexes[ind])) {
+                                                    sameCount++;
+                                                }
+                                            }
+
+                                            if(sameCount === staticAndDynamicUniqueIndexes.length) {
+                                                // Create an array of only unique indexes, and invoke proper function afterwards !
+                                                let staticAndDynamicIndexes = dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd].concat(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][dynamicInd]);
+                                                let pointersUniqueIndexes_set = new Set(staticAndDynamicIndexes);
+                                                let pointersUniqueIndexes_array = Array.from(pointersUniqueIndexes_set);
+                                                console.log(pointersUniqueIndexes_array);
+                                                //console.error('SwordFish can possibly HELP !');
+
+                                                let pointersIndexes_arr = [pointer_static_pos, pointer_dynamic_pos, pointer_conditional_pos];
+
+                                                let didHelp = checkCounterpartRemoval(currentDim, pointersIndexes_arr, dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos][staticInd], pointersUniqueIndexes_array, pointersCount, isSwordfish);
+                                               
+                                                if(didHelp) {isHelpful = true;}
+                                                // Do tej funkcji jako argumentów potrzebujemy:
+                                                // Dimension - czy to rząd, czy kolumna
+                                                // Nr indeksów wszystkich wskaźników, tworzących X-wing (2 wskaźniki) lub swordfish (3 wskaźniki)
+                                                // Cyfrę, dla której znaleźliśmy x-wings / swordfish
+                                                // Indeksy wystąpienia tej cyfry we wskaźnikach
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
-
+            
+            return isHelpful;
         }
 
-        function checkCounterpartRemoval(dimensionObj, currentDim, pointersIndexes_arr, digit, digitIndexes_arr, pointersCount) {
+        function checkCounterpartRemoval(currentDim, pointersIndexes_arr, digit, digitIndexes_arr, pointersCount, isSwordfish) {
             let isHelpful = false;
-            console.log(`current dim is: `, currentDim, ' pointers indexes are: ', pointersIndexes_arr, ' digit is: ', digit, ' and digit indexes are: ', digitIndexes_arr);
+            //console.log(`current dim is: `, currentDim, ' pointers indexes are: ', pointersIndexes_arr, ' digit is: ', digit, ' and digit indexes are: ', digitIndexes_arr);
             // Now let's finish things off with potential removals
             
 
@@ -1251,7 +1354,8 @@ const engine = {
                             if((grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].includes(digit)) && (!pointersIndexes_arr.includes(tile_in_counterpart))) {
                                 let index = grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].indexOf(digit);
                                 grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].splice(index, 1);
-                                console.error('X-wing is theeere in row and removed number: ', digit, ` from grid[${tile_in_counterpart}][${digitIndexes_arr[pointer_no_counterpart]}]`);
+                                if(!isSwordfish) { console.error('X-wing is theeere in row and removed number: ', digit, ` from grid[${tile_in_counterpart}][${digitIndexes_arr[pointer_no_counterpart]}]`);}
+                                else { console.error('SWORDFISH HELPS in row and removed number: ', digit, ` from grid[${tile_in_counterpart}][${digitIndexes_arr[pointer_no_counterpart]}]`);}
                                 isHelpful = true;
                             }
                         }
@@ -1269,7 +1373,8 @@ const engine = {
                             if((grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].includes(digit)) && (!pointersIndexes_arr.includes(tile_in_counterpart))) {
                                 let index = grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].indexOf(digit);
                                 grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].splice(index, 1);
-                                console.error(`X-wing is theeere in column and removed number `, digit, ` from grid[${digitIndexes_arr[pointer_no_counterpart]}][${tile_in_counterpart}]`);
+                                if(!isSwordfish) {console.error(`X-wing is theeere in column and removed number `, digit, ` from grid[${digitIndexes_arr[pointer_no_counterpart]}][${tile_in_counterpart}]`);}
+                                else {console.error(`SWORDFISH HELPS in column and removed number `, digit, ` from grid[${digitIndexes_arr[pointer_no_counterpart]}][${tile_in_counterpart}]`);}
                                 isHelpful = true;
                             }
                         }
