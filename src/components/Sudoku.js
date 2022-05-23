@@ -145,7 +145,7 @@ function Sudoku(props) {
         //engine.fadeDigits(props);
         //engine.backtrack();
         engine.backtrack();
-        engine.solveSudoku();
+        //engine.solveSudoku(); -> we will use it more often when it comes to render a grid with proper difficulty
 
         // ALWAYS INIT LAST
         //board.current.addEventListener('click', interact);

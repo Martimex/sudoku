@@ -8,7 +8,8 @@ const rules = {
         initialNumbers: {
             min: 30,
             max: 32,
-        }, 
+        },
+        bestMethodsAllowed: [0, 1],
         conditions: {
             square_min_fill: 2, // The least amount of initial digits that a square can have
             max_squares_min_filled: 2, // How much squares can be minimally filled ?
@@ -22,6 +23,7 @@ const rules = {
             min: 27,
             max: 29,
         },
+        bestMethodsAllowed: [2, 3],
         conditions: {
             square_min_fill: 1, // The least amount of initial digits that a square can have
             max_squares_min_filled: 2, // How much squares can be minimally filled ?
@@ -35,6 +37,7 @@ const rules = {
             min: 24,
             max: 26,
         },
+        bestMethodsAllowed: [4, 5],
         conditions: {
             square_min_fill: 0, // The least amount of initial digits that a square can have
             max_squares_min_filled: 1, // How much squares can be minimally filled ?
@@ -48,6 +51,7 @@ const rules = {
             min: 21,
             max: 23,
         },
+        bestMethodsAllowed: [6, 7, null],
         conditions: {
             square_min_fill: 0, // The least amount of initial digits that a square can have
             max_squares_min_filled: 3, // How much squares can be minimally filled ?
@@ -270,8 +274,9 @@ const engine = {
                 ordered[counterPart].textContent = '';
 
                 let isStillUnique = this.backtrack();
+                //const hardestMethodNo = this.solveSudoku(); -> uncomment when rebuilding
                 console.log('UNIQUE SUDOKU ?', isStillUnique);
-                if(isStillUnique) {
+                if((isStillUnique) /* && (rules[difficulty]['bestMethodsAllowed'].includes(hardestMethodNo)) -> uncomment when rebuilding */) {
                     // Order here is important !
                     ordered.splice(counterPart, 1);
                     ordered.splice(rand, 1);
@@ -334,6 +339,8 @@ const engine = {
         })
 
         let isUnique = this.backtrack();
+        const hardestMethodNo = this.solveSudoku();
+        console.log('Hardest method no is... ', hardestMethodNo);
         console.warn('isSudokuUnique? ', isUnique);
 
     },
@@ -929,10 +936,11 @@ const engine = {
 
         function xWings(isSwordfish) {
             let helpedSolving = null;
-            console.log(`%c xWings needed...`, 'background: hsla(55, 60%, 65%, 50%); color: hsl(166, 70%, 70%);');
-
+            
             if(isSwordfish) {
                 console.log(`%c Welcome to Swordfish !`, 'background: hsla(12, 60%, 50%); color: #000;');
+            } else {
+                console.log(`%c xWings needed...`, 'background: hsla(55, 60%, 65%, 50%); color: hsl(166, 70%, 70%);');
             }
 
             const dimensionObj = {
@@ -1143,6 +1151,7 @@ const engine = {
         ] // For Swordfish - Perfect ! It gathered all 3 unnecessary numbers ! */
 
         let currMethodNo = 0;
+        let bestMethod = 0;
         while(currMethodNo < methodsArr.length) {
             let doesItHelp = methodsArr[currMethodNo]();
             if(doesItHelp) {
@@ -1150,6 +1159,9 @@ const engine = {
                 console.log('back to method first'); 
                 const y = [...grid];
                 console.log(y);
+                if(currMethodNo > bestMethod) {
+                    bestMethod = currMethodNo;
+                }
                 currMethodNo = 0; 
                 updateGrid(grid); 
             }
@@ -1159,6 +1171,22 @@ const engine = {
             }
             //updateGrid(grid);
             //updateDimensionObject(grid, dimensionObject);
+        }
+        const isGridFullyFilled = testGridFullyFilled(grid); 
+        if(!isGridFullyFilled) {
+            bestMethod = null;
+        }
+
+        function testGridFullyFilled(grid) {
+            //console.log(grid);
+            for(let row = 0; row<9; row++) {
+                for(let col = 0; col<9; col++) {
+                    if(typeof(grid[row][col]) === 'object') {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
 /*         function testHiddenSubset(grid, dimensionObj_dim, dimensionObj_dim_subset_l,  hiddenSubset_l, dimension_no, dimension_item) {
@@ -2715,6 +2743,7 @@ const engine = {
                 if(num === parseInt(grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column])) return false; // CHECK SQUARE || if False = We have this number in a square already
             }
         } */
+        return bestMethod;
     },
 
     fadeDigits: function({difficulty, theme, options}) {
