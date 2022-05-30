@@ -9,6 +9,7 @@ const rules = {
             min: 30,
             max: 32,
         },
+        renderingTrials: 55, 
         bestMethodsAllowed: [0, 1],
         conditions: {
             square_min_fill: 2, // The least amount of initial digits that a square can have
@@ -23,6 +24,7 @@ const rules = {
             min: 27,
             max: 29,
         },
+        renderingTrials: 55, // was 70
         bestMethodsAllowed: [2, 3],
         conditions: {
             square_min_fill: 1, // The least amount of initial digits that a square can have
@@ -37,6 +39,7 @@ const rules = {
             min: 24,
             max: 26,
         },
+        renderingTrials: 55, // was 85
         bestMethodsAllowed: [4, 5],
         conditions: {
             square_min_fill: 0, // The least amount of initial digits that a square can have
@@ -48,9 +51,10 @@ const rules = {
     },
     master: {
         initialNumbers: {
-            min: 21,
-            max: 23,
+            min: 25, // was 21
+            max: 26, // was 23
         },
+        renderingTrials: 55,  // was 100
         bestMethodsAllowed: [6, 7, null],
         conditions: {
             square_min_fill: 0, // The least amount of initial digits that a square can have
@@ -332,7 +336,21 @@ const engine = {
 
         console.log('our iterator is: ', i, '  tiles uncover count is: ', j.j);
 
-        this.singleRemoval(ordered, randInitial, i, randHide); 
+        const ordered_copy = [...ordered];
+        const randomized_ordered_copy = [];
+        const elAndDigit = [];
+        
+        for(let initial_no = 0; initial_no<ordered_copy.length;) {
+            let rand = Math.floor(Math.random() * ordered_copy.length);
+            randomized_ordered_copy.push(ordered_copy[rand]);
+            ordered_copy.splice(rand, 1);
+        }
+
+        const trials_used = {
+            used: 0,
+        }
+
+        const setUp = this.singleRemoval(ordered, randInitial, i, randHide,  rules[difficulty]['renderingTrials'], 0); 
 
         allTilesArray.forEach(tile => {
             if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
@@ -340,18 +358,71 @@ const engine = {
 
         let isUnique = this.backtrack();
         const hardestMethodNo = this.solveSudoku();
+        console.log('Are Sudoku preparations made nicely: ', setUp);
         console.log('Hardest method no is... ', hardestMethodNo);
         console.warn('isSudokuUnique? ', isUnique);
 
+        this.fadeNonInitials(allTilesArray);
     },
 
-    singleRemoval: function(ordered, randInitial, singleRemove_start, randHide) {
-        
+    fadeNonInitials: function(allTilesArray) {
+        console.log('Fading...');
+        allTilesArray.forEach(tile => {
+            if(!tile.classList.contains('initial')) {
+                tile.textContent = '';
+            }
+        })
+    },
+
+    singleRemoval: function(ordered, randInitial, singleRemove_start, randHide, trials, trials_used) {
+        // RECURSIVE WAY (STILL NOT GREAT)
+
+
+        /* for(let x=index; x<randomized_ordered_copy.length; x++) {
+            if(isFinished) {return true; }
+            trials_used['used'] = trials_used['used'] + 1 || 1;
+            console.log('used ', trials_used['used'], ' trials, out of ', trials);
+
+            if(trials_used['used'] >= trials) {
+                isFinished = true;
+            }
+
+            elAndDigit.push([randomized_ordered_copy[x], randomized_ordered_copy[x].textContent]);
+            randomized_ordered_copy[x].textContent = '';
+            let isStillUnique = this.backtrack();
+            //randomized_ordered_copy.splice(x, 1);
+
+            if(isStillUnique) {
+                //randomized_ordered_copy.splice(index, 0, elAndDigit[elAndDigit.length - 1][0])
+                this.singleRemoval(randomized_ordered_copy, elAndDigit, trials, trials_used, index + 1); // + 2 because of splicing new elem
+            }
+
+            else {
+                // Sudoku is not unique
+                //randomized_ordered_copy.splice(x, 0, elAndDigit[elAndDigit.length - 1][0])
+                randomized_ordered_copy[x].textContent = elAndDigit[elAndDigit.length - 1][1];
+                elAndDigit.pop();
+
+                if(x === randomized_ordered_copy.length - 1) {
+                    elAndDigit[elAndDigit.length - 1][0].textContent = elAndDigit[elAndDigit.length - 1][1];
+                    //randomized_ordered_copy.splice(0, 0, elAndDigit[elAndDigit.length - 1][0]);
+                    elAndDigit.pop();
+
+                    this.singleRemoval(randomized_ordered_copy, elAndDigit, trials, trials_used, index - 1); 
+                }
+            }
+        }
+
+        return false; */
+
+        // ITERATIVE APPROACH
+
         let orderedCopy = [...ordered];
         let elAndDigit = [];
 
         for(let x=singleRemove_start; x>randInitial + randHide; x--) {
-           
+            if(trials_used >= trials) {return; }
+            trials_used++;
             let rand = Math.floor(Math.random() * orderedCopy.length);
             elAndDigit.push([orderedCopy[rand], orderedCopy[rand].textContent]);
 
@@ -373,7 +444,7 @@ const engine = {
                 }
             }
 
-            elAndDigit.pop();
+            elAndDigit.pop(); 
             
         }
 
@@ -607,7 +678,7 @@ const engine = {
             for(let r=0; r<9; r++) {
                 for(let iir=0; iir<9; iir++) {
                     if((grid[r][iir].length <= 1) && (typeof(grid[r][iir]) !== 'string')) { 
-                        ordered[(r * 9) + iir].style.color = 'tomato';
+                        //ordered[(r * 9) + iir].style.color = 'tomato';
                         ordered[(r * 9) + iir].textContent = grid[r][iir][0];
                         grid[r][iir] = grid[r][iir][0];
                         helpedSolving = true;
@@ -2718,9 +2789,9 @@ const engine = {
         function applyOnePosition(grid, dim_1, dim_2, singPos, dim) {
             for(let x=0; x<singPos.length; x++) {
                 if(grid[dim_1][dim_2].includes(singPos[x])) {
-                    if(dim === 'r') {ordered[(dim_1 * 9) + dim_2].style.color = 'aqua'};
-                    if(dim === 'c') {ordered[(dim_1 * 9) + dim_2].style.color = 'green'};
-                    if(dim === 's') {ordered[(dim_1 * 9) + dim_2].style.color = 'burlywood'};
+                    //if(dim === 'r') {ordered[(dim_1 * 9) + dim_2].style.color = 'aqua'};
+                    //if(dim === 'c') {ordered[(dim_1 * 9) + dim_2].style.color = 'green'};
+                    //if(dim === 's') {ordered[(dim_1 * 9) + dim_2].style.color = 'burlywood'};
                     ordered[(dim_1 * 9) + dim_2].textContent = singPos[x];
                     grid[dim_1][dim_2] = singPos[x];
                     return true;
@@ -2895,23 +2966,33 @@ const engine = {
         }
     },
 
-    backtrack: function () {
+    backtrack: function (currGridState) {
         //console.log('tracking....');
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
-        const grid = [];
-        const grid2 = [];
+        let grid;
+        let grid2;
 
-        ordered.map((el, index) => { 
-            if(index % 9 === 0 ) {
-                grid.push([]);
-                grid2.push([]);
-            }
-            el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push(0);
-            el.textContent ? grid2[grid2.length -1].push(el.textContent) : grid2[grid2.length -1].push(0);
-        })
+        if(!currGridState) {
+            grid = [];
+            grid2 = [];
+
+            ordered.map((el, index) => { 
+                if(index % 9 === 0 ) {
+                    grid.push([]);
+                    grid2.push([]);
+                }
+                el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push(0);
+                el.textContent ? grid2[grid2.length -1].push(el.textContent) : grid2[grid2.length -1].push(0);
+            })
+        }
+        
+        else {
+            grid = currGridState;
+            grid2 = currGridState;
+        }
 
        //console.log(grid);
 
