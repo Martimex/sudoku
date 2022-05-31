@@ -363,6 +363,28 @@ const engine = {
         console.warn('isSudokuUnique? ', isUnique);
 
         this.fadeNonInitials(allTilesArray);
+    
+        let difficulty_name;
+
+        for(let key in rules) {
+            if(rules[key]['bestMethodsAllowed'].includes(hardestMethodNo)) {
+                difficulty_name = key;
+            }
+        }
+
+        return difficulty_name;
+    },
+
+    setInitialClassToChosenTiles: function({theme}) {
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+
+        allTilesArray.forEach(tile => {
+            if(tile.textContent) {
+                //console.log('add!');
+                tile.classList.add(`initial`, `initial-${theme}`);
+            }
+        })
     },
 
     fadeNonInitials: function(allTilesArray) {
@@ -2873,7 +2895,8 @@ const engine = {
         //console.log(currentBoard)
 
         allTilesArray.forEach(tile => {
-            if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
+            console.log('test')
+            if(tile.textContent) { console.log('yes'); tile.classList.add(`initial`, `initial-${theme}`); }
         })
 
         //console.log(currentBoard);

@@ -35,12 +35,15 @@ const difficultyColors = {
 
 function Sudoku(props) {
 
+    // final_Difficulty should be replaced by props.difficulty, once a not-random pick-up Sudoku generating mechanism would be implemented
+
     const squareRows = 3;
     const squareColumns = 3;
     const rows = 9;
     const columns = 9;
 
     const [active, setActive] = useState(0);
+    const [final_Difficulty, setFinalDifficulty] = useState(null);
 
     const sudoku = useRef(null);
     const all = useRef(null);
@@ -57,7 +60,7 @@ function Sudoku(props) {
     }
 
     const allSquares = renderArray.map((square, index) => 
-        <Square key={index.toString()} id={index} theme={props.theme} difficulty={props.difficulty}
+        <Square key={index.toString()} id={index} theme={props.theme} difficulty={final_Difficulty}
          mainRows={rows} mainColumns={columns} squareRows={squareRows} squareColumns={squareColumns} />
     );
 
@@ -125,7 +128,7 @@ function Sudoku(props) {
         anime({
             targets: e.target,
             duration: 1100,
-            background: [`#0000`, `${difficultyColors[props.theme][props.difficulty]}`],
+            background: [`#0000`, `${difficultyColors[props.theme][final_Difficulty]}`], 
             easing: 'easeOutSine',
             direction: 'alternate',
         })
@@ -133,7 +136,7 @@ function Sudoku(props) {
         anime({
             targets: active,
             duration: 1000,
-            color: [`#0000`, `${difficultyColors[props.theme][props.difficulty]}`],
+            color: [`#0000`, `${difficultyColors[props.theme][final_Difficulty]}`], // props.difficulty
             easing: 'linear',
         })
     }
@@ -141,10 +144,13 @@ function Sudoku(props) {
     // Perform engine operations
     useEffect(() => {
         engine.setBoard();
-        engine.hideDigits(props);
+        const final_Diff = engine.hideDigits(props);
         //engine.fadeDigits(props);
         //engine.backtrack();
         engine.backtrack();
+        setFinalDifficulty(final_Diff);
+
+
         //engine.solveSudoku(); -> we will use it more often when it comes to render a grid with proper difficulty
 
         // ALWAYS INIT LAST
@@ -159,21 +165,25 @@ function Sudoku(props) {
         }
     }, []);
 
+    useEffect(() => {
+        engine.setInitialClassToChosenTiles(props);
+    }, [final_Difficulty])
+
 
     return (
         <div className={`sudoku-${props.theme}`} ref={sudoku}>
             <div className={`all all-${props.theme}`} ref={all}>
                 <div className="sudoku-title">
-                    Sudoku {props.difficulty} 
+                    Sudoku {final_Difficulty} 
                     {engine.version}
                 </div>
                 <div className="sudoku-map">
-                    <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} style={mainGridStyle} difficulty={props.difficulty} theme={props.theme} >
+                    <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} style={mainGridStyle} difficulty={final_Difficulty} theme={props.theme} >
                         {allSquares}
                     </div>
                 </div>
                 {/* <Palette ref={paletteRef} /> */}
-                <div className={`numbers-box numbers-${props.difficulty}`} ref={numbox} onClick={(e) => { if(active) appendNumber(e)}}>
+                <div className={`numbers-box numbers-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(active) appendNumber(e)}}>
                     <div className="option option-1"> 1 </div>
                     <div className="option option-2"> 2 </div>
                     <div className="option option-3"> 3 </div>
