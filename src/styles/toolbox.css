@@ -1,0 +1,75 @@
+.tool-box {
+    margin: 1rem .5rem -0.8rem .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.tool {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    margin: .4rem;
+    width: 4rem;
+    border: .2rem double #fff;
+    border-radius:  30%;
+}
+
+.tool-easy {
+    border-color: hsl(116, 73%, 40%);
+    /* color: hsl(142, 75%, 35%); */
+}
+
+.tool-medium {
+    border-color: hsl(55, 73%, 40%);
+   /*  color: hsl(66, 75%, 45%); */
+}
+
+.tool-hard {
+    border-color: hsl(12, 73%, 40%);
+    /* color: hsl(22, 75%, 35%);  */
+}
+
+.tool-master {
+    border-color: hsl(182, 73%, 40%);
+   /*  color: hsl(274, 75%, 35%); */
+}
+
+.tool-icon {
+    font-size: 1.5rem;
+    pointer-events: none;
+    /* margin: .6rem .2rem; */
+}
+
+.desc {
+    margin: .3rem .2rem;
+}
+
+.pencilmark_on {
+    border: .4rem dotted #535;
+
+    animation: borderSpin 4s infinite linear;
+}
+
+@keyframes borderSpin {
+    0% {
+        border: .4rem dotted hsl(12, 60%, 45%);
+    }
+
+    25% {
+        border: .4rem dotted hsl(82, 60%, 45%);
+    }
+
+    50% {
+        border:.4rem dotted  hsl(152, 60%, 45%);
+    }
+
+    75% {
+        border: .4rem dotted hsl(222, 60%, 45%);
+    }
+
+    100% {
+        border: .4rem dotted  hsl(292, 60%, 45%);
+    }
+}

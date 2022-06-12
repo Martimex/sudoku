@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Audiowide&effect=neon');
 
+:root {
+    --bg-easy: 'linear-gradient(75deg, hsl(112, 40%, 60%), hsl(132, 50%, 70%))';
+    --bg-medium: 'linear-gradient(75deg, hsl(46, 40%, 60%), hsl(66, 50%, 70%))';
+    --bg-hard: 'linear-gradient(75deg, hsl(2, 40%, 60%), hsl(22, 50%, 70%))';
+    --bg-insane: 'linear-gradient(75deg, hsl(244, 40%, 60%), hsl(264, 50%, 70%))';
+}
+
 .layout {
     position: absolute; 
     top: 0%; left: 0%;
@@ -8,10 +15,6 @@
     /* background-image: linear-gradient(135deg, #000,#000, #000); */
     background-color: #000;
     color: #ddd;
-}
-
-.content {
-    font-family: 'Audiowide', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .app-text {
@@ -49,26 +52,30 @@
     margin: .1rem;
 }
 
+.content {
+    font-family: 'Audiowide';
+}
+
 .difficulty-easy {
-    background-image: linear-gradient(75deg, hsl(112, 40%, 60%), hsl(132, 50%, 70%));
+    background-image: var(--bg-easy);
     border-color: hsl(142, 75%, 35%);
     border-style: solid none none solid;
 }
 
 .difficulty-medium {
-    background-image: linear-gradient(75deg, hsl(46, 40%, 60%), hsl(66, 50%, 70%));
-    border-color: hsl(76, 75%, 35%);
+    background-image: var(--bg-medium);
+    border-color: hsl(66, 75%, 45%);
     border-style: solid solid none none;
 }
 
 .difficulty-hard {
-    background-image: linear-gradient(75deg, hsl(2, 40%, 60%), hsl(22, 50%, 70%));
+    background-image: var(--bg-hard);
     border-color: hsl(22, 75%, 35%);
     border-style: none none solid solid;
 }
 
 .difficulty-master {
-    background-image: linear-gradient(75deg, hsl(244, 40%, 60%), hsl(264, 50%, 70%));
+    background-image: var(--bg-insane);
     border-color: hsl(274, 75%, 35%);
     border-style: none solid solid none;
 }

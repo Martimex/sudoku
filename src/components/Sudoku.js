@@ -4,6 +4,7 @@ import App from '../App';
 import Landing from "../Landing";
 import Square from "./Square";
 import Palette from "./Palette";
+import Toolbox from './Toolbox';
 import '../styles/sudoku.css';
 import engine from '../addons/engine.js';
 
@@ -175,8 +176,9 @@ function Sudoku(props) {
             <div className={`all all-${props.theme}`} ref={all}>
                 <div className="sudoku-title">
                     Sudoku {final_Difficulty} 
-                    {engine.version}
+                    {/* {engine.version} */}
                 </div>
+                <Toolbox difficulty={final_Difficulty} theme={props.theme} />
                 <div className="sudoku-map">
                     <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} style={mainGridStyle} difficulty={final_Difficulty} theme={props.theme} >
                         {allSquares}

@@ -145,7 +145,7 @@ function Landing(props) {
                         <div className="difficulty difficulty-easy easy" ref={easyRef} onClick={() => {props.setDifficulty('easy')}}> EASY </div>
                         <div className="difficulty difficulty-medium medium" ref={mediumRef} onClick={() => {props.setDifficulty('medium')}}> MEDIUM </div>
                         <div className="difficulty difficulty-hard hard" ref={hardRef} onClick={() => {props.setDifficulty('hard')}}> HARD </div>
-                        <div className="difficulty difficulty-master master" ref={masterRef} onClick={() => {props.setDifficulty('master')}}> KOREA </div>
+                        <div className="difficulty difficulty-master master" ref={masterRef} onClick={() => {props.setDifficulty('master')}}> INSANE </div>
                     </div>
                 </div>
 
