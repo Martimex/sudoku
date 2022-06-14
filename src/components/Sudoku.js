@@ -45,6 +45,7 @@ function Sudoku(props) {
 
     const [active, setActive] = useState(0);
     const [final_Difficulty, setFinalDifficulty] = useState(null);
+    const [pencilmarks_Enabled, setPencilMarksEnabled] = useState(false);
 
     const sudoku = useRef(null);
     const all = useRef(null);
@@ -124,7 +125,51 @@ function Sudoku(props) {
 
         console.log(e.target.textContent);
         console.log(active);
-        active.textContent = e.target.textContent;
+
+        if(!pencilmarks_Enabled) {
+            if(active.classList.contains('pencilmark_tile')) {
+                active.classList.remove('pencilmark_tile');
+                while(active.childNodes.length) {
+                    active.childNodes[active.childNodes.length - 1].remove();
+                }
+            }
+            active.textContent = e.target.textContent;
+
+        }
+        else {
+            console.log(active.childNodes);
+            if(active.classList.contains('pencilmark_tile')) {
+                for(let ind=0; ind<active.childNodes.length; ind++) {
+                    console.log(active.childNodes[ind], e.target.textContent);
+                    if(active.childNodes[ind].classList.contains(`no-${parseInt(e.target.textContent)}`)) {
+                        if(active.childNodes[ind].textContent) {
+                            active.childNodes[ind].textContent = '';
+                        }
+                        else {
+                            active.childNodes[ind].textContent = e.target.textContent;
+                        }
+                    }
+                }
+            }
+            else {
+                active.textContent = '';
+                active.classList.add('pencilmark_tile');
+                // Append divs to pencilmark tile
+                for(let x=1; x<=9; x++) {
+                    let el = document.createElement('div');
+                    if(x === parseInt(e.target.textContent)) {el.textContent = e.target.textContent};
+                    el.classList.add('xd', `no-${x}`);
+                    active.appendChild(el);
+                }
+            }
+        }
+
+        anime({
+            targets: active,
+            duration: 1000,
+            color: [`#0000`, `${difficultyColors[props.theme][final_Difficulty]}`], // props.difficulty
+            easing: 'linear',
+        })
 
         anime({
             targets: e.target,
@@ -134,12 +179,8 @@ function Sudoku(props) {
             direction: 'alternate',
         })
 
-        anime({
-            targets: active,
-            duration: 1000,
-            color: [`#0000`, `${difficultyColors[props.theme][final_Difficulty]}`], // props.difficulty
-            easing: 'linear',
-        })
+
+        console.log(pencilmarks_Enabled);
     }
 
     // Perform engine operations
@@ -178,7 +219,7 @@ function Sudoku(props) {
                     Sudoku {final_Difficulty} 
                     {/* {engine.version} */}
                 </div>
-                <Toolbox difficulty={final_Difficulty} theme={props.theme} />
+                <Toolbox difficulty={final_Difficulty} theme={props.theme} handlePencilmarks={setPencilMarksEnabled} isEnabled={pencilmarks_Enabled} />
                 <div className="sudoku-map">
                     <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} style={mainGridStyle} difficulty={final_Difficulty} theme={props.theme} >
                         {allSquares}

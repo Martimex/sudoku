@@ -91,6 +91,35 @@
     border-radius: 10%;
 }
 
+/* When we append a number to a given tile with pencilmark option turn on*/
+
+.pencilmark_tile {
+    display: grid;
+    justify-items: center;
+    /*
+    align-content: start;
+    align-items: start;  
+    */
+    grid-template-columns: repeat(3, 33%);
+    grid-template-columns: repeat(3, 33%);
+    /* row-gap: 0; */
+}
+
+.xd {
+   /*  background: #43b12b; */
+    display: flex;
+    /* content: '.'; */
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    height: 33%;
+    position: relative; 
+    width: 33%;
+    font-size: .6rem;
+    font-weight: 650;
+}
+
+
 
 /* Chosen tile */
 

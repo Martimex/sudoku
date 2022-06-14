@@ -28,13 +28,14 @@ const tools = {
             console.log(target);
             if(this.isActive) {
                 console.log('PENCILMARKS ACTIVATED');
-                target.classList.add('pencilmark_on');
+                target.classList.add('pencilmark_on', 'animation-box');
                 console.log(target.classList);
             }
             else {
                 console.log('Pencilmark mode: off');
-                target.classList.remove('pencilmark_on');
+                target.classList.remove('pencilmark_on', 'animation-box');
             }
+
         }
     },
 }
@@ -61,9 +62,8 @@ function Toolbox(props) {
                 <FontAwesomeIcon icon={faRedo} className="tool-icon"></FontAwesomeIcon>
                 {/* <div className="desc"> Redo </div> */}
             </div>
-            <div className={`tool tool-${props.difficulty}`} data_name={'pencil'} >   
+            <div className={`tool tool-${props.difficulty}`} data_name={'pencil'} onClick={() => props.handlePencilmarks(!props.isEnabled) } >   
                 <FontAwesomeIcon icon={faPen} className="tool-icon"></FontAwesomeIcon>
-                {/* <div className="desc"> Off </div> */}
             </div>
         </div>
     )

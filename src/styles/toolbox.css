@@ -12,7 +12,7 @@
     height: 4rem;
     margin: .4rem;
     width: 4rem;
-    border: .2rem double #fff;
+    border: .3rem double #fff;
     border-radius:  30%;
 }
 
@@ -47,29 +47,46 @@
 }
 
 .pencilmark_on {
-    border: .4rem dotted #535;
-
+    border: .3rem dotted #535;
     animation: borderSpin 4s infinite linear;
+}
+
+.animation-box {
+    border: .3rem solid #572 ;
+    background: #000;
+}
+
+.animation-box::before {
+    position: relative;
+    z-index: 40;
+    top: 0%; left: 0%;
+    width: 2rem; height: .5rem;
+    background: #fff;
 }
 
 @keyframes borderSpin {
     0% {
-        border: .4rem dotted hsl(12, 60%, 45%);
+        border: .3rem dotted hsl(12, 60%, 45%);
+        /* transform: rotateZ(0deg) rotateY(0deg) rotateX(0deg); */
     }
 
     25% {
-        border: .4rem dotted hsl(82, 60%, 45%);
+        border: .3rem dotted hsl(82, 60%, 45%);
+        /* transform: rotateZ(30deg) rotateY(30deg) rotateX(30deg); */
     }
 
     50% {
-        border:.4rem dotted  hsl(152, 60%, 45%);
+        border: .3rem dotted  hsl(152, 60%, 45%);
+       /*  transform: rotateZ(60deg) rotateY(60deg) rotateX(60deg); */
     }
 
     75% {
-        border: .4rem dotted hsl(222, 60%, 45%);
+        border: .3rem dotted hsl(222, 60%, 45%);
+        /* transform: rotateZ(90deg) rotateY(90deg) rotateX(90deg); */
     }
 
     100% {
-        border: .4rem dotted  hsl(292, 60%, 45%);
+        border: .3rem dotted  hsl(292, 60%, 45%);
+        /* transform: rotateZ(0deg) rotateY(0deg) rotateX(0deg); */
     }
 }
