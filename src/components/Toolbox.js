@@ -50,7 +50,7 @@ function Toolbox(props) {
 
     return (
         <div className="tool-box" onClick={(e) => {  if(e.target.classList.contains('tool'))  { fireTool(e.target) } } }>
-            <div className={`tool tool-${props.difficulty}`} data_name={'info'} > 
+            <div className={`tool tool-${props.difficulty}`} data_name={'info'} onClick={() => console.log(props.history)} > 
                 <FontAwesomeIcon icon={faInfo} className="tool-icon"></FontAwesomeIcon>
                 {/* <div className="desc"> Info </div> */}
             </div>

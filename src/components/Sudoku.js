@@ -9,6 +9,7 @@ import '../styles/sudoku.css';
 import engine from '../addons/engine.js';
 
 import anime from 'animejs/lib/anime.es.js';
+import { act } from "react-dom/test-utils";
 
 const basics = {
     squareRows: 3,
@@ -16,6 +17,12 @@ const basics = {
     rows: 9,
     columns: 9,
 }
+
+const currentHistory = {
+    history: [],
+};
+
+const game_History = [];
 
 const difficultyColors = {
     day: {
@@ -46,11 +53,14 @@ function Sudoku(props) {
     const [active, setActive] = useState(0);
     const [final_Difficulty, setFinalDifficulty] = useState(null);
     const [pencilmarks_Enabled, setPencilMarksEnabled] = useState(false);
+    //const [game_History, setGameHistory] = useState([]);
+    const [step, setStep] = useState(0); // determines no of action (would enable to travel in time regarding board progress)
 
     const sudoku = useRef(null);
     const all = useRef(null);
     const board = useRef(null);
     const numbox = useRef(null);
+    const rubber = useRef(null);
     const paletteRef = createRef();
     
     const mainGridStyle = {gridTemplateRows: `repeat(${squareRows}, 7rem)`, gridTemplateColumns: `repeat(${squareColumns}, 7rem)`}
@@ -183,6 +193,56 @@ function Sudoku(props) {
         console.log(pencilmarks_Enabled);
     }
 
+    const updateHistory = (e) => {
+
+        let currentHistory_copy = JSON.parse(JSON.stringify(currentHistory));
+
+        console.log(active);
+        let activeTileOrder = parseInt(active.dataset['order']);
+        const activeTile_Row = Math.floor(activeTileOrder / 9);
+        const activeTile_Col = ((activeTileOrder - 1) % 9);
+
+        console.log(currentHistory.history);
+
+        if(pencilmarks_Enabled) {
+            if(active.classList.contains('pencilmark_tile')) {
+                if(typeof(game_History[step][activeTile_Row][activeTile_Col]) !== 'object') { // We meant an array by that
+                    currentHistory_copy.history[activeTile_Row][activeTile_Col] = [];
+                }
+                if(game_History[step][activeTile_Row][activeTile_Col].includes(parseInt(e.target.textContent))) {
+                    let ind = game_History[step][activeTile_Row][activeTile_Col].indexOf(parseInt(e.target.textContent));
+                    currentHistory_copy.history[activeTile_Row][activeTile_Col].splice(ind, 1);
+                    if(!currentHistory_copy.history[activeTile_Row][activeTile_Col].length) {
+                        currentHistory_copy.history[activeTile_Row][activeTile_Col] = '';
+                    }
+                } else {
+                    currentHistory_copy.history[activeTile_Row][activeTile_Col].push(parseInt(e.target.textContent));
+                }
+
+                if(typeof(currentHistory_copy.history[activeTile_Row][activeTile_Col]) === 'object') {
+                    currentHistory_copy.history[activeTile_Row][activeTile_Col].sort();
+                }
+
+            }
+            else {
+                console.warn('NO PENCILMARK CLASS PROVIDED !');
+            }
+        }
+        else {
+            currentHistory_copy.history[activeTile_Row][activeTile_Col] = e.target.textContent;
+        }
+
+
+        game_History.push(currentHistory_copy.history);
+        console.log(game_History);
+
+        currentHistory.history = currentHistory_copy.history;
+
+        setStep(step + 1);
+        //setGameHistory([...prev_State, history_to_update]); -> not working
+        //setGameHistory([...game_History, [...history_to_update]])
+    }    
+
     // Perform engine operations
     useEffect(() => {
         engine.setBoard();
@@ -192,7 +252,11 @@ function Sudoku(props) {
         engine.backtrack();
         setFinalDifficulty(final_Diff);
 
-
+        // Create game history
+        const history = engine.createInitialGameHistory();
+        console.log(history);
+        currentHistory.history = history;
+        game_History.push(history);
         //engine.solveSudoku(); -> we will use it more often when it comes to render a grid with proper difficulty
 
         // ALWAYS INIT LAST
@@ -211,6 +275,28 @@ function Sudoku(props) {
         engine.setInitialClassToChosenTiles(props);
     }, [final_Difficulty])
 
+    useEffect(() => {
+        console.log('rubber animations')
+        if(pencilmarks_Enabled === true) {
+            anime({
+                targets: rubber.current,
+                duration: 800,
+                backgroundColor: [`#0000`, `${difficultyColors[props.theme][final_Difficulty]}`], // props.difficulty
+                easing: 'easeInSine',
+                border: `${difficultyColors[props.theme][final_Difficulty]}`,  
+                opacity: .5,
+            })
+        } else {
+            anime({
+                targets: rubber.current,
+                duration: 800,
+                backgroundColor: [`#000`], // props.difficulty
+                easing: 'easeOutSine',
+                border: 'none',
+                opacity: 0,
+            })
+        }
+    }, [pencilmarks_Enabled])
 
     return (
         <div className={`sudoku-${props.theme}`} ref={sudoku}>
@@ -226,7 +312,7 @@ function Sudoku(props) {
                     </div>
                 </div>
                 {/* <Palette ref={paletteRef} /> */}
-                <div className={`numbers-box numbers-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(active) appendNumber(e)}}>
+                <div className={`numbers-box numbers-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(active && (!(pencilmarks_Enabled && !parseInt(e.target.textContent))) && (!(!parseInt(active.textContent) && !parseInt(e.target.textContent)))) { appendNumber(e); updateHistory(e); } }}>
                     <div className="option option-1"> 1 </div>
                     <div className="option option-2"> 2 </div>
                     <div className="option option-3"> 3 </div>
@@ -236,7 +322,7 @@ function Sudoku(props) {
                     <div className="option option-7"> 7 </div>
                     <div className="option option-8"> 8 </div>
                     <div className="option option-9"> 9 </div>
-                    <div className="option option-0">  </div>
+                    <div className="option option-0" ref={rubber}>  </div>
                 </div> 
 
             </div>

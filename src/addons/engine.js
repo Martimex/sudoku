@@ -231,6 +231,22 @@ const engine = {
             }
 
         }
+       
+    },
+
+    createInitialGameHistory: function() {
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
+
+        const initialBoard = [];
+
+        ordered.forEach((el, ind) => {
+            if(ind % 9 === 0) { initialBoard.push([]); }
+            (el.classList.contains('initial')) ? initialBoard[initialBoard.length - 1].push(el.textContent) : initialBoard[initialBoard.length - 1].push(' ');
+        })
+
+        return initialBoard;
     },
 
     gatherTilesData: function(allTiles) {
