@@ -243,7 +243,7 @@ const engine = {
 
         ordered.forEach((el, ind) => {
             if(ind % 9 === 0) { initialBoard.push([]); }
-            (el.classList.contains('initial')) ? initialBoard[initialBoard.length - 1].push(el.textContent) : initialBoard[initialBoard.length - 1].push(' ');
+            (el.classList.contains('initial')) ? initialBoard[initialBoard.length - 1].push(el.textContent) : initialBoard[initialBoard.length - 1].push('');
         })
 
         return initialBoard;
@@ -3142,6 +3142,84 @@ const engine = {
 
         return true;
         
+    },
+
+    // This one is a Toolbox specific function, which repaints the board whenever player 'travels in time'
+    travelInTime: function(current_step, game_history) {
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray);
+        console.log(game_history);
+        console.log(current_step);
+        //console.log(ordered);
+
+        // KONIECZNE BĘDZIE JESZCZE PRZYGOTOWANIE MECHANIZMU ZABEZPIECZAJĄCEGO, GDY GRACZ PO NADPISANIU HISTORII GRY, ZMIENI NAGLE KAFELEK
+        // Z "PENCILMARK TILE" NA "SINGLE DIGIT" TILE, PO CZYM COFNIE SIĘ W CZASIE DO POPRZEDNIEJ TURY
+
+        console.log(game_history[current_step])
+        for(let tile = 0; tile<ordered.length; tile++) {
+            let row = Math.floor(tile / 9);
+            let column = tile%9;
+
+            if(ordered[(row * 9) + column].classList.contains('pencilmark_tile') && typeof(game_history[current_step][row][column]) === 'object') {
+                console.log('Lets deal with array now')
+                //console.log(ordered[(row * 9) + column].childNodes, game_history[current_step][row][column])
+                
+                let orderedPencilmarks = [];
+                for(let y=0; y<ordered[(row * 9) + column].childNodes.length; y++) {
+                    if(parseInt(ordered[(row * 9) + column].childNodes[y].textContent)) {
+                        orderedPencilmarks.push(parseInt(ordered[(row * 9) + column].childNodes[y].textContent));
+                    }
+                }
+
+                console.log(orderedPencilmarks, game_history[current_step][row][column]);
+                if(orderedPencilmarks.length !== game_history[current_step][row][column].length) {
+                    let pencilmarkToModify;
+                    let longerArray = (orderedPencilmarks.length > game_history[current_step][row][column].length) ? orderedPencilmarks : game_history[current_step][row][column];
+                    let shorterArray = (orderedPencilmarks.length > game_history[current_step][row][column].length) ? game_history[current_step][row][column] : orderedPencilmarks;
+                    // W pencilmarks tego kafelka nastąpił update. Zidentyfikuj zmianę w tym kafelku
+                    longerArray.some((val, ind) => {
+                        if(!shorterArray.includes(val)) {
+                            pencilmarkToModify = val;
+                            return val;
+                        }
+                    })
+
+                    console.log(pencilmarkToModify);
+
+                    let pencilmark_tile = ordered[(row * 9) + column].querySelector(`.no-${pencilmarkToModify}`);
+                    (parseInt(pencilmark_tile.textContent)) ? pencilmark_tile.textContent = '' : pencilmark_tile.textContent = pencilmarkToModify; 
+                }
+            }
+
+            // When player change tile role from "pencilmark" to "single digit" and vice versa
+            else if(ordered[(row * 9) + column].classList.contains('pencilmark_tile') || typeof(game_history[current_step][row][column]) === 'object') {
+                console.warn('entering dev state');
+                // ... TO DO
+            }
+
+            // This statements will not work for pencilmarks !
+            else if(ordered[(row * 9) + column].textContent !== game_history[current_step][row][column]) {
+                console.log(ordered[(row * 9) + column], game_history[current_step][row][column])
+                ordered[(row * 9) + column].textContent = game_history[current_step][row][column];
+            }
+
+            /* if(typeof(game_history[current_step][row][column]) !== 'string'  || (typeof(game_history[current_step][row][column]) === 'string' && !parseInt(game_history[current_step][row][column]))) {
+                // It means it's not initial tile - because those can never be modified by history travel
+                // Now determine whether a tile is normal digit appen
+                console.log(parseInt(game_history[current_step][row][column]), game_history[current_step][row][column])
+
+                if(typeof(game_history[current_step][row][column]) === 'string') {
+                    console.log('empty cell');
+                }
+                else if(typeof(game_history[current_step][row][column]) === 'number') {
+                    console.log(`it's number`);
+                }
+                else if(typeof(game_history[current_step][row][column]) === 'object') {
+                    console.log(`it is Pencilmark Array`)
+                }
+            } */
+        }
     },
 
     interact: function() {

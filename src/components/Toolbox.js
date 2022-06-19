@@ -13,26 +13,27 @@ const tools = {
     },
     back: {
         run: function(target) {
-            console.log('running...')
+            console.log('go back in game history [-1]')
+            //console.log(target);
         }
     },
     forth: {
         run: function(target) {
-            console.log('running...')
+            console.log('go forth in game history [+1]')
         }
     },
     pencil: {
         isActive: false,
         run: function(target) {
             this.isActive = !this.isActive;
-            console.log(target);
+            //console.log(target);
             if(this.isActive) {
-                console.log('PENCILMARKS ACTIVATED');
+                //console.log('PENCILMARKS ACTIVATED');
                 target.classList.add('pencilmark_on', 'animation-box');
-                console.log(target.classList);
+                //console.log(target.classList);
             }
             else {
-                console.log('Pencilmark mode: off');
+                //console.log('Pencilmark mode: off');
                 target.classList.remove('pencilmark_on', 'animation-box');
             }
 
@@ -54,11 +55,11 @@ function Toolbox(props) {
                 <FontAwesomeIcon icon={faInfo} className="tool-icon"></FontAwesomeIcon>
                 {/* <div className="desc"> Info </div> */}
             </div>
-            <div className={`tool tool-${props.difficulty}`} data_name={'back'} > 
+            <div className={`tool tool-${props.difficulty}`} data_name={'back'} onClick={() => { if(props.maxStep !== 0 && props.currentStep !== 0) { props.changeCurrentStep(props.currentStep - 1); props.historyTravel(props.travel - 1) } } } > 
                 <FontAwesomeIcon icon={faUndo} className="tool-icon"></FontAwesomeIcon>
                 {/* <div className="desc"> Undo </div> */}
             </div>
-            <div className={`tool tool-${props.difficulty}`} data_name={'forth'} >
+            <div className={`tool tool-${props.difficulty}`} data_name={'forth'} onClick={() => { if(props.maxStep !== 0 && props.currentStep !== props.maxStep) { props.changeCurrentStep(props.currentStep + 1); props.historyTravel(props.travel + 1) } } } > 
                 <FontAwesomeIcon icon={faRedo} className="tool-icon"></FontAwesomeIcon>
                 {/* <div className="desc"> Redo </div> */}
             </div>

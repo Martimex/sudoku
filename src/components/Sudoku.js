@@ -55,6 +55,8 @@ function Sudoku(props) {
     const [pencilmarks_Enabled, setPencilMarksEnabled] = useState(false);
     //const [game_History, setGameHistory] = useState([]);
     const [step, setStep] = useState(0); // determines no of action (would enable to travel in time regarding board progress)
+    const [current_step, setCurrentStep] = useState(0); // determines current step no - also the one currently browsed by player
+    const [history_travel, setHistoryTravel] = useState(0); // it's only use to trigger stuff properly, it's an artificial state, but dont remove it !
 
     const sudoku = useRef(null);
     const all = useRef(null);
@@ -195,22 +197,30 @@ function Sudoku(props) {
 
     const updateHistory = (e) => {
 
-        let currentHistory_copy = JSON.parse(JSON.stringify(currentHistory));
-
-        console.log(active);
         let activeTileOrder = parseInt(active.dataset['order']);
-        const activeTile_Row = Math.floor(activeTileOrder / 9);
+        const activeTile_Row = Math.floor((activeTileOrder - 1) / 9);
         const activeTile_Col = ((activeTileOrder - 1) % 9);
 
-        console.log(currentHistory.history);
+        if(current_step !== step) {
+            console.log('PIWO PO 3 ZŁOTE !');
+            console.log(game_History, current_step, 'max: ', step);
+            game_History.splice(current_step + 1);
+            currentHistory.history = game_History[game_History.length - 1];
+        }
+
+  
+        let currentHistory_copy = JSON.parse(JSON.stringify(currentHistory));
+
+        //console.log(active);
+        //console.log(currentHistory.history);
 
         if(pencilmarks_Enabled) {
             if(active.classList.contains('pencilmark_tile')) {
-                if(typeof(game_History[step][activeTile_Row][activeTile_Col]) !== 'object') { // We meant an array by that
+                if(typeof(game_History[current_step][activeTile_Row][activeTile_Col]) !== 'object') { // We meant an array by that
                     currentHistory_copy.history[activeTile_Row][activeTile_Col] = [];
                 }
-                if(game_History[step][activeTile_Row][activeTile_Col].includes(parseInt(e.target.textContent))) {
-                    let ind = game_History[step][activeTile_Row][activeTile_Col].indexOf(parseInt(e.target.textContent));
+                if(game_History[current_step][activeTile_Row][activeTile_Col].includes(parseInt(e.target.textContent))) {
+                    let ind = game_History[current_step][activeTile_Row][activeTile_Col].indexOf(parseInt(e.target.textContent));
                     currentHistory_copy.history[activeTile_Row][activeTile_Col].splice(ind, 1);
                     if(!currentHistory_copy.history[activeTile_Row][activeTile_Col].length) {
                         currentHistory_copy.history[activeTile_Row][activeTile_Col] = '';
@@ -229,19 +239,37 @@ function Sudoku(props) {
             }
         }
         else {
-            currentHistory_copy.history[activeTile_Row][activeTile_Col] = e.target.textContent;
+            currentHistory_copy.history[activeTile_Row][activeTile_Col] = parseInt(e.target.textContent);
         }
 
-
+        
+        
         game_History.push(currentHistory_copy.history);
         console.log(game_History);
 
         currentHistory.history = currentHistory_copy.history;
 
-        setStep(step + 1);
+        if(current_step !== step) {
+            // If we override history
+            setStep(current_step + 1);
+            setCurrentStep(current_step + 1);
+            
+        } else {
+            // Normal behaviour
+            setStep(step + 1);
+            setCurrentStep(current_step + 1);
+        }
+
         //setGameHistory([...prev_State, history_to_update]); -> not working
         //setGameHistory([...game_History, [...history_to_update]])
     }    
+
+    /*     const repaintBoard = () => {
+        console.log('WRITING OUT THE HISTORY')
+        // Now paint the board based on currentStep value
+        console.log(game_History[current_step]);
+        console.log(board.current.childNodes);
+    } */
 
     // Perform engine operations
     useEffect(() => {
@@ -296,7 +324,13 @@ function Sudoku(props) {
                 opacity: 0,
             })
         }
-    }, [pencilmarks_Enabled])
+    }, [pencilmarks_Enabled]);
+
+    useEffect(() => {
+        if(step > 0) { // Prevents from initial fire when component is being rendered
+            engine.travelInTime(current_step, game_History);
+        }
+    }, [history_travel])
 
     return (
         <div className={`sudoku-${props.theme}`} ref={sudoku}>
@@ -305,7 +339,9 @@ function Sudoku(props) {
                     Sudoku {final_Difficulty} 
                     {/* {engine.version} */}
                 </div>
-                <Toolbox difficulty={final_Difficulty} theme={props.theme} handlePencilmarks={setPencilMarksEnabled} isEnabled={pencilmarks_Enabled} />
+                <Toolbox difficulty={final_Difficulty} theme={props.theme} handlePencilmarks={setPencilMarksEnabled} isEnabled={pencilmarks_Enabled} 
+                         changeCurrentStep={setCurrentStep} currentStep={current_step} maxStep={step} travel={history_travel} historyTravel={setHistoryTravel}
+                />
                 <div className="sudoku-map">
                     <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} style={mainGridStyle} difficulty={final_Difficulty} theme={props.theme} >
                         {allSquares}
@@ -330,4 +366,9 @@ function Sudoku(props) {
     );
 }
 
+// BUGI
+// 1. Gdy dajemy Pencilmark na ostatnią kratkę w Sudoku Board, (9 rząd, 9 kolumna) dostajemy błąd:
+//    "Uncaught TypeError: Cannot read properties of undefined (reading '8')" -> RESOLVED
+// 2. History travel - gdy gracz nadpisuje historię rozgrywki, zmieniając przy tym typ kafelka z "pencilmark" na "single digit" (i vice versa)
+//    Nie działa sama kwestia przejścia pomiędzy stanem pencilmark a single digit - po takim stanie podróżowanie w historii powoduje ERROR
 export default Sudoku;
