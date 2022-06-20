@@ -250,7 +250,11 @@ function Sudoku(props) {
             }
         }
         else {
-            currentHistory_copy.history[activeTile_Row][activeTile_Col] = parseInt(e.target.textContent);
+            if(currentHistory_copy.history[activeTile_Row][activeTile_Col] === parseInt(e.target.textContent)) {
+                currentHistory_copy.history[activeTile_Row][activeTile_Col] = '';
+            } else{
+                currentHistory_copy.history[activeTile_Row][activeTile_Col] = parseInt(e.target.textContent);
+            }
         }
 
         
