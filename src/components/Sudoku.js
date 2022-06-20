@@ -214,21 +214,32 @@ function Sudoku(props) {
         //console.log(active);
         //console.log(currentHistory.history);
 
+        // Tu też nie ma ochrony przed przejściem z single digit tile -> pencilmark tile    [EDIT: SOLVED]
+
         if(pencilmarks_Enabled) {
             if(active.classList.contains('pencilmark_tile')) {
-                if(typeof(game_History[current_step][activeTile_Row][activeTile_Col]) !== 'object') { // We meant an array by that
-                    currentHistory_copy.history[activeTile_Row][activeTile_Col] = [];
-                }
-                if(game_History[current_step][activeTile_Row][activeTile_Col].includes(parseInt(e.target.textContent))) {
-                    let ind = game_History[current_step][activeTile_Row][activeTile_Col].indexOf(parseInt(e.target.textContent));
-                    currentHistory_copy.history[activeTile_Row][activeTile_Col].splice(ind, 1);
-                    if(!currentHistory_copy.history[activeTile_Row][activeTile_Col].length) {
-                        currentHistory_copy.history[activeTile_Row][activeTile_Col] = '';
+                
+                if(typeof(game_History[current_step][activeTile_Row][activeTile_Col]) === 'object') {
+                    // Pencilmark tile into pencilmark tile
+                    if(game_History[current_step][activeTile_Row][activeTile_Col].includes(parseInt(e.target.textContent))) {
+                        let ind = game_History[current_step][activeTile_Row][activeTile_Col].indexOf(parseInt(e.target.textContent));
+                        currentHistory_copy.history[activeTile_Row][activeTile_Col].splice(ind, 1);
+                        if(!currentHistory_copy.history[activeTile_Row][activeTile_Col].length) {
+                            currentHistory_copy.history[activeTile_Row][activeTile_Col] = '';
+                        }
+                    } else {
+                        currentHistory_copy.history[activeTile_Row][activeTile_Col].push(parseInt(e.target.textContent));
                     }
-                } else {
+                }
+
+                else {
+                    // Single digit into pencilmark
+                    //console.log('happens...');
+                    currentHistory_copy.history[activeTile_Row][activeTile_Col] = [];
                     currentHistory_copy.history[activeTile_Row][activeTile_Col].push(parseInt(e.target.textContent));
                 }
 
+                // If we have multiple elems pencilmark tile, sort'em
                 if(typeof(currentHistory_copy.history[activeTile_Row][activeTile_Col]) === 'object') {
                     currentHistory_copy.history[activeTile_Row][activeTile_Col].sort();
                 }

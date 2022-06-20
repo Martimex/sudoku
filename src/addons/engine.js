@@ -3196,12 +3196,46 @@ const engine = {
             else if(ordered[(row * 9) + column].classList.contains('pencilmark_tile') || typeof(game_history[current_step][row][column]) === 'object') {
                 console.warn('entering dev state');
                 // ... TO DO
+                if(ordered[(row * 9) + column].classList.contains('pencilmark_tile')) {
+                    // "Pencilmark tile" -> "Single digit tile"
+                    console.log("Pencilmark tile -> Single digit tile");
+                    ordered[(row * 9) + column].classList.remove('pencilmark_tile');
+                    while(ordered[(row * 9) + column].childNodes.length) {
+                        ordered[(row * 9) + column].childNodes[ordered[(row * 9) + column].childNodes.length - 1].remove();
+                    }
+                    // At last append before existent number to the tile
+                    ordered[(row * 9) + column].textContent = game_history[current_step][row][column];
+                }
+
+                else if(typeof(game_history[current_step][row][column]) === 'object') {
+                    // "Single digit tile -> Pencilmark tile"
+                    console.log("Single digit tile -> Pencilmark tile");
+                    ordered[(row * 9) + column].textContent = '';
+                    ordered[(row * 9) + column].classList.add('pencilmark_tile');
+                    // Append divs to pencilmark tile
+                    for(let x=1; x<=9; x++) {
+                        let el = document.createElement('div');
+                        //if(x === parseInt(e.target.textContent)) {el.textContent = e.target.textContent};
+                        if(game_history[current_step][row][column].includes(x)) {
+                            let ind = game_history[current_step][row][column].indexOf(x);
+                            el.textContent = game_history[current_step][row][column][ind];
+                        }
+                        //console.log(game_history[current_step][row][column].length);
+                        el.classList.add('xd', `no-${x}`);
+                        ordered[(row * 9) + column].appendChild(el);
+                    }
+                }
             }
 
             // This statements will not work for pencilmarks !
             else if(ordered[(row * 9) + column].textContent !== game_history[current_step][row][column]) {
                 console.log(ordered[(row * 9) + column], game_history[current_step][row][column])
-                ordered[(row * 9) + column].textContent = game_history[current_step][row][column];
+                if(!game_history[current_step][row][column]) {
+                    // If we used rubber, this might happen. Instead of appending 'NaN', let's append ''
+                    ordered[(row * 9) + column].textContent = '';
+                } else {
+                    ordered[(row * 9) + column].textContent = game_history[current_step][row][column];
+                }
             }
 
             /* if(typeof(game_history[current_step][row][column]) !== 'string'  || (typeof(game_history[current_step][row][column]) === 'string' && !parseInt(game_history[current_step][row][column]))) {
