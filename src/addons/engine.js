@@ -3145,7 +3145,7 @@ const engine = {
     },
 
     // This one is a Toolbox specific function, which repaints the board whenever player 'travels in time'
-    travelInTime: function(current_step, game_history) {
+    travelInTime: function(current_step, game_history, activeTiles_history, setActive) {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
@@ -3153,13 +3153,19 @@ const engine = {
         console.log(current_step);
         //console.log(ordered);
 
+
         // KONIECZNE BĘDZIE JESZCZE PRZYGOTOWANIE MECHANIZMU ZABEZPIECZAJĄCEGO, GDY GRACZ PO NADPISANIU HISTORII GRY, ZMIENI NAGLE KAFELEK
-        // Z "PENCILMARK TILE" NA "SINGLE DIGIT" TILE, PO CZYM COFNIE SIĘ W CZASIE DO POPRZEDNIEJ TURY
+        // Z "PENCILMARK TILE" NA "SINGLE DIGIT" TILE, PO CZYM COFNIE SIĘ W CZASIE DO POPRZEDNIEJ TURY -> EDIT: GOTOWE ✔️
 
         console.log(game_history[current_step])
         for(let tile = 0; tile<ordered.length; tile++) {
-            let row = Math.floor(tile / 9);
+            let row = Math.floor(tile / 9); 
             let column = tile%9;
+
+            // Przy używaniu podróży w czasie zmieniaj pozycję wskaźnika "active"
+             if(ordered[(row * 9) + column].classList.contains('active')) {   
+                ordered[(row * 9) + column].classList.remove('active');
+            } 
 
             if(ordered[(row * 9) + column].classList.contains('pencilmark_tile') && typeof(game_history[current_step][row][column]) === 'object') {
                 console.log('Lets deal with array now')
@@ -3254,6 +3260,21 @@ const engine = {
                 }
             } */
         }
+
+        //console.log(game_history, activeTiles_history);
+
+        // At the very end update active class
+        //console.log(ordered[activeTiles_history[current_step] - 1]);
+        if(ordered[activeTiles_history[current_step] - 1]) {
+            ordered[activeTiles_history[current_step] - 1].classList.add('active'); // For undo & redo 
+            setActive(ordered[activeTiles_history[current_step] - 1])
+        } else {
+            // When we move forward to the very recent move  (prevents from errors !)
+            ordered[activeTiles_history[current_step - 1] - 1].classList.add('active');
+            setActive(ordered[activeTiles_history[current_step - 1] - 1])
+        }
+        //ordered[(activeTiles_history[current_step] + 1) - 1].classList.add('active'); // For redo
+    
     },
 
     interact: function() {

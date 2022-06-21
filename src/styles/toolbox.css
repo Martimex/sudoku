@@ -64,6 +64,11 @@
     background: #fff;
 }
 
+.tool-blocked {
+    filter: grayscale(100%);
+    pointer-events: none;
+}
+
 @keyframes borderSpin {
     0% {
         border: .3rem dotted hsl(12, 60%, 45%);

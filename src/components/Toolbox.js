@@ -43,9 +43,34 @@ const tools = {
 
 function Toolbox(props) {
 
+    const history_undo = useRef(null);
+    const history_redo = useRef(null);
+
     const fireTool = (target) => {
-        tools[target.attributes['data_name'].value].run(target);
+        tools[target.attributes['data_name'].value].run(target); 
     }
+
+    useEffect(() => {
+        console.log('heres updated');
+        //if(props.currentStep)
+        // TO DO...
+
+        // Undo btn
+        if(props.currentStep !== 0) {
+            history_undo.current.classList.remove('tool-blocked');
+        } 
+        else {
+            history_undo.current.classList.add('tool-blocked');  
+        }
+
+        // Redo btn
+        if(props.currentStep !== props.maxStep) {
+            history_redo.current.classList.remove('tool-blocked');
+        }
+        else {
+            history_redo.current.classList.add('tool-blocked');
+        }
+    }, [props.currentStep])
 
     console.log(props);
 
@@ -55,11 +80,11 @@ function Toolbox(props) {
                 <FontAwesomeIcon icon={faInfo} className="tool-icon"></FontAwesomeIcon>
                 {/* <div className="desc"> Info </div> */}
             </div>
-            <div className={`tool tool-${props.difficulty}`} data_name={'back'} onClick={() => { if(props.maxStep !== 0 && props.currentStep !== 0) { props.changeCurrentStep(props.currentStep - 1); props.historyTravel(props.travel - 1) } } } > 
+            <div className={`tool tool-${props.difficulty} tool-blocked`} data_name={'back'} ref={history_undo} onClick={() => { if(props.maxStep !== 0 && props.currentStep !== 0) { props.changeCurrentStep(props.currentStep - 1); props.historyTravel(props.travel - 1) } } } > 
                 <FontAwesomeIcon icon={faUndo} className="tool-icon"></FontAwesomeIcon>
                 {/* <div className="desc"> Undo </div> */}
             </div>
-            <div className={`tool tool-${props.difficulty}`} data_name={'forth'} onClick={() => { if(props.maxStep !== 0 && props.currentStep !== props.maxStep) { props.changeCurrentStep(props.currentStep + 1); props.historyTravel(props.travel + 1) } } } > 
+            <div className={`tool tool-${props.difficulty} tool-blocked`} data_name={'forth'} ref={history_redo} onClick={() => { if(props.maxStep !== 0 && props.currentStep !== props.maxStep) { props.changeCurrentStep(props.currentStep + 1); props.historyTravel(props.travel + 1) } } } > 
                 <FontAwesomeIcon icon={faRedo} className="tool-icon"></FontAwesomeIcon>
                 {/* <div className="desc"> Redo </div> */}
             </div>

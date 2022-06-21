@@ -23,6 +23,7 @@ const currentHistory = {
 };
 
 const game_History = [];
+const activeTiles_History = []; // Array that contains history of tiles, which were targeted by player (change onto them - each index = change)
 
 const difficultyColors = {
     day: {
@@ -145,7 +146,9 @@ function Sudoku(props) {
                     active.childNodes[active.childNodes.length - 1].remove();
                 }
             }
-            active.textContent = e.target.textContent;
+            
+            console.log(active.textContent, e.target.textContent);
+            (parseInt(active.textContent) === parseInt(e.target.textContent)) ? active.textContent = '' : active.textContent = e.target.textContent;
 
         }
         else {
@@ -205,6 +208,7 @@ function Sudoku(props) {
             console.log('PIWO PO 3 ZŁOTE !');
             console.log(game_History, current_step, 'max: ', step);
             game_History.splice(current_step + 1);
+            activeTiles_History.splice(current_step + 1);
             currentHistory.history = game_History[game_History.length - 1];
         }
 
@@ -263,6 +267,10 @@ function Sudoku(props) {
         console.log(game_History);
 
         currentHistory.history = currentHistory_copy.history;
+
+        //Update active's history
+        console.warn(parseInt(active.dataset.order));
+        activeTiles_History.push(parseInt(active.dataset.order));
 
         if(current_step !== step) {
             // If we override history
@@ -343,7 +351,7 @@ function Sudoku(props) {
 
     useEffect(() => {
         if(step > 0) { // Prevents from initial fire when component is being rendered
-            engine.travelInTime(current_step, game_History);
+            engine.travelInTime(current_step, game_History, activeTiles_History, setActive);
         }
     }, [history_travel])
 
@@ -386,4 +394,5 @@ function Sudoku(props) {
 //    "Uncaught TypeError: Cannot read properties of undefined (reading '8')" -> RESOLVED
 // 2. History travel - gdy gracz nadpisuje historię rozgrywki, zmieniając przy tym typ kafelka z "pencilmark" na "single digit" (i vice versa)
 //    Nie działa sama kwestia przejścia pomiędzy stanem pencilmark a single digit - po takim stanie podróżowanie w historii powoduje ERROR
+//    (EDIT: SOLVED)
 export default Sudoku;
