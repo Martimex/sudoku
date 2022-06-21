@@ -3222,7 +3222,9 @@ const engine = {
                     for(let x=1; x<=9; x++) {
                         let el = document.createElement('div');
                         //if(x === parseInt(e.target.textContent)) {el.textContent = e.target.textContent};
-                        if(game_history[current_step][row][column].includes(x)) {
+                        // ⛔ Uncaught TypeError: Cannot read properties of null (reading 'includes')
+                        console.log(game_history[current_step][row][column], x)
+                        if(game_history[current_step][row][column].includes(x)) { // Throws errors 💀 - we need to test if it's still an issue here
                             let ind = game_history[current_step][row][column].indexOf(x);
                             el.textContent = game_history[current_step][row][column][ind];
                         }
@@ -3236,12 +3238,7 @@ const engine = {
             // This statements will not work for pencilmarks !
             else if(ordered[(row * 9) + column].textContent !== game_history[current_step][row][column]) {
                 console.log(ordered[(row * 9) + column], game_history[current_step][row][column])
-                if(!game_history[current_step][row][column]) {
-                    // If we used rubber, this might happen. Instead of appending 'NaN', let's append ''
-                    ordered[(row * 9) + column].textContent = '';
-                } else {
-                    ordered[(row * 9) + column].textContent = game_history[current_step][row][column];
-                }
+                ordered[(row * 9) + column].textContent = game_history[current_step][row][column];
             }
 
             /* if(typeof(game_history[current_step][row][column]) !== 'string'  || (typeof(game_history[current_step][row][column]) === 'string' && !parseInt(game_history[current_step][row][column]))) {
@@ -3259,6 +3256,12 @@ const engine = {
                     console.log(`it is Pencilmark Array`)
                 }
             } */
+
+            if(!game_history[current_step][row][column]) {
+                // If we used rubber, this might happen. Instead of appending 'NaN', let's append ''
+                ordered[(row * 9) + column].textContent = '';
+                
+            }
         }
 
         //console.log(game_history, activeTiles_history);
