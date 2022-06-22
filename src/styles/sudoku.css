@@ -127,6 +127,15 @@
     animation: focus 4s infinite linear alternate;
 }
 
+.new-sudoku {
+    width: 6rem;
+    height: 2.5rem;
+    background: hsl(113, 45%, 55%);
+    color: #000;
+    position: absolute; bottom: 5%; left: 30%;
+}
+
+
 @keyframes colored {
     0% {
         background-image: radial-gradient(#222, #555, #888, #bbb, #eee);

@@ -22,8 +22,8 @@ const currentHistory = {
     history: [],
 };
 
-const game_History = [];
-const activeTiles_History = []; // Array that contains history of tiles, which were targeted by player (change onto them - each index = change)
+let game_History = [];
+let activeTiles_History = []; // Array that contains history of tiles, which were targeted by player (change onto them - each index = change)
 
 const difficultyColors = {
     day: {
@@ -294,6 +294,37 @@ function Sudoku(props) {
         console.log(board.current.childNodes);
     } */
 
+    const resetSudoku = () => {
+        console.log('RESETTING SUDOKU...')
+        // 1. Make some cleanups first !
+        setActive(0);
+        setStep(0);
+        setCurrentStep(0);
+        setHistoryTravel(0);
+        engine.resetSudoku(final_Difficulty);
+        game_History = [];
+        activeTiles_History = [];
+
+        // 2. Init randomizing function
+        engine.setBoard();
+        const final_Diff = engine.hideDigits(props);
+        //engine.fadeDigits(props);
+        //engine.backtrack();
+        engine.backtrack();
+        setFinalDifficulty(final_Diff);
+        setPencilMarksEnabled(false);
+
+        // Create game history
+        const history = engine.createInitialGameHistory();
+        console.log(history);
+        currentHistory.history = history;
+        game_History.push(history);
+    }
+
+    /* const resetSudoku = new Promise((resolve, reject) => {
+        console.log('RESETTING SUDOKU...');
+    }) */
+
     // Perform engine operations
     useEffect(() => {
         engine.setBoard();
@@ -383,6 +414,8 @@ function Sudoku(props) {
                     <div className="option option-9"> 9 </div>
                     <div className="option option-0" ref={rubber}>  </div>
                 </div> 
+
+                <div className="new-sudoku" onClick={() => {resetSudoku()}} > Reset Sudoku </div>
 
             </div>
         </div>

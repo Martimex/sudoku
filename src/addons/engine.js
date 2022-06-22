@@ -3280,6 +3280,18 @@ const engine = {
     
     },
 
+    resetSudoku: function(final_difficulty) {
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray);
+
+        ordered.forEach(el => {
+            el.textContent = '';
+            el.style.color = '';
+            el.classList.remove(`active`, `initial`, `initial-night`, `initial-day`, `pencilmark_tile`, /* `tile-${final_difficulty}` */);
+        })
+    },
+
     interact: function() {
         console.log('clicked');
     },
