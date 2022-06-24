@@ -7,9 +7,11 @@ import Palette from "./Palette";
 import Toolbox from './Toolbox';
 import '../styles/sudoku.css';
 import engine from '../addons/engine.js';
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 import anime from 'animejs/lib/anime.es.js';
 import { act } from "react-dom/test-utils";
+import { type } from "@testing-library/user-event/dist/type";
 
 const basics = {
     squareRows: 3,
@@ -58,6 +60,8 @@ function Sudoku(props) {
     const [step, setStep] = useState(0); // determines no of action (would enable to travel in time regarding board progress)
     const [current_step, setCurrentStep] = useState(0); // determines current step no - also the one currently browsed by player
     const [history_travel, setHistoryTravel] = useState(0); // it's only use to trigger stuff properly, it's an artificial state, but dont remove it !
+
+    const [newSudoku, setNewSudoku] = useState(0);
 
     const sudoku = useRef(null);
     const all = useRef(null);
@@ -295,31 +299,104 @@ function Sudoku(props) {
     } */
 
     const resetSudoku = () => {
+        setNewSudoku(newSudoku + 1);
         console.log('RESETTING SUDOKU...')
-        // 1. Make some cleanups first !
-        setActive(0);
-        setStep(0);
-        setCurrentStep(0);
-        setHistoryTravel(0);
-        engine.resetSudoku(final_Difficulty);
-        game_History = [];
-        activeTiles_History = [];
-
-        // 2. Init randomizing function
-        engine.setBoard();
-        const final_Diff = engine.hideDigits(props);
-        //engine.fadeDigits(props);
-        //engine.backtrack();
-        engine.backtrack();
-        setFinalDifficulty(final_Diff);
-        setPencilMarksEnabled(false);
-
-        // Create game history
-        const history = engine.createInitialGameHistory();
-        console.log(history);
-        currentHistory.history = history;
-        game_History.push(history);
     }
+
+    useEffect(() => {
+        if(newSudoku > 0) {
+            // 1. Make some cleanups first !
+            setActive(0);
+            setStep(0);
+            setCurrentStep(0);
+            setHistoryTravel(0);
+            engine.resetSudoku(final_Difficulty);
+            game_History = [];
+            activeTiles_History = [];
+    
+            setPencilMarksEnabled(false);
+
+            // 2. Init randomizing function
+            // 2.1 Create main loading board
+            const all = document.querySelector('.all');
+            let el = document.createElement('div');
+            el.classList.add('loading');
+            all.appendChild(el);
+            // 2.2 Get ref to main loading board
+            const queryEl = all.querySelector('.loading');
+            // 2.3 Create loading text
+            const text = document.createElement('div');
+            text.classList.add('loading-text');
+            text.textContent = 'Loading...';
+            queryEl.appendChild(text);
+            //2.4 Create spinner
+            const i = document.createElement('img');
+            i.classList.add('loading-spinner', 'fa-solid', `fa-spinner`);
+            queryEl.appendChild(i);
+            console.log(faSpinner)
+
+
+            engine.setBoard();
+            let difficulty;
+
+            // Interval use
+            const timeOut = setTimeout(fireAsync, 100);
+            const loadingInterval = setInterval(checkAsyncCompletion, 200);
+
+            function fireAsync() {
+                difficulty = engine.hideDigits(props);
+                clearTimeout(timeOut);
+            }
+
+            function checkAsyncCompletion() {
+                if(typeof(difficulty) === 'string' || typeof(difficulty) === null) {
+                    engine.backtrack();
+                    setFinalDifficulty(difficulty);
+                    init();
+
+                    async function init() {
+                        await fadeOut()
+                            .then(() => {
+                                el.classList.remove('loading');
+                                el.remove();
+                                clearInterval(loadingInterval);
+                            })
+                    }
+
+                    async function fadeOut() {
+                        const a1 = anime({
+                            targets: el,
+                            duration: 650,
+                            opacity: 0,
+                            easing: 'linear',
+                        
+                        }).finished;
+
+                        const a2 = anime({
+                            targets: [text, i],
+                            duration: 400,
+                            background: '#000',
+                            color: '#000',
+                            easing: 'linear',
+                        }).finished;
+
+                        await Promise.all([a1, a2]);
+                    }
+                }
+            }
+            
+            // Create game history
+            const history = engine.createInitialGameHistory();
+            console.log(history);
+            currentHistory.history = history;
+            game_History.push(history);
+
+            //engine.fadeDigits(props);
+            //engine.backtrack();
+
+        }
+        
+    }, [newSudoku])
 
     /* const resetSudoku = new Promise((resolve, reject) => {
         console.log('RESETTING SUDOKU...');
@@ -327,12 +404,15 @@ function Sudoku(props) {
 
     // Perform engine operations
     useEffect(() => {
+
         engine.setBoard();
-        const final_Diff = engine.hideDigits(props);
-        //engine.fadeDigits(props);
-        //engine.backtrack();
+        const difficulty = engine.hideDigits(props);
+
+        // Interval use
         engine.backtrack();
-        setFinalDifficulty(final_Diff);
+        setFinalDifficulty(difficulty);
+        //el.classList.remove('loading');
+        //el.remove();
 
         // Create game history
         const history = engine.createInitialGameHistory();

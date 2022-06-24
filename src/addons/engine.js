@@ -194,44 +194,49 @@ const engine = {
     },
 
     setBoard: function() {
-        const allTiles = document.querySelectorAll('.tile');
-        const allTilesArray = [...allTiles];
-        const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
-        //console.log(ordered);
-        for(let currRow=0; currRow<9; currRow++) {  // current row
-            let possibilitiesObj = {  // key means digit to use; arr of values refers to which row tile no. that digit could be assigned
-                1: [],
-                2: [],
-                3: [],
-                4: [],
-                5: [],
-                6: [],
-                7: [],
-                8: [],
-                9: [],
-            }
-
-            for(let currTile_inRow = 0; currTile_inRow <this.columns; currTile_inRow++) { 
-                let allDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-                let index = ((currRow * 9) + currTile_inRow);
-                this.checkColumnCompatibility(allDigits, ordered[index], ordered);
-                this.checkSquareCompatibility(allDigits, ordered[index], ordered, index);
-                for(let digit of allDigits) {
-                    possibilitiesObj[digit].push(currTile_inRow + 1);
+       // console.error('SETBOARD COMPLETED')
+        //return new Promise((resolve, reject) => {
+            const allTiles = document.querySelectorAll('.tile');
+            const allTilesArray = [...allTiles];
+            const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
+            //console.log(ordered);
+            for(let currRow=0; currRow<9; currRow++) {  // current row
+                let possibilitiesObj = {  // key means digit to use; arr of values refers to which row tile no. that digit could be assigned
+                    1: [],
+                    2: [],
+                    3: [],
+                    4: [],
+                    5: [],
+                    6: [],
+                    7: [],
+                    8: [],
+                    9: [],
                 }
-            }
 
-            const isSuccess = this.applyRow(currRow, ordered, possibilitiesObj);
-
-            if(!isSuccess) {
-                for(let i=((currRow - 1) * this.columns); i<=(currRow * this.columns) + 9; i++) {
-                    ordered[i].textContent = '';
+                for(let currTile_inRow = 0; currTile_inRow <this.columns; currTile_inRow++) { 
+                    let allDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                    let index = ((currRow * 9) + currTile_inRow);
+                    this.checkColumnCompatibility(allDigits, ordered[index], ordered);
+                    this.checkSquareCompatibility(allDigits, ordered[index], ordered, index);
+                    for(let digit of allDigits) {
+                        possibilitiesObj[digit].push(currTile_inRow + 1);
+                    }
                 }
-                currRow = currRow - 2;
+
+                const isSuccess = this.applyRow(currRow, ordered, possibilitiesObj);
+
+                if(!isSuccess) {
+                    for(let i=((currRow - 1) * this.columns); i<=(currRow * this.columns) + 9; i++) {
+                        console.log(ordered, ordered[i]);
+                        ordered[i].textContent = '';
+                    }
+                    currRow = currRow - 2;
+                }
+
             }
 
-        }
-       
+          //  resolve();
+        //})
     },
 
     createInitialGameHistory: function() {
@@ -263,131 +268,134 @@ const engine = {
     },
 
     hideDigits: function({difficulty, theme, options}) {
-        console.log(difficulty, theme, options);
-        console.log(rules[difficulty]);
+        //return new Promise((resolve, reject) => {
+            console.log(difficulty, theme, options);
+            console.log(rules[difficulty]);
 
-        const allTiles = document.querySelectorAll('.tile');
-        const allTilesArray = [...allTiles];
+            const allTiles = document.querySelectorAll('.tile');
+            const allTilesArray = [...allTiles];
 
-        const ordered = this.orderTiles(allTilesArray);
+            const ordered = this.orderTiles(allTilesArray);
 
-        const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
+            const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
 
-        console.log(ordered);
+            console.log(ordered);
 
-        // Remove counterparts
-            // 1. First randomize, whether the middle tile in middle square should be hidden or not
-            const randHide = Math.floor(Math.random() * 2);
-            const initialCounterPartsRemove = 18;
-            console.log(randHide);
-            if(randHide) {ordered[Math.floor(ordered.length / 2)].textContent = ''; } //  + invoke score checking function
-            ordered.splice(Math.floor(ordered.length / 2), 1);
+            // Remove counterparts
+                // 1. First randomize, whether the middle tile in middle square should be hidden or not
+                const randHide = Math.floor(Math.random() * 2);
+                const initialCounterPartsRemove = 18;
+                console.log(randHide);
+                if(randHide) {ordered[Math.floor(ordered.length / 2)].textContent = ''; } //  + invoke score checking function
+                ordered.splice(Math.floor(ordered.length / 2), 1);
 
-            for(let c=0; c<initialCounterPartsRemove; c++) {
-                let rand = Math.floor(Math.random() * (ordered.length / 2));
-                let counterPart = ordered.length - (rand + 1);
+                for(let c=0; c<initialCounterPartsRemove; c++) {
+                    let rand = Math.floor(Math.random() * (ordered.length / 2));
+                    let counterPart = ordered.length - (rand + 1);
 
-                let partDigit = ordered[rand].textContent;
-                let counterPartDigit = ordered[counterPart].textContent;
+                    let partDigit = ordered[rand].textContent;
+                    let counterPartDigit = ordered[counterPart].textContent;
 
-                ordered[rand].textContent = '';
-                ordered[counterPart].textContent = '';
+                    ordered[rand].textContent = '';
+                    ordered[counterPart].textContent = '';
+
+                    let isStillUnique = this.backtrack();
+                    //const hardestMethodNo = this.solveSudoku(); -> uncomment when rebuilding
+                    console.log('UNIQUE SUDOKU ?', isStillUnique);
+                    if((isStillUnique) /* && (rules[difficulty]['bestMethodsAllowed'].includes(hardestMethodNo)) -> uncomment when rebuilding */) {
+                        // Order here is important !
+                        ordered.splice(counterPart, 1);
+                        ordered.splice(rand, 1);
+                    } else {
+                        c = c - 1;
+                        ordered[rand].textContent = partDigit;
+                        ordered[counterPart].textContent = counterPartDigit;
+                    }  
+
+
+
+                }
+
+                //. To this point Sudoku can be 100% solved with only Single Candidate and Single Position (36 - 37 digits already removed)
+            
+
+
+            let substr = 2;
+            let multiRemove_start = 81 - ((initialCounterPartsRemove * 2) + randHide);
+            console.log(multiRemove_start, randHide);
+            let multiRemove_stop = 34;
+            let i;
+            console.log(multiRemove_stop);
+
+            for(i=multiRemove_start; i>multiRemove_stop - randHide; i = i - substr) {
+
+                let temp = [];
+
+                for(let x=0; x<substr; x++) {
+                    let rand = Math.floor(Math.random() * ordered.length);
+                    temp.push([]);
+                    temp[temp.length - 1].push(ordered[rand], ordered[rand].textContent);
+                    ordered[rand].textContent = '';
+                    ordered.splice(rand, 1);
+                }
 
                 let isStillUnique = this.backtrack();
-                //const hardestMethodNo = this.solveSudoku(); -> uncomment when rebuilding
-                console.log('UNIQUE SUDOKU ?', isStillUnique);
-                if((isStillUnique) /* && (rules[difficulty]['bestMethodsAllowed'].includes(hardestMethodNo)) -> uncomment when rebuilding */) {
-                    // Order here is important !
-                    ordered.splice(counterPart, 1);
-                    ordered.splice(rand, 1);
-                } else {
-                    c = c - 1;
-                    ordered[rand].textContent = partDigit;
-                    ordered[counterPart].textContent = counterPartDigit;
-                }  
+                console.log('HAS SUDOKU JUST ONE SOLUTION ?', isStillUnique);
 
-
-
-            }
-
-            //. To this point Sudoku can be 100% solved with only Single Candidate and Single Position (36 - 37 digits already removed)
-        
-
-
-        let substr = 2;
-        let multiRemove_start = 81 - ((initialCounterPartsRemove * 2) + randHide);
-        console.log(multiRemove_start, randHide);
-        let multiRemove_stop = 34;
-        let i;
-        console.log(multiRemove_stop);
-
-        for(i=multiRemove_start; i>multiRemove_stop - randHide; i = i - substr) {
-
-            let temp = [];
-
-            for(let x=0; x<substr; x++) {
-                let rand = Math.floor(Math.random() * ordered.length);
-                temp.push([]);
-                temp[temp.length - 1].push(ordered[rand], ordered[rand].textContent);
-                ordered[rand].textContent = '';
-                ordered.splice(rand, 1);
-            }
-
-            let isStillUnique = this.backtrack();
-            console.log('HAS SUDOKU JUST ONE SOLUTION ?', isStillUnique);
-
-            if(!isStillUnique) {
-                for(let x=0; x<temp.length; x++) {
-                    temp[x][0].textContent = temp[x][1];
-                    ordered.push(temp[x][0]);
+                if(!isStillUnique) {
+                    for(let x=0; x<temp.length; x++) {
+                        temp[x][0].textContent = temp[x][1];
+                        ordered.push(temp[x][0]);
+                    }
+                    i = i + substr;
                 }
-                i = i + substr;
+            } 
+
+            let j = {j: 0 + randHide};
+            ordered.forEach(el => {
+                return j.j++;
+            })
+
+            console.log('our iterator is: ', i, '  tiles uncover count is: ', j.j);
+
+            const ordered_copy = [...ordered];
+            const randomized_ordered_copy = [];
+            const elAndDigit = [];
+            
+            for(let initial_no = 0; initial_no<ordered_copy.length;) {
+                let rand = Math.floor(Math.random() * ordered_copy.length);
+                randomized_ordered_copy.push(ordered_copy[rand]);
+                ordered_copy.splice(rand, 1);
             }
-        } 
 
-        let j = {j: 0 + randHide};
-        ordered.forEach(el => {
-            return j.j++;
-        })
+            const trials_used = {
+                used: 0,
+            }
 
-        console.log('our iterator is: ', i, '  tiles uncover count is: ', j.j);
+            const setUp = this.singleRemoval(ordered, randInitial, i, randHide,  rules[difficulty]['renderingTrials'], 0); 
 
-        const ordered_copy = [...ordered];
-        const randomized_ordered_copy = [];
-        const elAndDigit = [];
+            allTilesArray.forEach(tile => {
+                if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
+            })
+
+            let isUnique = this.backtrack();
+            const hardestMethodNo = this.solveSudoku();
+            console.log('Are Sudoku preparations made nicely: ', setUp);
+            console.log('Hardest method no is... ', hardestMethodNo);
+            console.warn('isSudokuUnique? ', isUnique);
+
+            this.fadeNonInitials(allTilesArray);
         
-        for(let initial_no = 0; initial_no<ordered_copy.length;) {
-            let rand = Math.floor(Math.random() * ordered_copy.length);
-            randomized_ordered_copy.push(ordered_copy[rand]);
-            ordered_copy.splice(rand, 1);
-        }
+            let difficulty_name;
 
-        const trials_used = {
-            used: 0,
-        }
-
-        const setUp = this.singleRemoval(ordered, randInitial, i, randHide,  rules[difficulty]['renderingTrials'], 0); 
-
-        allTilesArray.forEach(tile => {
-            if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
-        })
-
-        let isUnique = this.backtrack();
-        const hardestMethodNo = this.solveSudoku();
-        console.log('Are Sudoku preparations made nicely: ', setUp);
-        console.log('Hardest method no is... ', hardestMethodNo);
-        console.warn('isSudokuUnique? ', isUnique);
-
-        this.fadeNonInitials(allTilesArray);
-    
-        let difficulty_name;
-
-        for(let key in rules) {
-            if(rules[key]['bestMethodsAllowed'].includes(hardestMethodNo)) {
-                difficulty_name = key;
+            for(let key in rules) {
+                if(rules[key]['bestMethodsAllowed'].includes(hardestMethodNo)) {
+                    difficulty_name = key;
+                }
             }
-        }
 
+           // resolve(difficulty_name);
+        //})
         return difficulty_name;
     },
 
