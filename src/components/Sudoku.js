@@ -5,6 +5,7 @@ import Landing from "../Landing";
 import Square from "./Square";
 import Palette from "./Palette";
 import Toolbox from './Toolbox';
+import Loading from './Loading';
 import '../styles/sudoku.css';
 import engine from '../addons/engine.js';
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +13,7 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import anime from 'animejs/lib/anime.es.js';
 import { act } from "react-dom/test-utils";
 import { type } from "@testing-library/user-event/dist/type";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const basics = {
     squareRows: 3,
@@ -61,7 +63,7 @@ function Sudoku(props) {
     const [current_step, setCurrentStep] = useState(0); // determines current step no - also the one currently browsed by player
     const [history_travel, setHistoryTravel] = useState(0); // it's only use to trigger stuff properly, it's an artificial state, but dont remove it !
 
-    const [newSudoku, setNewSudoku] = useState(0);
+    const [newSudokuLoading, setNewSudokuLoading] = useState(0);
 
     const sudoku = useRef(null);
     const all = useRef(null);
@@ -299,12 +301,12 @@ function Sudoku(props) {
     } */
 
     const resetSudoku = () => {
-        setNewSudoku(newSudoku + 1);
+        setNewSudokuLoading(1);
         console.log('RESETTING SUDOKU...')
     }
 
     useEffect(() => {
-        if(newSudoku > 0) {
+        if(newSudokuLoading !== 0) {
             // 1. Make some cleanups first !
             setActive(0);
             setStep(0);
@@ -316,7 +318,7 @@ function Sudoku(props) {
     
             setPencilMarksEnabled(false);
 
-            // 2. Init randomizing function
+            /* // 2. Init randomizing function
             // 2.1 Create main loading board
             const all = document.querySelector('.all');
             let el = document.createElement('div');
@@ -330,10 +332,11 @@ function Sudoku(props) {
             text.textContent = 'Loading...';
             queryEl.appendChild(text);
             //2.4 Create spinner
-            const i = document.createElement('img');
-            i.classList.add('loading-spinner', 'fa-solid', `fa-spinner`);
+            const i = document.createElement('i');
+            //i.classList.add('loading-spinner', 'fa-solid', 'fa-spinner');
+            i.innerHTML = '<FontAwesomeIcon icon="fa-solid fa-spinner" />';
             queryEl.appendChild(i);
-            console.log(faSpinner)
+            console.log(faSpinner, i) */
 
 
             engine.setBoard();
@@ -345,35 +348,39 @@ function Sudoku(props) {
 
             function fireAsync() {
                 difficulty = engine.hideDigits(props);
+                /* anime({
+                    targets
+                }) */
                 clearTimeout(timeOut);
             }
 
             function checkAsyncCompletion() {
-                if(typeof(difficulty) === 'string' || typeof(difficulty) === null) {
-                    engine.backtrack();
+                if(typeof(difficulty) === 'string' || typeof(difficulty) === null) { // change && to ||
+                    //engine.backtrack();
                     setFinalDifficulty(difficulty);
+                    //setNewSudokuLoading(0);
+                    //clearInterval(loadingInterval);
                     init();
 
                     async function init() {
                         await fadeOut()
                             .then(() => {
-                                el.classList.remove('loading');
-                                el.remove();
                                 clearInterval(loadingInterval);
+                                setNewSudokuLoading(0);
                             })
-                    }
+                    } 
 
                     async function fadeOut() {
                         const a1 = anime({
-                            targets: el,
-                            duration: 650,
+                            targets: '.loading',
+                            duration: 450,
                             opacity: 0,
                             easing: 'linear',
                         
                         }).finished;
 
                         const a2 = anime({
-                            targets: [text, i],
+                            targets: ['.loading-text', '.loading-spinner'],
                             duration: 400,
                             background: '#000',
                             color: '#000',
@@ -396,7 +403,7 @@ function Sudoku(props) {
 
         }
         
-    }, [newSudoku])
+    }, [newSudokuLoading])
 
     /* const resetSudoku = new Promise((resolve, reject) => {
         console.log('RESETTING SUDOKU...');
@@ -495,7 +502,11 @@ function Sudoku(props) {
                     <div className="option option-0" ref={rubber}>  </div>
                 </div> 
 
-                <div className="new-sudoku" onClick={() => {resetSudoku()}} > Reset Sudoku </div>
+                <div className="new-sudoku" onClick={() => resetSudoku()} > Reset Sudoku </div>
+
+                {newSudokuLoading === 1 && (
+                    <Loading theme={props.theme} />
+                )}
 
             </div>
         </div>

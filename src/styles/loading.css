@@ -1,0 +1,21 @@
+.loading {
+    position: absolute; top: 0%; left: 0%;
+    height: 100%; width: 100%;
+    background:#000;
+    pointer-events: none;
+}
+
+.loading-text {
+    position:absolute; top:65%; left: 15%;
+    width: 10%; height: 10%;
+    color: #ddd;
+    font-size: 3rem;
+}
+
+.loading-spinner {
+    position:absolute; top:25%; left: 15%;
+    width: 8rem; height: 8rem;
+     color: #ddd;
+    /* background: #ddd; */
+    font-size: 10rem;
+}
