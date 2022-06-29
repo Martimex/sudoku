@@ -3,6 +3,12 @@ import Square from '../components/Square.js';
 import Tile from '../components/Tile.js';
 import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from 'react-dom';
 
+/*
+    IMPORTANT REBUILD DEFINITIONS:
+    ☢️ - this line is harmful. Replace textContent manipulations for currentBoard workarounds (board state inside array) and finally,
+          when everything is done, just textContent initials on the board 
+*/
+
 const rules = {
     easy:  {
         initialNumbers: {
@@ -67,6 +73,16 @@ const rules = {
     },
 }
 
+const initial_board = [];
+const success_board = [];
+
+const store = {
+    sudoku_easy: [],
+    sudoku_medium: [],
+    sudoku_hard: [],
+    sudoku_master: [],
+}
+
 const engine = {
 
     version: '1.0.0',
@@ -111,40 +127,38 @@ const engine = {
         for(let i=0; i<(squareColumns * squareRows); i++) {
             if(numbers_array.includes(parseInt(ordered[(rowNo * (squareColumns * squareRows)) + i]))) {
                 // Usuń wartość z tablicy
-                const index = numbers_array.indexOf(parseInt(ordered[(rowNo * (squareColumns * squareRows)) + i].textContent));
+                const index = numbers_array.indexOf(parseInt(ordered[(rowNo * (squareColumns * squareRows)) + i].textContent)); 
+                // Above line is not an issue, since checkRowCompatibil1ty is NOT USED !
                 numbers_array.splice(index, 1);
             }
         }
     },
 
-    checkColumnCompatibility: function(numbers_array, thisEl, ordered) {  // Works perfectly
-        const columnNo = ((thisEl.dataset.order - 1) % this.columns) + 1;
-        for(let c=columnNo; c<=parseInt(thisEl.dataset.order); c = c + this.columns) {
-            if(numbers_array.includes(parseInt(ordered[c-1].textContent))) {
+    checkColumnCompatibility: function(numbers_array, success_board, row_no, col_no) {  // Works perfectly
+        for(let c=0; c<9; c++) {
+            if(numbers_array.includes(parseInt(success_board[c][col_no]))) {
                 // Usuń wartość z tablicy
-                const index = numbers_array.indexOf(parseInt(ordered[c-1].textContent));
+                const index = numbers_array.indexOf(parseInt(success_board[c][col_no]));
                 numbers_array.splice(index, 1);
             }
         }
     },
 
-    checkSquareCompatibility: function(numbers_array, thisEl, ordered, elIndex) {  // Works fine
-        const squareRows = 3; const squareColumns = 3;
-        const allTiles = document.querySelectorAll('.tile');
-        const allTilesArr = [...allTiles];
-        const squaredBaseIndex = allTilesArr.indexOf(thisEl);
-        const  start = (Math.floor(squaredBaseIndex / (squareRows * squareColumns)));
-        for(let i=0; i<(squareRows * squareColumns); i++) {
-            //allTiles[((start * (squareRows * squareColumns)) + i)].style.background = "tomato";
-            if(numbers_array.includes(parseInt(allTiles[((start * (squareRows * squareColumns)) + i)].textContent))) {
-                // Usuń wartość z tablicy
-                const index = numbers_array.indexOf(parseInt(allTiles[((start * (squareRows * squareColumns)) + i)].textContent));
-                numbers_array.splice(index, 1);
+    checkSquareCompatibility: function(numbers_array, success_board, row_no, col_no) {  // Works fine
+        const box_row_start = (Math.floor(row_no / 3)) * 3;
+        const box_col_start = (Math.floor(col_no / 3)) * 3; 
+
+        for(let box_row_no = 0; box_row_no < 3; box_row_no++) {
+            for(let box_col_no = 0; box_col_no < 3; box_col_no++) {
+                if(numbers_array.includes(parseInt(success_board[box_row_start + box_row_no][box_col_start + box_col_no]))) {
+                    const index = numbers_array.indexOf(parseInt(success_board[box_row_start + box_row_no][box_col_start + box_col_no]));
+                    numbers_array.splice(index, 1);
+                }
             }
         }
     },
 
-    applyRow: function(currRow, ordered, possibilitiesObj) {
+    applyRow: function(currRow, success_board, possibilitiesObj) {
         let usedDigits = [];
         let usedTiles = [];
 
@@ -168,22 +182,22 @@ const engine = {
                 }
             }
 
-
             let rand_digit = Math.floor(Math.random() * dangerZoneDigits.length); // pick the array index (choose a digit)
             let rand_tile = Math.floor(Math.random() * possibilitiesObj[dangerZoneDigits[rand_digit]].length);
-            let index = (currRow * 9) + (parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1));
 
             usedTiles.push(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile]);
             usedDigits.push(dangerZoneDigits[rand_digit]);
 
-            if(!ordered[index]) { return false; }
+            if(!success_board[currRow][parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1)] && 
+                typeof(success_board[currRow][parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1)]) !== 'string') 
+            { return false; }
 
-            ordered[index].textContent = dangerZoneDigits[rand_digit];
+            success_board[currRow][parseInt(possibilitiesObj[dangerZoneDigits[rand_digit]][rand_tile] - 1)] = dangerZoneDigits[rand_digit];
 
             for(let key in possibilitiesObj) {
                 if(possibilitiesObj[key].includes(parseInt(usedTiles[usedTiles.length - 1]))) {
-                    let inde = possibilitiesObj[key].indexOf(parseInt(usedTiles[usedTiles.length - 1]));
-                    possibilitiesObj[key].splice(inde, 1);
+                    let index = possibilitiesObj[key].indexOf(parseInt(usedTiles[usedTiles.length - 1]));
+                    possibilitiesObj[key].splice(index, 1);
                 }
             }
             // 1
@@ -195,10 +209,23 @@ const engine = {
 
     setBoard: function() {
        // console.error('SETBOARD COMPLETED')
+
+
         //return new Promise((resolve, reject) => {
-            const allTiles = document.querySelectorAll('.tile');
+           /*  const allTiles = document.querySelectorAll('.tile');
             const allTilesArray = [...allTiles];
-            const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
+            const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property */
+            if(success_board.length) {
+                while(success_board.length) success_board.pop();
+            }
+
+            for(let success_board_row = 0; success_board_row < 9; success_board_row++) {
+                success_board.push([]);
+                for(let success_board_tile_in_row = 0; success_board_tile_in_row < 9; success_board_tile_in_row++) {
+                    success_board[success_board_row].push('');
+                }
+            } 
+
             //console.log(ordered);
             for(let currRow=0; currRow<9; currRow++) {  // current row
                 let possibilitiesObj = {  // key means digit to use; arr of values refers to which row tile no. that digit could be assigned
@@ -215,20 +242,20 @@ const engine = {
 
                 for(let currTile_inRow = 0; currTile_inRow <this.columns; currTile_inRow++) { 
                     let allDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-                    let index = ((currRow * 9) + currTile_inRow);
-                    this.checkColumnCompatibility(allDigits, ordered[index], ordered);
-                    this.checkSquareCompatibility(allDigits, ordered[index], ordered, index);
+                    this.checkColumnCompatibility(allDigits, success_board, currRow, currTile_inRow);
+                    this.checkSquareCompatibility(allDigits, success_board, currRow, currTile_inRow);
                     for(let digit of allDigits) {
                         possibilitiesObj[digit].push(currTile_inRow + 1);
                     }
                 }
 
-                const isSuccess = this.applyRow(currRow, ordered, possibilitiesObj);
+                const isSuccess = this.applyRow(currRow, success_board, possibilitiesObj);
 
                 if(!isSuccess) {
-                    for(let i=((currRow - 1) * this.columns); i<=(currRow * this.columns) + 9; i++) {
-                        console.log(ordered, ordered[i]);
-                        ordered[i].textContent = '';
+                    for(let row_to_undo = 0; row_to_undo <= 1; row_to_undo++) {
+                        for(let tile_in_row = 0; tile_in_row < 9; tile_in_row++) {
+                            success_board[currRow - row_to_undo][tile_in_row] = '';
+                        }
                     }
                     currRow = currRow - 2;
                 }
@@ -240,16 +267,17 @@ const engine = {
     },
 
     createInitialGameHistory: function() {
-        const allTiles = document.querySelectorAll('.tile');
-        const allTilesArray = [...allTiles];
-        const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
-
         const initialBoard = [];
 
-        ordered.forEach((el, ind) => {
-            if(ind % 9 === 0) { initialBoard.push([]); }
-            (el.classList.contains('initial')) ? initialBoard[initialBoard.length - 1].push(el.textContent) : initialBoard[initialBoard.length - 1].push('');
-        })
+        for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
+            initialBoard.push([]);
+            for(let sudoku_tile_in_row = 0; sudoku_tile_in_row < 9; sudoku_tile_in_row++) {
+                (parseInt(initial_board[sudoku_row][sudoku_tile_in_row])) ?
+                    initialBoard[initialBoard.length - 1].push(initial_board[sudoku_row][sudoku_tile_in_row])
+                    :
+                    initialBoard[initialBoard.length - 1].push('');
+            }
+        }
 
         return initialBoard;
     },
@@ -268,50 +296,72 @@ const engine = {
     },
 
     hideDigits: function({difficulty, theme, options}) {
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray);
+        console.log(ordered);
         //return new Promise((resolve, reject) => {
+            if(initial_board.length) {
+                while(initial_board.length) initial_board.pop();
+            }
+
+            for(let initial_board_row = 0; initial_board_row < 9; initial_board_row++) {
+                initial_board.push([]);
+                for(let initial_board_tile_in_row = 0; initial_board_tile_in_row < 9; initial_board_tile_in_row++) {
+                    initial_board[initial_board_row].push(success_board[initial_board_row][initial_board_tile_in_row]);
+                }
+            } 
+
             console.log(difficulty, theme, options);
             console.log(rules[difficulty]);
 
-            const allTiles = document.querySelectorAll('.tile');
+            /*const allTiles = document.querySelectorAll('.tile');
             const allTilesArray = [...allTiles];
 
-            const ordered = this.orderTiles(allTilesArray);
+            const ordered = this.orderTiles(allTilesArray); */
 
             const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
 
-            console.log(ordered);
+            //console.log(ordered);
 
             // Remove counterparts
                 // 1. First randomize, whether the middle tile in middle square should be hidden or not
                 const randHide = Math.floor(Math.random() * 2);
                 const initialCounterPartsRemove = 18;
                 console.log(randHide);
-                if(randHide) {ordered[Math.floor(ordered.length / 2)].textContent = ''; } //  + invoke score checking function
-                ordered.splice(Math.floor(ordered.length / 2), 1);
+                if(randHide) {initial_board[4][4] = ''; } //  + invoke score checking function
+
+                let randomElemsToHide = [];
+                for(let i=0; i<40; i++) {
+                    randomElemsToHide.push(i);
+                }
 
                 for(let c=0; c<initialCounterPartsRemove; c++) {
-                    let rand = Math.floor(Math.random() * (ordered.length / 2));
-                    let counterPart = ordered.length - (rand + 1);
+                    let ind = Math.floor(Math.random() * randomElemsToHide.length);
+                    let rand = randomElemsToHide[ind];
+                    let rand_row = Math.floor(rand / 9);
+                    let rand_col = rand % 9; 
 
-                    let partDigit = ordered[rand].textContent;
-                    let counterPartDigit = ordered[counterPart].textContent;
+                    let partDigit = [...initial_board[rand_row][rand_col]];
+                    let counterPartDigit = [...initial_board[8 - rand_row][8 - rand_col]];
 
-                    ordered[rand].textContent = '';
-                    ordered[counterPart].textContent = '';
+                    // let partDigit = ordered[rand].textContent;  // 
+                    // let counterPartDigit = ordered[counterPart].textContent;  // 
+
+                    initial_board[rand_row][rand_col] = '';  
+                    initial_board[8 - rand_row][8 - rand_col] = ''; 
 
                     let isStillUnique = this.backtrack();
                     //const hardestMethodNo = this.solveSudoku(); -> uncomment when rebuilding
                     console.log('UNIQUE SUDOKU ?', isStillUnique);
                     if((isStillUnique) /* && (rules[difficulty]['bestMethodsAllowed'].includes(hardestMethodNo)) -> uncomment when rebuilding */) {
-                        // Order here is important !
-                        ordered.splice(counterPart, 1);
-                        ordered.splice(rand, 1);
+                        randomElemsToHide.splice(ind, 1);
+                        //console.warn('UNIQUE :D');
                     } else {
                         c = c - 1;
-                        ordered[rand].textContent = partDigit;
-                        ordered[counterPart].textContent = counterPartDigit;
+                        initial_board[rand_row][rand_col] = partDigit[0];
+                        initial_board[8 - rand_row][8 - rand_col] = counterPartDigit[0];
                     }  
-
 
 
                 }
@@ -327,16 +377,31 @@ const engine = {
             let i;
             console.log(multiRemove_stop);
 
+            let remainTiles = [];
+            for(let board_row = 0; board_row < 9; board_row++) {
+                for(let tile_in_row = 0; tile_in_row < 9; tile_in_row++) {
+                    if(parseInt(initial_board[board_row][tile_in_row])) {
+                        remainTiles.push([board_row, tile_in_row]);
+                    }
+                }
+            }
+
+            console.log(initial_board);
+
             for(i=multiRemove_start; i>multiRemove_stop - randHide; i = i - substr) {
 
                 let temp = [];
+                let tempDigit = [];
 
                 for(let x=0; x<substr; x++) {
-                    let rand = Math.floor(Math.random() * ordered.length);
-                    temp.push([]);
-                    temp[temp.length - 1].push(ordered[rand], ordered[rand].textContent);
-                    ordered[rand].textContent = '';
-                    ordered.splice(rand, 1);
+                    let rand = Math.floor(Math.random() * remainTiles.length);
+                    //temp.push([]);
+                    console.log(x);
+                    console.log(remainTiles);
+                    temp.push([remainTiles[rand][0], remainTiles[rand][1]]); // Get tile cords
+                    tempDigit.push(initial_board[remainTiles[rand][0]][remainTiles[rand][1]]);
+                    initial_board[remainTiles[rand][0]][remainTiles[rand][1]] = '';
+                    remainTiles.splice(rand, 1);
                 }
 
                 let isStillUnique = this.backtrack();
@@ -344,21 +409,21 @@ const engine = {
 
                 if(!isStillUnique) {
                     for(let x=0; x<temp.length; x++) {
-                        temp[x][0].textContent = temp[x][1];
-                        ordered.push(temp[x][0]);
+                        initial_board[temp[x][0]][temp[x][1]] = tempDigit[x];
+                        remainTiles.push([temp[x][0], temp[x][1]]);
                     }
                     i = i + substr;
                 }
             } 
 
-            let j = {j: 0 + randHide};
+            /* let j = {j: 0 + randHide};
             ordered.forEach(el => {
                 return j.j++;
             })
 
-            console.log('our iterator is: ', i, '  tiles uncover count is: ', j.j);
+            console.log('our iterator is: ', i, '  tiles uncover count is: ', j.j); */
 
-            const ordered_copy = [...ordered];
+            /* const ordered_copy = [...ordered];
             const randomized_ordered_copy = [];
             const elAndDigit = [];
             
@@ -370,13 +435,22 @@ const engine = {
 
             const trials_used = {
                 used: 0,
+            } */
+
+            const setUp = this.singleRemoval(initial_board, remainTiles, randInitial, i, randHide,  rules[difficulty]['renderingTrials'], 0); 
+
+            // START OFF FROM HERE!
+
+            // Paint Sudoku with initials
+            for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
+                for(let sudoku_tile_in_row = 0; sudoku_tile_in_row<9; sudoku_tile_in_row++) {
+                    if(parseInt(initial_board[sudoku_row][sudoku_tile_in_row])) {
+                        ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = initial_board[sudoku_row][sudoku_tile_in_row];
+                    } else {
+                        ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = '';
+                    }
+                }
             }
-
-            const setUp = this.singleRemoval(ordered, randInitial, i, randHide,  rules[difficulty]['renderingTrials'], 0); 
-
-            allTilesArray.forEach(tile => {
-                if(tile.textContent) { tile.classList.add(`initial`, `initial-${theme}`); }
-            })
 
             let isUnique = this.backtrack();
             const hardestMethodNo = this.solveSudoku();
@@ -384,7 +458,7 @@ const engine = {
             console.log('Hardest method no is... ', hardestMethodNo);
             console.warn('isSudokuUnique? ', isUnique);
 
-            this.fadeNonInitials(allTilesArray);
+            this.applyInitials(ordered);
         
             let difficulty_name;
 
@@ -404,23 +478,28 @@ const engine = {
         const allTilesArray = [...allTiles];
 
         allTilesArray.forEach(tile => {
-            if(tile.textContent) {
+            if(tile.textContent) {  //  Not activated, so it wont be a problem
                 //console.log('add!');
                 tile.classList.add(`initial`, `initial-${theme}`);
             }
         })
     },
 
-    fadeNonInitials: function(allTilesArray) {
+    applyInitials: function(ordered) {
         console.log('Fading...');
-        allTilesArray.forEach(tile => {
-            if(!tile.classList.contains('initial')) {
-                tile.textContent = '';
+        console.log(ordered);
+        for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
+            for(let sudoku_tile_in_row = 0; sudoku_tile_in_row < 9; sudoku_tile_in_row++) {
+                if(parseInt(initial_board[sudoku_row][sudoku_tile_in_row])) {
+                    ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = initial_board[sudoku_row][sudoku_tile_in_row];
+                } else {
+                    ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = '';
+                }
             }
-        })
+        }
     },
 
-    singleRemoval: function(ordered, randInitial, singleRemove_start, randHide, trials, trials_used) {
+    singleRemoval: function(initial_board, remainTiles, randInitial, singleRemove_start, randHide, trials, trials_used) {
         // RECURSIVE WAY (STILL NOT GREAT)
 
 
@@ -463,28 +542,31 @@ const engine = {
 
         // ITERATIVE APPROACH
 
-        let orderedCopy = [...ordered];
+        //let orderedCopy = [...ordered];
+        let remainTilesCopy = [...remainTiles];
         let elAndDigit = [];
+        let f = remainTilesCopy;
+        console.log(f);
 
         for(let x=singleRemove_start; x>randInitial + randHide; x--) {
             if(trials_used >= trials) {return; }
             trials_used++;
-            let rand = Math.floor(Math.random() * orderedCopy.length);
-            elAndDigit.push([orderedCopy[rand], orderedCopy[rand].textContent]);
+            let rand = Math.floor(Math.random() * remainTilesCopy.length);
+            elAndDigit.push([remainTilesCopy[rand][0], remainTilesCopy[rand][1], initial_board[remainTilesCopy[rand][0]][remainTilesCopy[rand][1]]]); 
 
-            orderedCopy[rand].textContent = '';
+            initial_board[elAndDigit[elAndDigit.length -1][0]][elAndDigit[elAndDigit.length -1][1]] = '';
 
             let isStillUnique = this.backtrack();
 
             if(isStillUnique) { // it's unique Sudoku
-                ordered.splice(rand, 1);
-                orderedCopy = [...ordered];
+                remainTiles.splice(rand, 1);
+                remainTilesCopy = [...remainTiles];
             } else { // not unique
-                elAndDigit[elAndDigit.length -1][0].textContent = elAndDigit[elAndDigit.length -1][1];
-                orderedCopy.splice(rand, 1);
+                initial_board[elAndDigit[elAndDigit.length -1][0]][elAndDigit[elAndDigit.length -1][1]] = elAndDigit[elAndDigit.length -1][2];
+                remainTilesCopy.splice(rand, 1);
                 x = x + 1;
-                console.log(orderedCopy.length);
-                if(orderedCopy.length <= (ordered.length / 2)) { // WE WANT TO SAVE TIME FOR RENDERING, THATS WHY IT LOOKS LIKE THAT
+                console.log(remainTilesCopy.length);
+                if(remainTilesCopy.length <= (remainTiles.length / 2)) { // WE WANT TO SAVE TIME FOR RENDERING, THATS WHY IT LOOKS LIKE THAT
                     //console.log(`CANNOT REMOVE MORE - ${x} from ${randInitial + randHide} remain`);
                     return;
                 }
@@ -526,7 +608,7 @@ const engine = {
             if(index % 9 === 0 ) {
                 grid.push([]);
             }
-            el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push([]);
+            el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push([]);  // ☢️  ☢️
         })
 
         
@@ -725,7 +807,7 @@ const engine = {
                 for(let iir=0; iir<9; iir++) {
                     if((grid[r][iir].length <= 1) && (typeof(grid[r][iir]) !== 'string')) { 
                         //ordered[(r * 9) + iir].style.color = 'tomato';
-                        ordered[(r * 9) + iir].textContent = grid[r][iir][0];
+                        ordered[(r * 9) + iir].textContent = grid[r][iir][0];  // ☢️
                         grid[r][iir] = grid[r][iir][0];
                         helpedSolving = true;
                     }
@@ -2790,15 +2872,15 @@ const engine = {
 
         function testOrdered(ordered, {row, index_in_row}, num) {
             for(let k=0; k<9; k++) {
-                if(num === parseInt(ordered[row * 9 + k].textContent) /* && (grid[row][k].length <= 1) */) return false; // CHECK ROW || if False = We have this number in a row already
-                if(num === parseInt(ordered[k * 9 + index_in_row].textContent) /* && (grid[k][index_in_row].length <= 1) */) return false; // CHECK COLUMN || if False =  We have this number in a column already
+                if(num === parseInt(ordered[row * 9 + k].textContent) /* ☢️ && (grid[row][k].length <= 1) */) return false; // CHECK ROW || if False = We have this number in a row already
+                if(num === parseInt(ordered[k * 9 + index_in_row].textContent) /* ☢️ && (grid[k][index_in_row].length <= 1) */) return false; // CHECK COLUMN || if False =  We have this number in a column already
             }
     
             // Check square at last
     
             for(let square_row=0; square_row<3; square_row++) {
                 for(let square_column=0; square_column<3; square_column++) {
-                    if(num === parseInt(ordered[(((Math.floor(row / 3) * 3) + square_row) * 9) + (Math.floor(index_in_row / 3) * 3) + square_column].textContent)
+                    if(num === parseInt(ordered[(((Math.floor(row / 3) * 3) + square_row) * 9) + (Math.floor(index_in_row / 3) * 3) + square_column].textContent) // ☢️
                     /* &&  (grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column].length <= 1) */
                     ) return false; // CHECK SQUARE || if False = We have this number in a square already
                 }
@@ -2838,7 +2920,7 @@ const engine = {
                     //if(dim === 'r') {ordered[(dim_1 * 9) + dim_2].style.color = 'aqua'};
                     //if(dim === 'c') {ordered[(dim_1 * 9) + dim_2].style.color = 'green'};
                     //if(dim === 's') {ordered[(dim_1 * 9) + dim_2].style.color = 'burlywood'};
-                    ordered[(dim_1 * 9) + dim_2].textContent = singPos[x];
+                    ordered[(dim_1 * 9) + dim_2].textContent = singPos[x];  // ☢️
                     grid[dim_1][dim_2] = singPos[x];
                     return true;
                 }
@@ -2880,9 +2962,9 @@ const engine = {
                 }
 
                 if(el.classList.contains('initial')) {
-                    b[b.length - 1].push(el.textContent)
+                    b[b.length - 1].push(el.textContent)  // ☢️
                 } else {
-                    b[b.length - 1].push(parseInt(el.textContent))
+                    b[b.length - 1].push(parseInt(el.textContent))  // ☢️
                 }
             })
 
@@ -2920,7 +3002,7 @@ const engine = {
 
         allTilesArray.forEach(tile => {
             console.log('test')
-            if(tile.textContent) { console.log('yes'); tile.classList.add(`initial`, `initial-${theme}`); }
+            if(tile.textContent) { console.log('yes'); tile.classList.add(`initial`, `initial-${theme}`); }  // ☢️
         })
 
         //console.log(currentBoard);
@@ -2934,10 +3016,10 @@ const engine = {
             let randSquare = Math.floor(Math.random() * currentBoard.length);
             let randTile_inSquare = Math.floor(Math.random() * currentBoard[randSquare].length);
 
-            eov.all_digits_shown[(parseInt(currentBoard[randSquare][randTile_inSquare].textContent) - 1)]--;
+            eov.all_digits_shown[(parseInt(currentBoard[randSquare][randTile_inSquare].textContent) - 1)]--;  // ☢️
 
-            const number_to_keep = parseInt(currentBoard[randSquare][randTile_inSquare].textContent);
-            currentBoard[randSquare][randTile_inSquare].textContent = '';
+            const number_to_keep = parseInt(currentBoard[randSquare][randTile_inSquare].textContent);  // ☢️
+            currentBoard[randSquare][randTile_inSquare].textContent = '';   // ☢️
             currentBoard[randSquare].splice(randTile_inSquare, 1);
 
             if((eov.all_digits_shown[number_to_keep - 1]  - eov.substr) <= rules[difficulty].conditions.digit_shown_min) {
@@ -2945,7 +3027,7 @@ const engine = {
                 // Now remove all currentboard items, that has the same number attached, apart from the one we got now
                 for(let arr of currentBoard) {
                     arr.forEach((elem, index) => {
-                        if((arr[index].textContent === number_to_keep.toString()) /* && (arr[index] !== currentBoard[randSquare][randTile_inSquare]) */) {
+                        if((arr[index].textContent === number_to_keep.toString()) /* ☢️ && (arr[index] !== currentBoard[randSquare][randTile_inSquare]) */) {
                             //console.log(arr)
                             arr.splice(index, 1);
                         }
@@ -2969,7 +3051,7 @@ const engine = {
                             for(let arr of currentBoard) {
                                 arr.forEach((elem, index) => {
                                     //console.log(arr[index].textContent);
-                                    if(parseInt(arr[index].textContent) === (x + 1)) {
+                                    if(parseInt(arr[index].textContent) === (x + 1)) {  // ☢️
                                        // console.log('REMOVE: ', arr[index].textContent);
                                         arr.splice(index, 1);
                                     }
@@ -3015,9 +3097,6 @@ const engine = {
 
     backtrack: function (currGridState) {
         //console.log('tracking....');
-        const allTiles = document.querySelectorAll('.tile');
-        const allTilesArray = [...allTiles];
-        const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
         //
         let grid;
         let grid2;
@@ -3026,22 +3105,20 @@ const engine = {
             grid = [];
             grid2 = [];
 
-            ordered.map((el, index) => { 
-                if(index % 9 === 0 ) {
-                    grid.push([]);
-                    grid2.push([]);
+            for(let row_no = 0; row_no<9; row_no++) {
+                grid.push([]);
+                grid2.push([]);
+                for(let col_no = 0; col_no<9; col_no++) {
+                    parseInt(initial_board[row_no][col_no])  ? grid[grid.length - 1].push(initial_board[row_no][col_no]) : grid[grid.length -1].push(0);
+                    parseInt(initial_board[row_no][col_no])  ? grid2[grid2.length -1].push(initial_board[row_no][col_no]) : grid2[grid2.length -1].push(0);
                 }
-                el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push(0);
-                el.textContent ? grid2[grid2.length -1].push(el.textContent) : grid2[grid2.length -1].push(0);
-            })
+            }
         }
         
         else {
             grid = currGridState;
             grid2 = currGridState;
         }
-
-       //console.log(grid);
 
         function initBackTrack(grid, start_num, end_num) {
 
@@ -3181,8 +3258,8 @@ const engine = {
                 
                 let orderedPencilmarks = [];
                 for(let y=0; y<ordered[(row * 9) + column].childNodes.length; y++) {
-                    if(parseInt(ordered[(row * 9) + column].childNodes[y].textContent)) {
-                        orderedPencilmarks.push(parseInt(ordered[(row * 9) + column].childNodes[y].textContent));
+                    if(parseInt(ordered[(row * 9) + column].childNodes[y].textContent)) {  // ☢️
+                        orderedPencilmarks.push(parseInt(ordered[(row * 9) + column].childNodes[y].textContent));  // ☢️
                     }
                 }
 
@@ -3202,7 +3279,7 @@ const engine = {
                     console.log(pencilmarkToModify);
 
                     let pencilmark_tile = ordered[(row * 9) + column].querySelector(`.no-${pencilmarkToModify}`);
-                    (parseInt(pencilmark_tile.textContent)) ? pencilmark_tile.textContent = '' : pencilmark_tile.textContent = pencilmarkToModify; 
+                    (parseInt(pencilmark_tile.textContent)) ? pencilmark_tile.textContent = '' : pencilmark_tile.textContent = pencilmarkToModify;  // ☢️ ☢️ ☢️
                 }
             }
 
@@ -3218,13 +3295,13 @@ const engine = {
                         ordered[(row * 9) + column].childNodes[ordered[(row * 9) + column].childNodes.length - 1].remove();
                     }
                     // At last append before existent number to the tile
-                    ordered[(row * 9) + column].textContent = game_history[current_step][row][column];
+                    ordered[(row * 9) + column].textContent = game_history[current_step][row][column];  // ☢️
                 }
 
                 else if(typeof(game_history[current_step][row][column]) === 'object') {
                     // "Single digit tile -> Pencilmark tile"
                     console.log("Single digit tile -> Pencilmark tile");
-                    ordered[(row * 9) + column].textContent = '';
+                    ordered[(row * 9) + column].textContent = '';   // ☢️
                     ordered[(row * 9) + column].classList.add('pencilmark_tile');
                     // Append divs to pencilmark tile
                     for(let x=1; x<=9; x++) {
@@ -3234,7 +3311,7 @@ const engine = {
                         console.log(game_history[current_step][row][column], x)
                         if(game_history[current_step][row][column].includes(x)) { // Throws errors 💀 - we need to test if it's still an issue here
                             let ind = game_history[current_step][row][column].indexOf(x);
-                            el.textContent = game_history[current_step][row][column][ind];
+                            el.textContent = game_history[current_step][row][column][ind];  // ☢️
                         }
                         //console.log(game_history[current_step][row][column].length);
                         el.classList.add('xd', `no-${x}`);
@@ -3244,9 +3321,9 @@ const engine = {
             }
 
             // This statements will not work for pencilmarks !
-            else if(ordered[(row * 9) + column].textContent !== game_history[current_step][row][column]) {
+            else if(ordered[(row * 9) + column].textContent !== game_history[current_step][row][column]) {  // ☢️
                 console.log(ordered[(row * 9) + column], game_history[current_step][row][column])
-                ordered[(row * 9) + column].textContent = game_history[current_step][row][column];
+                ordered[(row * 9) + column].textContent = game_history[current_step][row][column];   // ☢️
             }
 
             /* if(typeof(game_history[current_step][row][column]) !== 'string'  || (typeof(game_history[current_step][row][column]) === 'string' && !parseInt(game_history[current_step][row][column]))) {
@@ -3267,7 +3344,7 @@ const engine = {
 
             if(!game_history[current_step][row][column]) {
                 // If we used rubber, this might happen. Instead of appending 'NaN', let's append ''
-                ordered[(row * 9) + column].textContent = '';
+                ordered[(row * 9) + column].textContent = ''; // ☢️
                 
             }
         }
@@ -3294,7 +3371,7 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray);
 
         ordered.forEach(el => {
-            el.textContent = '';
+            el.textContent = '';  // ☢️
             el.style.color = '';
             el.classList.remove(`active`, `initial`, `initial-night`, `initial-day`, `pencilmark_tile`, /* `tile-${final_difficulty}` */);
         })

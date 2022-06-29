@@ -301,8 +301,11 @@ function Sudoku(props) {
     } */
 
     const resetSudoku = () => {
-        setNewSudokuLoading(1);
-        console.log('RESETTING SUDOKU...')
+        //setTimeout(() => { // REMOVE THIS SETTIMEOU WHEN YOU CHANGE ENGINE TO BE INDEPENDENT FROM BOARD TEXT CONTENTS
+            setNewSudokuLoading(1);
+            console.log('RESETTING SUDOKU...')
+        //}, 1000)
+
     }
 
     useEffect(() => {
