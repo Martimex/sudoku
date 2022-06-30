@@ -4,7 +4,7 @@ import App from '../App';
 import Landing from "../Landing";
 import Square from "./Square";
 import Palette from "./Palette";
-import Toolbox from './Toolbox';
+import {Toolbox, tools} from './Toolbox';
 import Loading from './Loading';
 import '../styles/sudoku.css';
 import engine from '../addons/engine.js';
@@ -321,9 +321,11 @@ function Sudoku(props) {
             activeTiles_History = [];
     
             setPencilMarksEnabled(false);
+            tools['pencil'].isActive = false;
             let pencilmark = document.querySelector('.pencilmark_on');
             console.log('PENCILMARK IS: ', pencilmark);
             if(pencilmark) {pencilmark.classList.remove('pencilmark_on')}
+
             /* // 2. Init randomizing function
             // 2.1 Create main loading board
             const all = document.querySelector('.all');
@@ -380,6 +382,7 @@ function Sudoku(props) {
                                 if(!game_History.length) {
                                     game_History.push(history);
                                 }
+                                engine.applyInitials();
                             })
                     } 
 

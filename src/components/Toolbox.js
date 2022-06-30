@@ -95,4 +95,4 @@ function Toolbox(props) {
     )
 }
 
-export default Toolbox;
+export {Toolbox, tools};

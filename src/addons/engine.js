@@ -459,7 +459,7 @@ const engine = {
             console.log('Hardest method no is... ', hardestMethodNo);
             console.warn('isSudokuUnique? ', isUnique, success_board);
 
-            this.applyInitials(ordered);
+            this.applyInitials();
         
             let difficulty_name;
 
@@ -486,13 +486,18 @@ const engine = {
         })
     },
 
-    applyInitials: function(ordered) {
+    applyInitials: function() {
         console.log('Fading...');
         //console.log(ordered);
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray);
+
         for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
             for(let sudoku_tile_in_row = 0; sudoku_tile_in_row < 9; sudoku_tile_in_row++) {
                 if(parseInt(initial_board[sudoku_row][sudoku_tile_in_row])) {
                     ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = initial_board[sudoku_row][sudoku_tile_in_row];
+                    ordered[(sudoku_row * 9) + sudoku_tile_in_row].classList.add('initial');
                 } else {
                     ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = '';
                 }
