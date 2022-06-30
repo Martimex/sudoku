@@ -3309,6 +3309,7 @@ const engine = {
                         //if(x === parseInt(e.target.textContent)) {el.textContent = e.target.textContent};
                         // ⛔ Uncaught TypeError: Cannot read properties of null (reading 'includes')
                         console.log(game_history[current_step][row][column], x)
+                        if(game_history[current_step][row][column] === null) {game_history[current_step][row][column] = ''}
                         if(game_history[current_step][row][column].includes(x)) { // Throws errors 💀 - we need to test if it's still an issue here
                             let ind = game_history[current_step][row][column].indexOf(x);
                             el.textContent = game_history[current_step][row][column][ind];  // ☢️

@@ -205,7 +205,6 @@ function Sudoku(props) {
     }
 
     const updateHistory = (e) => {
-
         let activeTileOrder = parseInt(active.dataset['order']);
         const activeTile_Row = Math.floor((activeTileOrder - 1) / 9);
         const activeTile_Col = ((activeTileOrder - 1) % 9);
@@ -263,11 +262,13 @@ function Sudoku(props) {
             if(currentHistory_copy.history[activeTile_Row][activeTile_Col] === parseInt(e.target.textContent)) {
                 currentHistory_copy.history[activeTile_Row][activeTile_Col] = '';
             } else{
+                console.log('now just applied');
                 currentHistory_copy.history[activeTile_Row][activeTile_Col] = parseInt(e.target.textContent);
             }
         }
 
-        
+        let r = [...game_History];
+        console.log(r);
         
         game_History.push(currentHistory_copy.history);
         console.log(game_History);
@@ -320,7 +321,9 @@ function Sudoku(props) {
             activeTiles_History = [];
     
             setPencilMarksEnabled(false);
-
+            let pencilmark = document.querySelector('.pencilmark_on');
+            console.log('PENCILMARK IS: ', pencilmark);
+            if(pencilmark) {pencilmark.classList.remove('pencilmark_on')}
             /* // 2. Init randomizing function
             // 2.1 Create main loading board
             const all = document.querySelector('.all');
@@ -340,11 +343,11 @@ function Sudoku(props) {
             i.innerHTML = '<FontAwesomeIcon icon="fa-solid fa-spinner" />';
             queryEl.appendChild(i);
             console.log(faSpinner, i) */
-            sudoku.current.style = "";
 
             engine.setBoard();
             let difficulty;
 
+            
             // Interval use
             const timeOut = setTimeout(fireAsync, 100);
             const loadingInterval = setInterval(checkAsyncCompletion, 200);
@@ -374,7 +377,9 @@ function Sudoku(props) {
                                 const history = engine.createInitialGameHistory();
                                 console.log(history);
                                 currentHistory.history = history;
-                                game_History.push(history);
+                                if(!game_History.length) {
+                                    game_History.push(history);
+                                }
                             })
                     } 
 
