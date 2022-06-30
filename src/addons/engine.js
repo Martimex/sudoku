@@ -1,12 +1,13 @@
 import  Sudoku from '../components/Sudoku.js';
 import Square from '../components/Square.js';
 import Tile from '../components/Tile.js';
+import anime from 'animejs/lib/anime.es.js';
 import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from 'react-dom';
 
 /*
     IMPORTANT REBUILD DEFINITIONS:
     ☢️ - this line is harmful. Replace textContent manipulations for currentBoard workarounds (board state inside array) and finally,
-          when everything is done, just textContent initials on the board 
+          when everything is done, just textContent initials on the board - EDIT: MOSTLY SOLVED, FOR NOW IT'S FINE
 */
 
 const rules = {
@@ -268,7 +269,7 @@ const engine = {
 
     createInitialGameHistory: function() {
         const initialBoard = [];
-
+        
         for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
             initialBoard.push([]);
             for(let sudoku_tile_in_row = 0; sudoku_tile_in_row < 9; sudoku_tile_in_row++) {
@@ -456,7 +457,7 @@ const engine = {
             const hardestMethodNo = this.solveSudoku();
             console.log('Are Sudoku preparations made nicely: ', setUp);
             console.log('Hardest method no is... ', hardestMethodNo);
-            console.warn('isSudokuUnique? ', isUnique);
+            console.warn('isSudokuUnique? ', isUnique, success_board);
 
             this.applyInitials(ordered);
         
@@ -487,7 +488,7 @@ const engine = {
 
     applyInitials: function(ordered) {
         console.log('Fading...');
-        console.log(ordered);
+        //console.log(ordered);
         for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
             for(let sudoku_tile_in_row = 0; sudoku_tile_in_row < 9; sudoku_tile_in_row++) {
                 if(parseInt(initial_board[sudoku_row][sudoku_tile_in_row])) {
@@ -539,7 +540,6 @@ const engine = {
         }
 
         return false; */
-
         // ITERATIVE APPROACH
 
         //let orderedCopy = [...ordered];

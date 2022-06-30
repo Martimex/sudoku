@@ -301,10 +301,10 @@ function Sudoku(props) {
     } */
 
     const resetSudoku = () => {
-        //setTimeout(() => { // REMOVE THIS SETTIMEOU WHEN YOU CHANGE ENGINE TO BE INDEPENDENT FROM BOARD TEXT CONTENTS
+        setTimeout(() => { // REMOVE THIS SETTIMEOU WHEN YOU CHANGE ENGINE TO BE INDEPENDENT FROM BOARD TEXT CONTENTS
             setNewSudokuLoading(1);
             console.log('RESETTING SUDOKU...')
-        //}, 1000)
+        }, 350)
 
     }
 
@@ -340,7 +340,7 @@ function Sudoku(props) {
             i.innerHTML = '<FontAwesomeIcon icon="fa-solid fa-spinner" />';
             queryEl.appendChild(i);
             console.log(faSpinner, i) */
-
+            sudoku.current.style = "";
 
             engine.setBoard();
             let difficulty;
@@ -370,6 +370,11 @@ function Sudoku(props) {
                             .then(() => {
                                 clearInterval(loadingInterval);
                                 setNewSudokuLoading(0);
+                                // Create game history
+                                const history = engine.createInitialGameHistory();
+                                console.log(history);
+                                currentHistory.history = history;
+                                game_History.push(history);
                             })
                     } 
 
@@ -394,12 +399,6 @@ function Sudoku(props) {
                     }
                 }
             }
-            
-            // Create game history
-            const history = engine.createInitialGameHistory();
-            console.log(history);
-            currentHistory.history = history;
-            game_History.push(history);
 
             //engine.fadeDigits(props);
             //engine.backtrack();
@@ -413,9 +412,11 @@ function Sudoku(props) {
     }) */
 
     // Perform engine operations
-    useEffect(() => {
+    useLayoutEffect(() => {
 
-        engine.setBoard();
+        setNewSudokuLoading(1);
+
+       /*  engine.setBoard();
         const difficulty = engine.hideDigits(props);
 
         // Interval use
@@ -429,7 +430,7 @@ function Sudoku(props) {
         console.log(history);
         currentHistory.history = history;
         game_History.push(history);
-        //engine.solveSudoku(); -> we will use it more often when it comes to render a grid with proper difficulty
+        //engine.solveSudoku(); -> we will use it more often when it comes to render a grid with proper difficulty */
 
         // ALWAYS INIT LAST
         //board.current.addEventListener('click', interact);
