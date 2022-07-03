@@ -297,6 +297,8 @@ const engine = {
     },
 
     hideDigits: function({difficulty, theme, options}) {
+
+        //console.time();
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
@@ -437,9 +439,9 @@ const engine = {
             const trials_used = {
                 used: 0,
             } */
-
+            console.time();
             const setUp = this.singleRemoval(initial_board, remainTiles, randInitial, i, randHide,  rules[difficulty]['renderingTrials'], 0); 
-
+            console.timeEnd();
             // START OFF FROM HERE!
 
             // Paint Sudoku with initials
@@ -452,15 +454,22 @@ const engine = {
                     }
                 }
             }
+            //console.timeEnd();
 
+            console.time();
             let isUnique = this.backtrack();
             const hardestMethodNo = this.solveSudoku();
             console.log('Are Sudoku preparations made nicely: ', setUp);
             console.log('Hardest method no is... ', hardestMethodNo);
             console.warn('isSudokuUnique? ', isUnique, success_board);
+           
+           
+            console.timeEnd();
 
-            this.applyInitials();
-        
+
+            this.applyInitials(theme);
+
+
             let difficulty_name;
 
             for(let key in rules) {
@@ -486,7 +495,7 @@ const engine = {
         })
     },
 
-    applyInitials: function() {
+    applyInitials: function(theme) {
         console.log('Fading...');
         //console.log(ordered);
         const allTiles = document.querySelectorAll('.tile');
@@ -497,7 +506,7 @@ const engine = {
             for(let sudoku_tile_in_row = 0; sudoku_tile_in_row < 9; sudoku_tile_in_row++) {
                 if(parseInt(initial_board[sudoku_row][sudoku_tile_in_row])) {
                     ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = initial_board[sudoku_row][sudoku_tile_in_row];
-                    ordered[(sudoku_row * 9) + sudoku_tile_in_row].classList.add('initial');
+                    ordered[(sudoku_row * 9) + sudoku_tile_in_row].classList.add('initial', `initial-${theme}`);
                 } else {
                     ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = '';
                 }
@@ -553,6 +562,9 @@ const engine = {
         let f = remainTilesCopy;
         console.log(f);
 
+        const time_stop = 2000;
+        const measure_start = Date.now();
+
         for(let x=singleRemove_start; x>randInitial + randHide; x--) {
             if(trials_used >= trials) {return; }
             trials_used++;
@@ -576,6 +588,9 @@ const engine = {
                     return;
                 }
             }
+
+            let measure_stop = Date.now();
+            if(measure_stop - measure_start > time_stop) { console.warn('Process terminated - too much time ! ', measure_stop - measure_start); return; }
 
             elAndDigit.pop(); 
             

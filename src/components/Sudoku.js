@@ -352,6 +352,7 @@ function Sudoku(props) {
             
             // Interval use
             const timeOut = setTimeout(fireAsync, 100);
+            /* difficulty = engine.hideDigits(props); */
             const loadingInterval = setInterval(checkAsyncCompletion, 200);
 
             function fireAsync() {
@@ -382,7 +383,7 @@ function Sudoku(props) {
                                 if(!game_History.length) {
                                     game_History.push(history);
                                 }
-                                engine.applyInitials();
+                                engine.applyInitials(props.theme);
                             })
                     } 
 
