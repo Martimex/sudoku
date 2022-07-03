@@ -5,17 +5,32 @@
     pointer-events: none;
 }
 
-.loading-text {
-    position:absolute; top:65%; left: 15%;
-    width: 10%; height: 10%;
-    color: #ddd;
-    font-size: 3rem;
+.loading-content {
+    position: relative; top: 25%;
+    height: 50%;
+}
+
+.spinner-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 3.5rem;
 }
 
 .loading-spinner {
-    position:absolute; top:25%; left: 15%;
-    width: 8rem; height: 8rem;
+    /* position:absolute; top:25%;  */
+    width: 12rem; height: 12rem;
      color: #ddd;
     /* background: #ddd; */
     font-size: 10rem;
+}
+
+.loading-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ddd;
+    font-size: 3.8rem;
+    flex-wrap: wrap;
+    margin-top: 3.5rem;
 }

@@ -48,12 +48,21 @@
     color: #bbb;
 }
  */
+
+.palette {  /* Indicates main box for palette */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: .1rem;
+}
+
 .numbers-box {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(2, 1fr);
     width: 80%;
-    position: absolute; left: 10%;
+    /* position: absolute; left: 10%; */
     border-radius: 10%;
 }
 
@@ -127,12 +136,41 @@
     animation: focus 4s infinite linear alternate;
 }
 
+.new-sudoku-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .new-sudoku {
     width: 6rem;
+    margin: 1rem;
+    padding: .4rem;
     height: 2.5rem;
-    background: hsl(113, 45%, 55%);
+    /* background: hsl(113, 45%, 55%); */
     color: #000;
-    position: absolute; bottom: 5%; left: 30%;
+    border-radius: 25%;
+   /*  position: absolute; bottom: 5%; left: 30%; */
+}
+
+.new-sudoku-easy {
+    color: hsla(116, 73%, 40%, .85);
+    border: .2rem solid hsl(116, 73%, 30%);
+}
+
+.new-sudoku-medium {
+    color: hsla(55, 73%, 50%, .85);
+    border: .2rem solid hsl(55, 73%, 30%);
+}
+
+.new-sudoku-hard {
+    color: hsla(12, 73%, 40%, .85);
+    border: .2rem solid  hsl(12, 73%, 30%);
+}
+
+.new-sudoku-master {
+    color: hsla(182, 73%, 40%, .85);
+    border: .2rem solid  hsl(182, 73%, 30%);
 }
 
 @keyframes colored {

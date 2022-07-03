@@ -9,16 +9,20 @@
 
 .tile-easy {
     border: .1rem solid hsl(116, 73%, 30%);
+    border: .1rem solid hsla(116, 73%, 40%, .75); /* This pattern looks much better */
 }
 
 .tile-medium {
     border: .1rem solid hsl(55, 73%, 40%);
+    border: .1rem solid hsla(55, 73%, 50%, .75); /* This pattern looks much better */
 }
 
 .tile-hard {
     border: .1rem solid hsl(12, 73%, 30%);
+    border: .1rem solid hsla(12, 73%, 40%, .75); /* This pattern looks much better */
 }
 
 .tile-master {
     border: .1rem solid hsl(182, 73%, 30%);
+    border: .1rem solid hsla(182, 73%, 40%, .75); /* This pattern looks much better */
 }

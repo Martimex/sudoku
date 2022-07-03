@@ -309,6 +309,13 @@ function Sudoku(props) {
 
     }
 
+    const conditionsPassed = (e) => {
+        if(active && !e.target.parentNode.classList.contains('palette') &&  (!(pencilmarks_Enabled && !parseInt(e.target.textContent))) && (!(!parseInt(active.textContent) && !parseInt(e.target.textContent)))) {
+            console.warn(e.target.classList);
+            return true;
+        } else return false;
+    }
+
     useEffect(() => {
         if(newSudokuLoading !== 0) {
             // 1. Make some cleanups first !
@@ -502,20 +509,25 @@ function Sudoku(props) {
                     </div>
                 </div>
                 {/* <Palette ref={paletteRef} /> */}
-                <div className={`numbers-box numbers-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(active && (!(pencilmarks_Enabled && !parseInt(e.target.textContent))) && (!(!parseInt(active.textContent) && !parseInt(e.target.textContent)))) { appendNumber(e); updateHistory(e); } }}>
-                    <div className="option option-1"> 1 </div>
-                    <div className="option option-2"> 2 </div>
-                    <div className="option option-3"> 3 </div>
-                    <div className="option option-4"> 4 </div>
-                    <div className="option option-5"> 5 </div>
-                    <div className="option option-6"> 6 </div>
-                    <div className="option option-7"> 7 </div>
-                    <div className="option option-8"> 8 </div>
-                    <div className="option option-9"> 9 </div>
-                    <div className="option option-0" ref={rubber}>  </div>
-                </div> 
+                <div className="palette">
+                    <div className={`numbers-box numbers-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(conditionsPassed(e)) { appendNumber(e); updateHistory(e); } }}>
+                        <div className="option option-1"> 1 </div>
+                        <div className="option option-2"> 2 </div>
+                        <div className="option option-3"> 3 </div>
+                        <div className="option option-4"> 4 </div>
+                        <div className="option option-5"> 5 </div>
+                        <div className="option option-6"> 6 </div>
+                        <div className="option option-7"> 7 </div>
+                        <div className="option option-8"> 8 </div>
+                        <div className="option option-9"> 9 </div>
+                        <div className="option option-0" ref={rubber}>  </div>
+                    </div> 
+                </div>
 
-                <div className="new-sudoku" onClick={() => resetSudoku()} > Reset Sudoku </div>
+                <div className="new-sudoku-box">
+                    <div className={`new-sudoku new-sudoku-${final_Difficulty}`} onClick={() => resetSudoku()} > New Sudoku </div>
+                </div>
+
 
                 {newSudokuLoading === 1 && (
                     <Loading theme={props.theme} />

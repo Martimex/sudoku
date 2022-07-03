@@ -35,10 +35,12 @@ class Loading extends React.Component {
     render() {
         return(
             <div className="loading">
-                <div className="spinner-div">
-                    <FontAwesomeIcon icon={faSpinner} className="loading-spinner" ></FontAwesomeIcon>
+                <div className="loading-content">
+                    <div className="spinner-div">
+                        <FontAwesomeIcon icon={faSpinner} className="loading-spinner" ></FontAwesomeIcon>
+                    </div>
+                    <div className="loading-text"> Loading... </div>
                 </div>
-                <div className="loading-text"> Loading... </div>
             </div>
         )
     }
