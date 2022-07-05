@@ -136,7 +136,7 @@ function Sudoku(props) {
             e.target.classList.add('active');
 
             engine.resetHighlightEffect(props);
-            engine.applyHighlightEffect(e, final_Difficulty);
+            engine.applyHighlightEffect(e.target, final_Difficulty);
         }
     }
 
@@ -158,7 +158,6 @@ function Sudoku(props) {
             
             console.log(active.textContent, e.target.textContent);
             (parseInt(active.textContent) === parseInt(e.target.textContent)) ? active.textContent = '' : active.textContent = e.target.textContent;
-
         }
         else {
             console.log(active.childNodes);
@@ -267,6 +266,7 @@ function Sudoku(props) {
             } else{
                 console.log('now just applied');
                 currentHistory_copy.history[activeTile_Row][activeTile_Col] = parseInt(e.target.textContent);
+                engine.removeOutDatedPencilmarks(currentHistory_copy.history, activeTile_Row, activeTile_Col, parseInt(e.target.textContent));
             }
         }
 
@@ -493,7 +493,7 @@ function Sudoku(props) {
 
     useEffect(() => {
         if(step > 0) { // Prevents from initial fire when component is being rendered
-            engine.travelInTime(current_step, game_History, activeTiles_History, setActive);
+            engine.travelInTime(current_step, game_History, activeTiles_History, setActive, final_Difficulty, props);
         }
     }, [history_travel])
 

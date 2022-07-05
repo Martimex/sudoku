@@ -3259,7 +3259,7 @@ const engine = {
     },
 
     // This one is a Toolbox specific function, which repaints the board whenever player 'travels in time'
-    travelInTime: function(current_step, game_history, activeTiles_history, setActive) {
+    travelInTime: function(current_step, game_history, activeTiles_history, setActive, finalDifficulty, props) {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
@@ -3386,10 +3386,16 @@ const engine = {
         if(ordered[activeTiles_history[current_step] - 1]) {
             ordered[activeTiles_history[current_step] - 1].classList.add('active'); // For undo & redo 
             setActive(ordered[activeTiles_history[current_step] - 1])
+            // And apply proper highlighting
+            this.resetHighlightEffect(props);
+            this.applyHighlightEffect(ordered[activeTiles_history[current_step] - 1], finalDifficulty);
         } else {
             // When we move forward to the very recent move  (prevents from errors !)
             ordered[activeTiles_history[current_step - 1] - 1].classList.add('active');
             setActive(ordered[activeTiles_history[current_step - 1] - 1])
+            // And apply proper highlighting
+            this.resetHighlightEffect(props);
+            this.applyHighlightEffect(ordered[activeTiles_history[current_step - 1] - 1], finalDifficulty);
         }
         //ordered[(activeTiles_history[current_step] + 1) - 1].classList.add('active'); // For redo
     
@@ -3419,10 +3425,11 @@ const engine = {
         }
     },
 
-    applyHighlightEffect: function(e, finalDifficulty) {
-        console.log(e.target, e.target.dataset.order, parseInt(Math.floor(e.target.dataset.order - 1) / 9), parseInt((e.target.dataset.order - 1) % 9));
-        const activeTile_row = parseInt(Math.floor(e.target.dataset.order - 1) / 9);
-        const activeTile_col = parseInt((e.target.dataset.order - 1) % 9);
+    applyHighlightEffect: function(e_target, finalDifficulty) {
+        //console.log(e, e.target);
+        //console.log(e.target, e.target.dataset.order, parseInt(Math.floor(e.target.dataset.order - 1) / 9), parseInt((e.target.dataset.order - 1) % 9));
+        const activeTile_row = parseInt(Math.floor(e_target.dataset.order - 1) / 9);
+        const activeTile_col = parseInt((e_target.dataset.order - 1) % 9);
 
         const activeTileSquare_row = Math.floor(activeTile_row / 3) * 3;
         const activeTileSquare_col = Math.floor(activeTile_col / 3) * 3;
@@ -3449,6 +3456,49 @@ const engine = {
                 ordered[((this_square_row + sq_row) * 9) + (this_square_col + sq_col)].style.backgroundColor = this.colors['highlight'][finalDifficulty]; // For square
             }
         }
+    },
+
+    removeOutDatedPencilmarks: function(currentHistory_copy_history, activeTile_Row, activeTile_Col, parsed_pressed_digit) {
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray);
+
+        const activeTileSquare_Row = Math.floor(activeTile_Row / 3) * 3;
+        const activeTileSquare_Col = Math.floor(activeTile_Col / 3) * 3;
+
+        // For rows & cols
+        for(let iir=0; iir<9; iir++) {
+            // Row
+            if(typeof(currentHistory_copy_history[activeTile_Row][iir]) === 'object') {
+                if(currentHistory_copy_history[activeTile_Row][iir].includes(parsed_pressed_digit)) {
+                    let ind = currentHistory_copy_history[activeTile_Row][iir].indexOf(parsed_pressed_digit);
+                    currentHistory_copy_history[activeTile_Row][iir].splice(ind, 1);
+                    ordered[(activeTile_Row * 9) + iir].childNodes[parsed_pressed_digit - 1].textContent = '';
+                }
+            }
+            // Col
+            if(typeof(currentHistory_copy_history[iir][activeTile_Col]) === 'object') {
+                if(currentHistory_copy_history[iir][activeTile_Col].includes(parsed_pressed_digit)) {
+                    let ind = currentHistory_copy_history[iir][activeTile_Col].indexOf(parsed_pressed_digit);
+                    currentHistory_copy_history[iir][activeTile_Col].splice(ind, 1);
+                    ordered[(iir * 9) + activeTile_Col].childNodes[parsed_pressed_digit - 1].textContent = '';
+                }
+            }
+        }
+
+        // For squares 
+        for(let sq_row=0; sq_row<3; sq_row++) {
+            for(let sq_col=0; sq_col<3; sq_col++) {
+                if(typeof(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col]) === 'object') {
+                    if(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].includes(parsed_pressed_digit)) {
+                        let ind = currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].indexOf(parsed_pressed_digit);
+                        currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].splice(ind, 1);
+                        ordered[((activeTileSquare_Row + sq_row) * 9) + (activeTileSquare_Col + sq_col)].childNodes[parsed_pressed_digit - 1].textContent = '';
+                    }
+                }
+            }
+        }
+
     },
 
     interact: function() {
