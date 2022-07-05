@@ -92,6 +92,15 @@ const engine = {
     rows: 9,
     columns: 9,
 
+    colors: {
+        highlight: {
+            easy: 'hsla(116, 40%, 30%, .4)',
+            medium: 'hsla(55, 40%, 30%, .4)',
+            hard: 'hsla(12, 40%, 30%, .4)',
+            master: 'hsla(182, 40%, 30%, .4)',
+        }
+    },
+
     orderTiles: function(arrToOrder) {
         const compareArr = [];
         for(let x=0; x<arrToOrder.length; x++) {
@@ -3396,6 +3405,50 @@ const engine = {
             el.style.color = '';
             el.classList.remove(`active`, `initial`, `initial-night`, `initial-day`, `pencilmark_tile`, /* `tile-${final_difficulty}` */);
         })
+    },
+
+    resetHighlightEffect: function({theme}) {
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray);
+        console.log(theme);
+        if(theme === 'night') {
+            for(let tile_no = 0; tile_no<ordered.length; tile_no++) {
+                ordered[tile_no].style.backgroundColor = `#000`;
+            }
+        }
+    },
+
+    applyHighlightEffect: function(e, finalDifficulty) {
+        console.log(e.target, e.target.dataset.order, parseInt(Math.floor(e.target.dataset.order - 1) / 9), parseInt((e.target.dataset.order - 1) % 9));
+        const activeTile_row = parseInt(Math.floor(e.target.dataset.order - 1) / 9);
+        const activeTile_col = parseInt((e.target.dataset.order - 1) % 9);
+
+        const activeTileSquare_row = Math.floor(activeTile_row / 3) * 3;
+        const activeTileSquare_col = Math.floor(activeTile_col / 3) * 3;
+
+        const allTiles = document.querySelectorAll('.tile');
+        const allTilesArray = [...allTiles];
+        const ordered = this.orderTiles(allTilesArray);
+
+        this.applyHighlightForRowAndCol(ordered, activeTile_row, activeTile_col, finalDifficulty);
+        this.applyHighlightForSquare(ordered, activeTileSquare_row, activeTileSquare_col, finalDifficulty);
+    },
+
+    applyHighlightForRowAndCol: function(ordered, this_row, this_col, finalDifficulty) {
+        for(let iir=0; iir<9; iir++) {
+            ordered[(this_row * 9) + iir].style.backgroundColor = this.colors['highlight'][finalDifficulty];  // For row
+            ordered[(iir * 9) + this_col].style.backgroundColor = this.colors['highlight'][finalDifficulty];  // For col
+        }
+    },
+
+    applyHighlightForSquare: function(ordered, this_square_row, this_square_col, finalDifficulty) {
+        console.log(this_square_row, this_square_col);
+        for(let sq_row=0; sq_row<3; sq_row++) {
+            for(let sq_col=0; sq_col<3; sq_col++) {
+                ordered[((this_square_row + sq_row) * 9) + (this_square_col + sq_col)].style.backgroundColor = this.colors['highlight'][finalDifficulty]; // For square
+            }
+        }
     },
 
     interact: function() {

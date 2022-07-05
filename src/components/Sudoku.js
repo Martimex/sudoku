@@ -134,6 +134,9 @@ function Sudoku(props) {
             if(active) { active.classList.remove('active'); }
             setActive(e.target);
             e.target.classList.add('active');
+
+            engine.resetHighlightEffect(props);
+            engine.applyHighlightEffect(e, final_Difficulty);
         }
     }
 
@@ -353,6 +356,7 @@ function Sudoku(props) {
             queryEl.appendChild(i);
             console.log(faSpinner, i) */
 
+            engine.resetHighlightEffect(props);
             engine.setBoard();
             let difficulty;
 
