@@ -1,0 +1,101 @@
+.blurred-theme {
+    position: absolute;
+    top: 0%; left: 0%;
+    width: 100%; height: 100%;
+    background: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.reset-box {
+    /* background: #777; */
+    background-image: linear-gradient(30deg, #777, #aaa, #777);
+    border: .3rem solid #444;
+    max-width: 80%;
+    padding: .4rem;
+    border-radius: 15%;
+    z-index: 40;
+    box-shadow: 0px 14px 16px 8px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0px 14px 16px 8px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 14px 16px 8px rgba(0,0,0,0.75);
+}
+
+/* .reset-box::before {
+    content: '';
+    display: block;
+    width: 20px; height: 20px;
+    background: hsl(124, 50%, 50%);
+    z-index: -20; 
+}
+ */
+.reset-title::before, .reset-title::after {
+    content: '';
+    display: block;
+    background: #666;
+    height: .4rem;
+    border-radius: 30% 20% 30% 20%;
+}
+
+.reset-title::before {
+    transform: translateX(1rem);
+    background-image: linear-gradient(75deg, #888, #777, #888);
+}
+
+.reset-title::after {
+    transform: rotateX(-1rem);
+    background-image: linear-gradient(165deg, #888, #777, #888);
+}
+
+.reset-title {
+    letter-spacing: .15rem;
+    padding: .3rem;
+    margin: 1rem;
+    /* border-bottom: .4rem solid #4448; */
+    color: #000;
+    font-size: 1.3rem;
+    font-weight: 600;
+    z-index: 40;
+}
+
+.message-box {
+    color: #000;
+    font-size: 1.1rem;
+    margin: 1rem;
+    z-index: 40;
+    padding: .2rem;
+    /* background: #888; */
+}
+
+/* .message-box::before {
+    content: open-quote;
+    font-size: 2rem;
+}
+
+.message-box::after {
+    content: close-quote;
+    font-size: 2rem;
+    display: inline-block;
+} */
+
+.choose-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 40;
+    padding: 1rem;
+}
+
+.choose-button {
+    font-size: 1.8rem;
+    /* border: .1rem dashed #ddd; */
+}
+
+.choose-decline {
+    color: hsl(3, 60%, 45%);
+}
+
+.choose-confirm {
+    color: hsl(120, 60%, 45%);
+}

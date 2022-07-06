@@ -5,6 +5,7 @@ import Landing from "../Landing";
 import Square from "./Square";
 import Palette from "./Palette";
 import {Toolbox, tools} from './Toolbox';
+import Reset from './Reset';
 import Loading from './Loading';
 import '../styles/sudoku.css';
 import engine from '../addons/engine.js';
@@ -63,6 +64,7 @@ function Sudoku(props) {
     const [current_step, setCurrentStep] = useState(0); // determines current step no - also the one currently browsed by player
     const [history_travel, setHistoryTravel] = useState(0); // it's only use to trigger stuff properly, it's an artificial state, but dont remove it !
 
+    const [confirmReset, setconfirmReset] = useState(false);
     const [newSudokuLoading, setNewSudokuLoading] = useState(0);
 
     const sudoku = useRef(null);
@@ -324,6 +326,7 @@ function Sudoku(props) {
             // 1. Make some cleanups first !
             setActive(0);
             setStep(0);
+            setconfirmReset(false);
             setCurrentStep(0);
             setHistoryTravel(0);
             engine.resetSudoku(final_Difficulty);
@@ -529,9 +532,12 @@ function Sudoku(props) {
                 </div>
 
                 <div className="new-sudoku-box">
-                    <div className={`new-sudoku new-sudoku-${final_Difficulty}`} onClick={() => resetSudoku()} > New Sudoku </div>
+                    <div className={`new-sudoku new-sudoku-${final_Difficulty}`} onClick={() => { if(step <= 0) { resetSudoku() } else { setconfirmReset(true) } } } > New Sudoku </div>
                 </div>
 
+                {confirmReset === true && (
+                    <Reset theme={props.theme} setconfirmReset={setconfirmReset} proceedReset={resetSudoku} />
+                )}
 
                 {newSudokuLoading === 1 && (
                     <Loading theme={props.theme} />
