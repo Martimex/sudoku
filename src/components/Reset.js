@@ -3,7 +3,7 @@ import  Sudoku from './Sudoku.js';
 import '../styles/reset.css';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faXMark, faBackspace, faRedo } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faBackspace } from '@fortawesome/free-solid-svg-icons';
 
 
 function Reset(props) {

@@ -7,8 +7,9 @@ import Palette from "./Palette";
 import {Toolbox, tools} from './Toolbox';
 import Reset from './Reset';
 import Loading from './Loading';
+import Win from './Win';
 import '../styles/sudoku.css';
-import engine from '../addons/engine.js';
+import { engine, success_board} from '../addons/engine.js';
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 import anime from 'animejs/lib/anime.es.js';
@@ -63,6 +64,7 @@ function Sudoku(props) {
     const [step, setStep] = useState(0); // determines no of action (would enable to travel in time regarding board progress)
     const [current_step, setCurrentStep] = useState(0); // determines current step no - also the one currently browsed by player
     const [history_travel, setHistoryTravel] = useState(0); // it's only use to trigger stuff properly, it's an artificial state, but dont remove it !
+    const [sudoku_solved, setSudokuSolved] = useState(false);
 
     const [confirmReset, setconfirmReset] = useState(false);
     const [newSudokuLoading, setNewSudokuLoading] = useState(0);
@@ -281,7 +283,7 @@ function Sudoku(props) {
         currentHistory.history = currentHistory_copy.history;
 
         //Update active's history
-        console.warn(parseInt(active.dataset.order));
+        //console.warn(parseInt(active.dataset.order));
         activeTiles_History.push(parseInt(active.dataset.order));
 
         if(current_step !== step) {
@@ -295,6 +297,9 @@ function Sudoku(props) {
             setCurrentStep(current_step + 1);
         }
 
+        // Check winning condition
+        checkSudokuSolved(game_History[game_History.length - 1], success_board);
+
         //setGameHistory([...prev_State, history_to_update]); -> not working
         //setGameHistory([...game_History, [...history_to_update]])
     }    
@@ -306,8 +311,34 @@ function Sudoku(props) {
         console.log(board.current.childNodes);
     } */
 
+    const checkSudokuSolved = (current_board, win_board) => {
+        console.log(current_board, win_board);
+        const isSudokuSolved = checkIfSolved(current_board, win_board);
+
+        if(isSudokuSolved) {
+            console.error('WIN !');
+            setSudokuSolved(true);
+        }
+
+        function checkIfSolved(current_board, win_board) {
+            for(let row_no = 0; row_no < 9; row_no++) {
+                for(let col_no = 0; col_no < 9; col_no++) {
+                    //console.log(parseInt(current_board[row_no][col_no]), parseInt(win_board[row_no][col_no]));
+                    if((parseInt(current_board[row_no][col_no]) !== parseInt(win_board[row_no][col_no])) ||
+                      (typeof(current_board[row_no][col_no]) === 'object')) 
+                    {
+                        return false;
+                    }
+                }
+            }
+            console.log(current_board, win_board)
+            return true;
+        }
+    }
+
+
     const resetSudoku = () => {
-        setTimeout(() => { // REMOVE THIS SETTIMEOU WHEN YOU CHANGE ENGINE TO BE INDEPENDENT FROM BOARD TEXT CONTENTS
+        setTimeout(() => { // helpful, because it prevents player for spamming reset button for too much
             setNewSudokuLoading(1);
             console.log('RESETTING SUDOKU...')
         }, 350)
@@ -316,7 +347,7 @@ function Sudoku(props) {
 
     const conditionsPassed = (e) => {
         if(active && !e.target.parentNode.classList.contains('palette') &&  (!(pencilmarks_Enabled && !parseInt(e.target.textContent))) && (!(!parseInt(active.textContent) && !parseInt(e.target.textContent)))) {
-            console.warn(e.target.classList);
+            //console.warn(e.target.classList);
             return true;
         } else return false;
     }
@@ -327,6 +358,7 @@ function Sudoku(props) {
             setActive(0);
             setStep(0);
             setconfirmReset(false);
+            setSudokuSolved(false);
             setCurrentStep(0);
             setHistoryTravel(0);
             engine.resetSudoku(final_Difficulty);
@@ -541,6 +573,10 @@ function Sudoku(props) {
 
                 {newSudokuLoading === 1 && (
                     <Loading theme={props.theme} />
+                )}
+
+                {sudoku_solved === true && (
+                    <Win theme={props.theme} final_difficulty={final_Difficulty} getNewSudoku={resetSudoku} goHome={props.backToLanding} />
                 )}
 
             </div>

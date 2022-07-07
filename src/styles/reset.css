@@ -1,15 +1,15 @@
-.blurred-theme {
+.blurred-theme, .blurred-screen {
     position: absolute;
     top: 0%; left: 0%;
     width: 100%; height: 100%;
-    background: #222;
+    background: #222d;
+   /*  filter:blur(20px); */
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
 }
 
-.reset-box {
+.reset-box, .win-screen {
     /* background: #777; */
     background-image: linear-gradient(30deg, #777, #aaa, #777);
     border: .3rem solid #444;
@@ -30,7 +30,9 @@
     z-index: -20; 
 }
  */
-.reset-title::before, .reset-title::after {
+.reset-title::before, .reset-title::after,
+.screen-title::before, .screen-title::after
+{
     content: '';
     display: block;
     background: #666;
@@ -38,17 +40,17 @@
     border-radius: 30% 20% 30% 20%;
 }
 
-.reset-title::before {
+.reset-title::before, .screen-title::before {
     transform: translateX(1rem);
     background-image: linear-gradient(75deg, #888, #777, #888);
 }
 
-.reset-title::after {
+.reset-title::after, .screen-title::after {
     transform: rotateX(-1rem);
     background-image: linear-gradient(165deg, #888, #777, #888);
 }
 
-.reset-title {
+.reset-title, .screen-title {
     letter-spacing: .15rem;
     padding: .3rem;
     margin: 1rem;
@@ -59,7 +61,7 @@
     z-index: 40;
 }
 
-.message-box {
+.message-box, .screen-description {
     color: #000;
     font-size: 1.1rem;
     margin: 1rem;
@@ -89,6 +91,7 @@
 
 .choose-button {
     font-size: 1.8rem;
+    z-index: 40;
     /* border: .1rem dashed #ddd; */
 }
 

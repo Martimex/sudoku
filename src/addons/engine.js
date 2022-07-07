@@ -3469,7 +3469,7 @@ const engine = {
         // For rows & cols
         for(let iir=0; iir<9; iir++) {
             // Row
-            if(typeof(currentHistory_copy_history[activeTile_Row][iir]) === 'object') {
+            if(typeof(currentHistory_copy_history[activeTile_Row][iir]) === 'object' && currentHistory_copy_history[activeTile_Row][iir].length) {
                 if(currentHistory_copy_history[activeTile_Row][iir].includes(parsed_pressed_digit)) {
                     let ind = currentHistory_copy_history[activeTile_Row][iir].indexOf(parsed_pressed_digit);
                     currentHistory_copy_history[activeTile_Row][iir].splice(ind, 1);
@@ -3477,7 +3477,7 @@ const engine = {
                 }
             }
             // Col
-            if(typeof(currentHistory_copy_history[iir][activeTile_Col]) === 'object') {
+            if(typeof(currentHistory_copy_history[iir][activeTile_Col]) === 'object' && currentHistory_copy_history[iir][activeTile_Col].length) {
                 if(currentHistory_copy_history[iir][activeTile_Col].includes(parsed_pressed_digit)) {
                     let ind = currentHistory_copy_history[iir][activeTile_Col].indexOf(parsed_pressed_digit);
                     currentHistory_copy_history[iir][activeTile_Col].splice(ind, 1);
@@ -3489,7 +3489,7 @@ const engine = {
         // For squares 
         for(let sq_row=0; sq_row<3; sq_row++) {
             for(let sq_col=0; sq_col<3; sq_col++) {
-                if(typeof(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col]) === 'object') {
+                if(typeof(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col]) === 'object' && currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].length) {
                     if(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].includes(parsed_pressed_digit)) {
                         let ind = currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].indexOf(parsed_pressed_digit);
                         currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].splice(ind, 1);
@@ -3507,4 +3507,4 @@ const engine = {
  
 }
 
-export default engine;
+export { engine, success_board };
