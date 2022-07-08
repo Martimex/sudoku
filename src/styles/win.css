@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=PT+Mono');
+
 .blurred-screen {
     position: absolute;
     top: 0%; left: 0%;
@@ -116,3 +118,12 @@
     color:hsl(182, 40%, 40%);
 }
 
+.time-text, .time-value {
+    display: inline;
+}
+
+.time-value {
+    font-family: 'PT';
+    font-weight: 750;
+    font-size: 1.3rem;
+}

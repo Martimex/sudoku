@@ -3387,15 +3387,19 @@ const engine = {
             ordered[activeTiles_history[current_step] - 1].classList.add('active'); // For undo & redo 
             setActive(ordered[activeTiles_history[current_step] - 1])
             // And apply proper highlighting
-            this.resetHighlightEffect(props);
-            this.applyHighlightEffect(ordered[activeTiles_history[current_step] - 1], finalDifficulty);
+            if(props.options['backlit']) {
+                this.resetHighlightEffect(props);
+                this.applyHighlightEffect(ordered[activeTiles_history[current_step] - 1], finalDifficulty);
+            }
         } else {
             // When we move forward to the very recent move  (prevents from errors !)
             ordered[activeTiles_history[current_step - 1] - 1].classList.add('active');
             setActive(ordered[activeTiles_history[current_step - 1] - 1])
             // And apply proper highlighting
-            this.resetHighlightEffect(props);
-            this.applyHighlightEffect(ordered[activeTiles_history[current_step - 1] - 1], finalDifficulty);
+            if(props.options['backlit']) {
+                this.resetHighlightEffect(props);
+                this.applyHighlightEffect(ordered[activeTiles_history[current_step - 1] - 1], finalDifficulty);
+            }
         }
         //ordered[(activeTiles_history[current_step] + 1) - 1].classList.add('active'); // For redo
     

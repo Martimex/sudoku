@@ -17,6 +17,14 @@ function Win(props) {
 
                 <div className={`screen-description screen-description-${props.final_difficulty}`} >
                     Congratulations! You've just solved Sudoku {props.final_difficulty} !
+                    {props.isTimeEnabled === true && (
+                        <div className="time-summary"> 
+                            <div className="time-text"> Solving time:  </div>
+                            <div className="time-value">
+                                {props.time[0]}:{(props.time[1] < 10 ? '0'+props.time[1] : props.time[1])}:{(props.time[2] < 10 ? '0'+props.time[2] : props.time[2])}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="choose-box">

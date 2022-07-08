@@ -20,7 +20,7 @@ function Reset(props) {
                     to replace it ? All progress will be lost
                 </div>
                 <div className="choose-box">
-                    <div className="choose-button choose-decline" onClick={() => {props.setconfirmReset(false)}}>
+                    <div className="choose-button choose-decline" onClick={() => {/* props.setStopTimer(false); */ props.setconfirmReset(false); }}>
                         <FontAwesomeIcon icon={faBackspace} />
                     </div>
                     <div className="choose-button choose-confirm" onClick={() => {props.proceedReset()}}>

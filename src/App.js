@@ -14,7 +14,7 @@ function App() {
 
   const [options, setOptions] = useState({
     timer: false,
-    counter: false,
+    backlit: false,
   })
 
   const triggerPlay = (...args) => {
@@ -23,6 +23,10 @@ function App() {
 
   const triggerBack = () => {
     setState('landing');
+    setOptions({
+      timer: false,
+      backlit: false,
+    })
   }
 
   return(

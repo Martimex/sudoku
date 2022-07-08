@@ -8,6 +8,7 @@ import {Toolbox, tools} from './Toolbox';
 import Reset from './Reset';
 import Loading from './Loading';
 import Win from './Win';
+import Timer from './Timer';
 import '../styles/sudoku.css';
 import { engine, success_board} from '../addons/engine.js';
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
@@ -68,6 +69,9 @@ function Sudoku(props) {
 
     const [confirmReset, setconfirmReset] = useState(false);
     const [newSudokuLoading, setNewSudokuLoading] = useState(0);
+
+    const [[hours, minutes, seconds], setTime] = useState([0, 0, 0]);
+    const [stopTimer, setStopTimer] = useState(false);
 
     const sudoku = useRef(null);
     const all = useRef(null);
@@ -139,8 +143,10 @@ function Sudoku(props) {
             setActive(e.target);
             e.target.classList.add('active');
 
-            engine.resetHighlightEffect(props);
-            engine.applyHighlightEffect(e.target, final_Difficulty);
+            if(props.options['backlit']) {
+                engine.resetHighlightEffect(props);
+                engine.applyHighlightEffect(e.target, final_Difficulty);
+            }
         }
     }
 
@@ -317,6 +323,7 @@ function Sudoku(props) {
 
         if(isSudokuSolved) {
             console.error('WIN !');
+            setStopTimer(true);
             setSudokuSolved(true);
         }
 
@@ -361,6 +368,8 @@ function Sudoku(props) {
             setSudokuSolved(false);
             setCurrentStep(0);
             setHistoryTravel(0);
+            setTime([0, 0, 0]);
+            setStopTimer(false);
             engine.resetSudoku(final_Difficulty);
             game_History = [];
             activeTiles_History = [];
@@ -528,6 +537,7 @@ function Sudoku(props) {
 
     useEffect(() => {
         if(step > 0) { // Prevents from initial fire when component is being rendered
+            console.log(props.options);
             engine.travelInTime(current_step, game_History, activeTiles_History, setActive, final_Difficulty, props);
         }
     }, [history_travel])
@@ -539,6 +549,9 @@ function Sudoku(props) {
                     Sudoku {final_Difficulty} 
                     {/* {engine.version} */}
                 </div>
+                {props.options['timer'] === true && (
+                    <Timer theme={props.theme} finalDifficulty={final_Difficulty} setTime={setTime} hours={hours} minutes={minutes} seconds={seconds} stopTimer={stopTimer} />
+                )}
                 <Toolbox difficulty={final_Difficulty} theme={props.theme} handlePencilmarks={setPencilMarksEnabled} isEnabled={pencilmarks_Enabled} 
                          changeCurrentStep={setCurrentStep} currentStep={current_step} maxStep={step} travel={history_travel} historyTravel={setHistoryTravel}
                 />
@@ -564,11 +577,11 @@ function Sudoku(props) {
                 </div>
 
                 <div className="new-sudoku-box">
-                    <div className={`new-sudoku new-sudoku-${final_Difficulty}`} onClick={() => { if(step <= 0) { resetSudoku() } else { setconfirmReset(true) } } } > New Sudoku </div>
+                    <div className={`new-sudoku new-sudoku-${final_Difficulty}`} onClick={() => { if(step <= 0) { resetSudoku() } else { setconfirmReset(true); /* setStopTimer(true); */ } } } > New Sudoku </div>
                 </div>
 
                 {confirmReset === true && (
-                    <Reset theme={props.theme} setconfirmReset={setconfirmReset} proceedReset={resetSudoku} />
+                    <Reset theme={props.theme} setconfirmReset={setconfirmReset} proceedReset={resetSudoku} /* setStopTimer={setStopTimer} */ />
                 )}
 
                 {newSudokuLoading === 1 && (
@@ -576,7 +589,7 @@ function Sudoku(props) {
                 )}
 
                 {sudoku_solved === true && (
-                    <Win theme={props.theme} final_difficulty={final_Difficulty} getNewSudoku={resetSudoku} goHome={props.backToLanding} />
+                    <Win theme={props.theme} final_difficulty={final_Difficulty} getNewSudoku={resetSudoku} goHome={props.backToLanding} isTimeEnabled={props.options['timer']} time={[hours, minutes, seconds]} />
                 )}
 
             </div>

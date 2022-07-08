@@ -157,14 +157,14 @@ function Landing(props) {
                             <input className="item-option" type="checkbox" value="false"  id="choose"/>
                             <label htmlFor="choose" className="label-item" onClick={() => props.setOptions(options => ({...options, timer: !props.options.timer}))}> </label>
                         </div>
-                        <span className="items-text"> Add timer </span>
+                        <span className="items-text"> Add Timer </span>
                     </div>
                     <div className="box-items">
                         <div className="items-vis">
-                            <input className="item-option" type="checkbox" value="false" id="choose2"/>
-                            <label htmlFor="choose2" className="label-item" onClick={() => props.setOptions(options => ({...options, counter: !props.options.counter}))}> </label>
+                            <input className="item-option" type="checkbox" value="true" id="choose2"/>
+                            <label htmlFor="choose2" className="label-item" onClick={() => props.setOptions(options => ({...options, backlit: !props.options.backlit}))}> </label>
                         </div>
-                        <span className="items-text"> Add counter </span>
+                        <span className="items-text"> Tile backlit </span>
                     </div>
                 </div>
 
