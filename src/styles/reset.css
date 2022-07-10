@@ -9,7 +9,7 @@
     justify-content: center;
 }
 
-.reset-box, .win-screen {
+.reset-box, .win-screen, .info-box {
     /* background: #777; */
     background-image: linear-gradient(30deg, #777, #aaa, #777);
     border: .3rem solid #444;

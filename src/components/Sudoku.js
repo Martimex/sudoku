@@ -9,6 +9,7 @@ import Reset from './Reset';
 import Loading from './Loading';
 import Win from './Win';
 import Timer from './Timer';
+import Info from './Info';
 import '../styles/sudoku.css';
 import { engine, success_board} from '../addons/engine.js';
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
@@ -67,6 +68,7 @@ function Sudoku(props) {
     const [history_travel, setHistoryTravel] = useState(0); // it's only use to trigger stuff properly, it's an artificial state, but dont remove it !
     const [sudoku_solved, setSudokuSolved] = useState(false);
 
+    const [checkInfo, setCheckInfo] = useState(false);
     const [confirmReset, setconfirmReset] = useState(false);
     const [newSudokuLoading, setNewSudokuLoading] = useState(0);
 
@@ -554,6 +556,7 @@ function Sudoku(props) {
                 )}
                 <Toolbox difficulty={final_Difficulty} theme={props.theme} handlePencilmarks={setPencilMarksEnabled} isEnabled={pencilmarks_Enabled} 
                          changeCurrentStep={setCurrentStep} currentStep={current_step} maxStep={step} travel={history_travel} historyTravel={setHistoryTravel}
+                         setCheckInfo={setCheckInfo}
                 />
                 <div className="sudoku-map">
                     <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} style={mainGridStyle} difficulty={final_Difficulty} theme={props.theme} >
@@ -579,6 +582,10 @@ function Sudoku(props) {
                 <div className="new-sudoku-box">
                     <div className={`new-sudoku new-sudoku-${final_Difficulty}`} onClick={() => { if(step <= 0) { resetSudoku() } else { setconfirmReset(true); /* setStopTimer(true); */ } } } > New Sudoku </div>
                 </div>
+
+                {checkInfo === true && (
+                    <Info theme={props.theme} finalDifficulty={final_Difficulty} setCheckInfo={setCheckInfo} />
+                )}
 
                 {confirmReset === true && (
                     <Reset theme={props.theme} setconfirmReset={setconfirmReset} proceedReset={resetSudoku} /* setStopTimer={setStopTimer} */ />
