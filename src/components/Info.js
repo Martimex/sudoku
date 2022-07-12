@@ -1,4 +1,4 @@
-import React, { useEffect, createRef, useRef } from "react";
+import React, { useEffect, useLayoutEffect, createRef, useRef } from "react";
 import  Sudoku from './Sudoku.js';
 import '../styles/info.css';
 import '../styles/reset.css';
@@ -7,6 +7,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {  faInfo, faCalendar, faStar, faFile, faPersonBooth, faTrophy  } from '@fortawesome/free-solid-svg-icons';
 
 function Info(props) {
+
+    useEffect(() => {
+        props.setStopTimer(!props.stopTimer);
+    }, [])
 
     return (
         <div className="blurred-screen">
@@ -72,7 +76,7 @@ function Info(props) {
                 </div>
 
                 <div className={`info-box info-${props.theme} info-box-new-sizing`} datatype="outro">
-                    <div className="info-close" onClick={() => {props.setCheckInfo(false)}}> Close </div>
+                    <div className="info-close" onClick={() => {props.setCheckInfo(false);}}> Close </div>
                 </div>
             </div>
         </div>

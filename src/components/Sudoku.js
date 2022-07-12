@@ -515,6 +515,11 @@ function Sudoku(props) {
     }, [final_Difficulty])
 
     useEffect(() => {
+        console.warn('RECOVER TIMING - SUDOKU COMP')
+        setStopTimer(!stopTimer);
+    }, [checkInfo])
+
+    useEffect(() => {
         console.log('rubber animations')
         if(pencilmarks_Enabled === true) {
             anime({
@@ -556,7 +561,7 @@ function Sudoku(props) {
                 )}
                 <Toolbox difficulty={final_Difficulty} theme={props.theme} handlePencilmarks={setPencilMarksEnabled} isEnabled={pencilmarks_Enabled} 
                          changeCurrentStep={setCurrentStep} currentStep={current_step} maxStep={step} travel={history_travel} historyTravel={setHistoryTravel}
-                         setCheckInfo={setCheckInfo}
+                         setCheckInfo={setCheckInfo} setStopTimer={setStopTimer}
                 />
                 <div className="sudoku-map">
                     <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} style={mainGridStyle} difficulty={final_Difficulty} theme={props.theme} >
@@ -584,7 +589,7 @@ function Sudoku(props) {
                 </div>
 
                 {checkInfo === true && (
-                    <Info theme={props.theme} finalDifficulty={final_Difficulty} setCheckInfo={setCheckInfo} />
+                    <Info theme={props.theme} finalDifficulty={final_Difficulty} checkInfo={checkInfo} setCheckInfo={setCheckInfo} setStopTimer={setStopTimer} />
                 )}
 
                 {confirmReset === true && (

@@ -24,7 +24,7 @@ function Timer(props) {
             const timerId = setInterval(() => tick(), 1000);
             return() => clearInterval(timerId);
         }
-    }, [props.seconds])
+    }, [props.seconds, props.stopTimer])
 
     /*     setInterval(() => {
         seconds++;

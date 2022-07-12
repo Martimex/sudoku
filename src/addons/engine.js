@@ -571,7 +571,7 @@ const engine = {
         let f = remainTilesCopy;
         console.log(f);
 
-        const time_stop = 2000;
+        const time_stop = 1750;
         const measure_start = Date.now();
 
         for(let x=singleRemove_start; x>randInitial + randHide; x--) {
