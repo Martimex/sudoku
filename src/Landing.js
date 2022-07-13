@@ -13,7 +13,13 @@ const visualObject = {
     // First array value refers to "initial values", second one to "new value"
     //borderStyle: ['none', 'none none double double'],
     borderRadius: ['0%', '15%'],
-    color: ['#333', '#ddd'],
+    color_active: {
+        easy: ['hsl(144, 57%, 53%)'],
+        medium: ['hsl(55, 57%, 53%)'],
+        hard: ['hsl(12, 57%, 53%)'],
+        master: ['hsl(248, 57%, 53%)'],
+    }, 
+    color_inactive: ['#333', '#ddd'],
     fontWeight: ['500', '700'],
     scale: [['100%', '100%'], ['100%', '110%']],
 }
@@ -21,28 +27,40 @@ const visualObject = {
 const themeObject = {
 
     backgroundColor: {
-        day: '#ccc',
+        day: '#eee',
         night: '#000',   
     },
     
     btnBgColor: {
         day: '#000',
-        night: '#ddd',
+        night: '#eee',
     },
 
     color: {
         day: '#000',
-        night: '#ddd',
+        night: '#eee',
     },
 
     btnColor: {
-        day: '#ddd',
+        day: '#eee',
         night: '#000',
     },
 
     borderColor: {
         day: '#000',
-        night: '#ddd',
+        night: '#eee',
+    },
+
+    difficultyBoxesColor: {
+        day: '#ddd',
+        night: '#333',
+    },
+
+    difficultyActiveBoxColor: {
+        easy: ['hsl(144, 57%, 53%)'],
+        medium: ['hsl(55, 57%, 53%)'],
+        hard: ['hsl(12, 57%, 53%)'],
+        master: ['hsl(248, 57%, 53%)'],
     }
 }
 
@@ -73,18 +91,24 @@ function Landing(props) {
             duration: 600,
             easing: 'easeInOutSine',
             borderRadius: visualObject.borderRadius[value],
-            color: visualObject.color[value],
+            color: (value === 1)? visualObject.color_active[`${props.difficulty}`] : (props.theme === 'night') ? visualObject.color_inactive[0] : visualObject.color_inactive[1],
             fontWeight: visualObject.fontWeight[value],
             scale: visualObject.scale[value],
         })
     }
 
     useEffect(() => {
-        let arr = [easyRef, mediumRef, hardRef, masterRef];
-        for(let i=0; i<arr.length; i++) {
-            let shouldUpdate = 0;
-            if(arr[i].current.classList[arr[i].current.classList.length - 1] === props.difficulty) {shouldUpdate++}
-            changeVisuals(arr[i].current, shouldUpdate);
+        // Remove active styling classes from ALL difficulty tiles
+        const difficultyBoxes = layoutRef.current.querySelectorAll('.difficulty');
+        for(let difficulty_box_no = 0; difficulty_box_no < difficultyBoxes.length; difficulty_box_no++) {
+            difficultyBoxes[difficulty_box_no].classList.remove('chosen_difficulty');
+            if(difficultyBoxes[difficulty_box_no].classList.contains(`${props.difficulty}`)) {
+                difficultyBoxes[difficulty_box_no].classList.add('chosen_difficulty');
+                changeVisuals(difficultyBoxes[difficulty_box_no], 1);
+            } else {
+                changeVisuals(difficultyBoxes[difficulty_box_no], 0);
+            }
+        
         }
 
     }, [props.difficulty]);
@@ -98,16 +122,20 @@ function Landing(props) {
         const allLabels = layoutRef.current.querySelectorAll('.label-item');
         const playButton = layoutRef.current.querySelectorAll('.start-play');
 
+        const difficultyBoxes = layoutRef.current.querySelectorAll('.difficulty');
+        //console.log(difficultyBoxes);
+        const inactiveBoxes = [...difficultyBoxes].filter((box) => {return !box.classList.contains('chosen_difficulty') } )
+        console.log(inactiveBoxes);
         const allModes = themesBoxRef.current.childNodes;
         const modesArr = [...allModes];
 
         for(let i=0; i<allModes.length; i++) {
-            if(allModes[i] === newTheme) { modesArr.splice(i, 1); changeThemes(newTheme, modesArr, props.theme, allContentBoxes, allInputs, allLabels, playButton);}
+            if(allModes[i] === newTheme) { modesArr.splice(i, 1); changeThemes(newTheme, modesArr, props.theme, props.difficulty, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes);}
         }
 
     }, [props.theme])
 
-    function changeThemes(newTheme, modesArr, theme, allContentBoxes, allInputs, allLabels, playButton) {
+    function changeThemes(newTheme, modesArr, theme, difficulty, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes) {
 
         anime({
             targets: [modesArr, layoutRef.current, allContentBoxes, allInputs, allLabels],
@@ -126,6 +154,19 @@ function Landing(props) {
             color: themeObject.btnColor[theme],
         })
 
+        anime({
+            targets: inactiveBoxes,
+            duration: 1300,
+            easing: 'easeInSine',
+            color: themeObject.difficultyBoxesColor[theme],
+        })
+
+        anime({
+            targets: '.chosen_difficulty',
+            duration: 1300,
+            easing: 'easeInSine',
+            color: themeObject.difficultyActiveBoxColor[difficulty],
+        })
 
     }
 

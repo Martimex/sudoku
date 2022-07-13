@@ -59,24 +59,28 @@
 .difficulty-easy {
     background-image: var(--bg-easy);
     border-color: hsl(142, 75%, 35%);
+    /* color: hsl(114, 57%, 53%); */
     border-style: solid none none solid;
 }
 
 .difficulty-medium {
     background-image: var(--bg-medium);
     border-color: hsl(66, 75%, 45%);
+    /* color: hsl(42, 57%, 53%); */
     border-style: solid solid none none;
 }
 
 .difficulty-hard {
     background-image: var(--bg-hard);
     border-color: hsl(22, 75%, 35%);
+    /* color: hsl(360, 57%, 53%); */
     border-style: none none solid solid;
 }
 
 .difficulty-master {
     background-image: var(--bg-insane);
     border-color: hsl(274, 75%, 35%);
+    /* color: hsl(248, 57%, 53%); */
     border-style: none solid solid none;
 }
 
@@ -163,3 +167,7 @@ input[type="checkbox"]:checked+input {
     border-radius: 20%;
     font-family: 'Audiowide', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+.difficulty:hover, .items-icons:hover, .start-play:hover {
+    cursor: pointer;
+} 
