@@ -16,6 +16,10 @@
     border-radius:  30%;
 }
 
+.tool:hover {
+    cursor: pointer;
+}
+
 .tool-easy {
     border-color: hsl(116, 73%, 40%);
     /* color: hsl(142, 75%, 35%); */
@@ -51,12 +55,28 @@
     animation: borderSpin 4s infinite linear;
 }
 
-.animation-box {
-    border: .3rem solid #572 ;
-    background: #000;
+.animation-box-easy {
+    border: .3rem solid hsl(116, 73%, 40%);
+   /*  background-image: radial-gradient(hsl(111, 40%, 50%), hsl(122, 15%, 30%)); */
 }
 
-.animation-box::before {
+.animation-box-medium {
+    border: .3rem solid hsl(55, 73%, 40%);
+    /* background-image: radial-gradient(hsl(66, 40%, 50%), hsl(55, 15%, 30%)); */
+}
+
+.animation-box-hard {
+    border: .3rem solid hsl(12, 73%, 40%);
+    /* background-image: radial-gradient(hsl(12, 40%, 50%), hsl(1, 15%, 30%)); */
+}
+
+.animation-box-master {
+    border: .3rem solid hsl(182, 73%, 40%);
+    /* background-image: radial-gradient(hsl(182, 40%, 50%), hsl(172, 15%, 30%)); */
+}
+
+.animation-box-easy::before, .animation-box-medium::before,
+.animation-box-hard::before, .animation-box-master::before {
     position: relative;
     z-index: 40;
     top: 0%; left: 0%;
@@ -72,26 +92,31 @@
 @keyframes borderSpin {
     0% {
         border: .3rem dotted hsl(12, 60%, 45%);
+        border-radius: 30%;
         /* transform: rotateZ(0deg) rotateY(0deg) rotateX(0deg); */
     }
 
     25% {
         border: .3rem dotted hsl(82, 60%, 45%);
+        border-radius: 40%;
         /* transform: rotateZ(30deg) rotateY(30deg) rotateX(30deg); */
     }
 
     50% {
         border: .3rem dotted  hsl(152, 60%, 45%);
+        border-radius: 50%;
        /*  transform: rotateZ(60deg) rotateY(60deg) rotateX(60deg); */
     }
 
     75% {
         border: .3rem dotted hsl(222, 60%, 45%);
+        border-radius: 40%;
         /* transform: rotateZ(90deg) rotateY(90deg) rotateX(90deg); */
     }
 
     100% {
         border: .3rem dotted  hsl(292, 60%, 45%);
+        border-radius: 30%;
         /* transform: rotateZ(0deg) rotateY(0deg) rotateX(0deg); */
     }
 }

@@ -94,10 +94,19 @@ const engine = {
 
     colors: {
         highlight: {
-            easy: 'hsla(116, 40%, 30%, .4)',
-            medium: 'hsla(55, 40%, 30%, .4)',
-            hard: 'hsla(12, 40%, 30%, .4)',
-            master: 'hsla(182, 40%, 30%, .4)',
+            day: {
+                easy: 'hsla(116, 40%, 70%, .4)',
+                medium: 'hsla(55, 40%, 70%, .4)',
+                hard: 'hsla(12, 40%, 70%, .4)',
+                master: 'hsla(182, 40%, 70%, .4)',
+            },
+
+            night: {
+                easy: 'hsla(116, 40%, 30%, .4)',
+                medium: 'hsla(55, 40%, 30%, .4)',
+                hard: 'hsla(12, 40%, 30%, .4)',
+                master: 'hsla(182, 40%, 30%, .4)',
+            },
         }
     },
 
@@ -3389,7 +3398,7 @@ const engine = {
             // And apply proper highlighting
             if(props.options['backlit']) {
                 this.resetHighlightEffect(props);
-                this.applyHighlightEffect(ordered[activeTiles_history[current_step] - 1], finalDifficulty);
+                this.applyHighlightEffect(ordered[activeTiles_history[current_step] - 1], finalDifficulty, props);
             }
         } else {
             // When we move forward to the very recent move  (prevents from errors !)
@@ -3398,7 +3407,7 @@ const engine = {
             // And apply proper highlighting
             if(props.options['backlit']) {
                 this.resetHighlightEffect(props);
-                this.applyHighlightEffect(ordered[activeTiles_history[current_step - 1] - 1], finalDifficulty);
+                this.applyHighlightEffect(ordered[activeTiles_history[current_step - 1] - 1], finalDifficulty, props);
             }
         }
         //ordered[(activeTiles_history[current_step] + 1) - 1].classList.add('active'); // For redo
@@ -3426,10 +3435,14 @@ const engine = {
             for(let tile_no = 0; tile_no<ordered.length; tile_no++) {
                 ordered[tile_no].style.backgroundColor = `#000`;
             }
+        } else if(theme === 'day') {
+            for(let tile_no = 0; tile_no<ordered.length; tile_no++) {
+                ordered[tile_no].style.backgroundColor = `#eee`;
+            }
         }
     },
 
-    applyHighlightEffect: function(e_target, finalDifficulty) {
+    applyHighlightEffect: function(e_target, finalDifficulty, props) {
         //console.log(e, e.target);
         //console.log(e.target, e.target.dataset.order, parseInt(Math.floor(e.target.dataset.order - 1) / 9), parseInt((e.target.dataset.order - 1) % 9));
         const activeTile_row = parseInt(Math.floor(e_target.dataset.order - 1) / 9);
@@ -3442,22 +3455,22 @@ const engine = {
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
 
-        this.applyHighlightForRowAndCol(ordered, activeTile_row, activeTile_col, finalDifficulty);
-        this.applyHighlightForSquare(ordered, activeTileSquare_row, activeTileSquare_col, finalDifficulty);
+        this.applyHighlightForRowAndCol(ordered, activeTile_row, activeTile_col, finalDifficulty, props);
+        this.applyHighlightForSquare(ordered, activeTileSquare_row, activeTileSquare_col, finalDifficulty, props);
     },
 
-    applyHighlightForRowAndCol: function(ordered, this_row, this_col, finalDifficulty) {
+    applyHighlightForRowAndCol: function(ordered, this_row, this_col, finalDifficulty, props) {
         for(let iir=0; iir<9; iir++) {
-            ordered[(this_row * 9) + iir].style.backgroundColor = this.colors['highlight'][finalDifficulty];  // For row
-            ordered[(iir * 9) + this_col].style.backgroundColor = this.colors['highlight'][finalDifficulty];  // For col
+            ordered[(this_row * 9) + iir].style.backgroundColor = this.colors['highlight'][props.theme][finalDifficulty];  // For row
+            ordered[(iir * 9) + this_col].style.backgroundColor = this.colors['highlight'][props.theme][finalDifficulty];  // For col
         }
     },
 
-    applyHighlightForSquare: function(ordered, this_square_row, this_square_col, finalDifficulty) {
+    applyHighlightForSquare: function(ordered, this_square_row, this_square_col, finalDifficulty, props) {
         console.log(this_square_row, this_square_col);
         for(let sq_row=0; sq_row<3; sq_row++) {
             for(let sq_col=0; sq_col<3; sq_col++) {
-                ordered[((this_square_row + sq_row) * 9) + (this_square_col + sq_col)].style.backgroundColor = this.colors['highlight'][finalDifficulty]; // For square
+                ordered[((this_square_row + sq_row) * 9) + (this_square_col + sq_col)].style.backgroundColor = this.colors['highlight'][props.theme][finalDifficulty]; // For square
             }
         }
     },
@@ -3473,19 +3486,23 @@ const engine = {
         // For rows & cols
         for(let iir=0; iir<9; iir++) {
             // Row
-            if(typeof(currentHistory_copy_history[activeTile_Row][iir]) === 'object' && currentHistory_copy_history[activeTile_Row][iir].length) {
-                if(currentHistory_copy_history[activeTile_Row][iir].includes(parsed_pressed_digit)) {
-                    let ind = currentHistory_copy_history[activeTile_Row][iir].indexOf(parsed_pressed_digit);
-                    currentHistory_copy_history[activeTile_Row][iir].splice(ind, 1);
-                    ordered[(activeTile_Row * 9) + iir].childNodes[parsed_pressed_digit - 1].textContent = '';
+            if(typeof(currentHistory_copy_history[activeTile_Row][iir]) === 'object' && currentHistory_copy_history[activeTile_Row][iir] !== null) {
+                if(currentHistory_copy_history[activeTile_Row][iir].length) {
+                    if(currentHistory_copy_history[activeTile_Row][iir].includes(parsed_pressed_digit)) {
+                        let ind = currentHistory_copy_history[activeTile_Row][iir].indexOf(parsed_pressed_digit);
+                        currentHistory_copy_history[activeTile_Row][iir].splice(ind, 1);
+                        ordered[(activeTile_Row * 9) + iir].childNodes[parsed_pressed_digit - 1].textContent = '';
+                    }
                 }
             }
             // Col
-            if(typeof(currentHistory_copy_history[iir][activeTile_Col]) === 'object' && currentHistory_copy_history[iir][activeTile_Col].length) {
-                if(currentHistory_copy_history[iir][activeTile_Col].includes(parsed_pressed_digit)) {
-                    let ind = currentHistory_copy_history[iir][activeTile_Col].indexOf(parsed_pressed_digit);
-                    currentHistory_copy_history[iir][activeTile_Col].splice(ind, 1);
-                    ordered[(iir * 9) + activeTile_Col].childNodes[parsed_pressed_digit - 1].textContent = '';
+            if(typeof(currentHistory_copy_history[iir][activeTile_Col]) === 'object' && currentHistory_copy_history[iir][activeTile_Col] !== null) {
+                if(currentHistory_copy_history[iir][activeTile_Col].length) {
+                    if(currentHistory_copy_history[iir][activeTile_Col].includes(parsed_pressed_digit)) {
+                        let ind = currentHistory_copy_history[iir][activeTile_Col].indexOf(parsed_pressed_digit);
+                        currentHistory_copy_history[iir][activeTile_Col].splice(ind, 1);
+                        ordered[(iir * 9) + activeTile_Col].childNodes[parsed_pressed_digit - 1].textContent = '';
+                    }
                 }
             }
         }
@@ -3493,11 +3510,13 @@ const engine = {
         // For squares 
         for(let sq_row=0; sq_row<3; sq_row++) {
             for(let sq_col=0; sq_col<3; sq_col++) {
-                if(typeof(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col]) === 'object' && currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].length) {
-                    if(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].includes(parsed_pressed_digit)) {
-                        let ind = currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].indexOf(parsed_pressed_digit);
-                        currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].splice(ind, 1);
-                        ordered[((activeTileSquare_Row + sq_row) * 9) + (activeTileSquare_Col + sq_col)].childNodes[parsed_pressed_digit - 1].textContent = '';
+                if(typeof(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col]) === 'object' && currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col] !== null) {
+                    if(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].length) {
+                        if(currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].includes(parsed_pressed_digit)) {
+                            let ind = currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].indexOf(parsed_pressed_digit);
+                            currentHistory_copy_history[activeTileSquare_Row + sq_row][activeTileSquare_Col + sq_col].splice(ind, 1);
+                            ordered[((activeTileSquare_Row + sq_row) * 9) + (activeTileSquare_Col + sq_col)].childNodes[parsed_pressed_digit - 1].textContent = '';
+                        }
                     }
                 }
             }

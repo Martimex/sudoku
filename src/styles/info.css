@@ -142,6 +142,10 @@
     font-size: 1.4rem;
 }
 
+.info-close:hover {
+    cursor: pointer;
+}
+
 .info-box-desc-icon[datatype='trophy'] {
     color: hsl(182, 40%, 50%);
 }

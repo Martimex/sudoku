@@ -95,6 +95,10 @@
     /* border: .1rem dashed #ddd; */
 }
 
+.choose-button:hover {
+    cursor: pointer;
+}
+
 .choose-decline {
     color: hsl(3, 60%, 45%);
 }

@@ -7,6 +7,10 @@
     font-weight: 700;
 }
 
+.tile:hover {
+    cursor: pointer;
+}
+
 .tile-easy {
     border: .1rem solid hsl(116, 73%, 30%);
     border: .1rem solid hsla(116, 73%, 40%, .75); /* This pattern looks much better */
@@ -14,7 +18,7 @@
 
 .tile-medium {
     border: .1rem solid hsl(55, 73%, 40%);
-    border: .1rem solid hsla(55, 73%, 50%, .75); /* This pattern looks much better */
+    border: .1rem solid hsla(55, 73%, 40%, .75); /* This pattern looks much better */
 }
 
 .tile-hard {

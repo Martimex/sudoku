@@ -35,10 +35,10 @@ let activeTiles_History = []; // Array that contains history of tiles, which wer
 
 const difficultyColors = {
     day: {
-        easy: 'hsl(116, 35%, 45%)',
-        medium: 'hsl(55, 35%, 45%)',
-        hard: 'hsl(12, 35%, 45%)',
-        master: 'hsl(182, 35%, 45%)',
+        easy: 'hsl(116, 40%, 40%)',
+        medium: 'hsl(55, 40%, 40%)',
+        hard: 'hsl(12, 40%, 40%)',
+        master: 'hsl(182, 40%, 40%)',
     },
     
     night: {
@@ -147,7 +147,7 @@ function Sudoku(props) {
 
             if(props.options['backlit']) {
                 engine.resetHighlightEffect(props);
-                engine.applyHighlightEffect(e.target, final_Difficulty);
+                engine.applyHighlightEffect(e.target, final_Difficulty, props);
             }
         }
     }
@@ -570,7 +570,7 @@ function Sudoku(props) {
                 </div>
                 {/* <Palette ref={paletteRef} /> */}
                 <div className="palette">
-                    <div className={`numbers-box numbers-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(conditionsPassed(e)) { appendNumber(e); updateHistory(e); } }}>
+                    <div className={`numbers-box numbers-${props.theme}-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(conditionsPassed(e)) { appendNumber(e); updateHistory(e); } }}>
                         <div className="option option-1"> 1 </div>
                         <div className="option option-2"> 2 </div>
                         <div className="option option-3"> 3 </div>
@@ -585,7 +585,7 @@ function Sudoku(props) {
                 </div>
 
                 <div className="new-sudoku-box">
-                    <div className={`new-sudoku new-sudoku-${final_Difficulty}`} onClick={() => { if(step <= 0) { resetSudoku() } else { setconfirmReset(true); /* setStopTimer(true); */ } } } > New Sudoku </div>
+                    <div className={`new-sudoku new-sudoku-${props.theme}-${final_Difficulty}`} onClick={() => { if(step <= 0) { resetSudoku() } else { setconfirmReset(true); /* setStopTimer(true); */ } } } > New Sudoku </div>
                 </div>
 
                 {checkInfo === true && (

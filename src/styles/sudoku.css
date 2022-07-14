@@ -66,26 +66,42 @@
     border-radius: 10%;
 }
 
-.numbers-easy {
+.numbers-night-easy {
     /* background-image: linear-gradient(135deg, hsl(102, 50%, 60%), hsl(124, 50%, 60%)); */
     border: .2rem solid hsl(116, 73%, 30%);
 }
 
-.numbers-medium {
+.numbers-day-easy {
+    border: .2rem solid hsl(116, 60%, 40%);
+}
+
+.numbers-night-medium {
     /* background-image: linear-gradient(135deg, hsl(45, 50%, 60%), hsl(70, 50%, 60%)); */
     border: .2rem solid hsl(55, 73%, 30%);
 }
 
-.numbers-hard {
+.numbers-day-medium {
+    border: .2rem solid hsl(55, 60%, 40%);
+}
+
+.numbers-night-hard {
    /*  background-image: linear-gradient(135deg, hsl(3, 50%, 60%), hsl(33, 50%, 60%));
     background-color: hsla(12, 65%, 45%, .85); */
     border: .2rem solid hsl(12, 73%, 30%);
 }
 
-.numbers-master {
+.numbers-day-hard {
+    border: .2rem solid hsl(12, 60%, 40%);
+}
+
+.numbers-night-master {
     /* background-image: linear-gradient(135deg, hsl(177, 50%, 60%), hsl(222, 50%, 60%)); */
     border: .2rem solid hsl(182, 73%, 30%);
 } 
+
+.numbers-day-master {
+    border: .2rem solid hsl(182, 60%, 40%);
+}
 
 .numbers-box .option {
     border: .1rem solid;
@@ -98,6 +114,10 @@
     border: .2rem dotted hsla(124, 5%, 5%, .6);
     font-weight: 700;
     border-radius: 10%;
+}
+
+.option:hover {
+    cursor: pointer;
 }
 
 /* When we append a number to a given tile with pencilmark option turn on*/
@@ -153,24 +173,49 @@
    /*  position: absolute; bottom: 5%; left: 30%; */
 }
 
-.new-sudoku-easy {
+.new-sudoku:hover {
+    cursor: pointer;
+}
+
+.new-sudoku-night-easy {
     color: hsla(116, 73%, 40%, .85);
     border: .2rem solid hsl(116, 73%, 30%);
 }
 
-.new-sudoku-medium {
+.new-sudoku-day-easy {
+    color: hsl(116, 73%, 30%);
+    border: .2rem solid hsla(116, 73%, 40%, .85);
+}
+
+.new-sudoku-night-medium {
     color: hsla(55, 73%, 50%, .85);
     border: .2rem solid hsl(55, 73%, 30%);
 }
 
-.new-sudoku-hard {
-    color: hsla(12, 73%, 40%, .85);
-    border: .2rem solid  hsl(12, 73%, 30%);
+.new-sudoku-day-medium {
+    color:  hsl(55, 73%, 40%);
+    border: .2rem solid hsla(55, 73%, 40%, .85);
 }
 
-.new-sudoku-master {
+.new-sudoku-night-hard {
+    color: hsla(12, 73%, 40%, .85);
+    border: .2rem solid   hsl(12, 73%, 30%)
+}
+
+.new-sudoku-day-hard {
+    color: hsl(12, 73%, 30%); 
+    border: .2rem solid hsla(12, 73%, 40%, .85);
+}
+
+
+.new-sudoku-night-master {
     color: hsla(182, 73%, 40%, .85);
     border: .2rem solid  hsl(182, 73%, 30%);
+}
+
+.new-sudoku-day-master {
+    color:  hsl(182, 73%, 30%);
+    border: .2rem solid  hsla(182, 73%, 40%, .85);
 }
 
 @keyframes colored {

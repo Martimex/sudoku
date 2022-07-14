@@ -24,17 +24,17 @@ const tools = {
     },
     pencil: {
         isActive: false,
-        run: function(target) {
+        run: function(target, props) {
             this.isActive = !this.isActive;
             //console.log(target);
             if(this.isActive) {
                 //console.log('PENCILMARKS ACTIVATED');
-                target.classList.add('pencilmark_on', 'animation-box');
+                target.classList.add('pencilmark_on', `animation-box-${props.difficulty}`);
                 //console.log(target.classList);
             }
             else {
                 //console.log('Pencilmark mode: off');
-                target.classList.remove('pencilmark_on', 'animation-box');
+                target.classList.remove('pencilmark_on', `animation-box-${props.difficulty}`);
             }
 
         }
@@ -47,7 +47,7 @@ function Toolbox(props) {
     const history_redo = useRef(null);
 
     const fireTool = (target) => {
-        tools[target.attributes['data_name'].value].run(target); 
+        tools[target.attributes['data_name'].value].run(target, props); 
     }
 
     useEffect(() => {
