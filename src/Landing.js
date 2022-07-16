@@ -179,47 +179,59 @@ function Landing(props) {
                     <p className="content-title-text font-effect-neon"> Sudoku World </p>
                 </div>
 
-                <div className="app-text"> Choose a difficulty </div>
-
-                <div className="content-box">
-                    <div className="box-difficulty">
-                        <div className="difficulty difficulty-easy easy" ref={easyRef} onClick={() => {props.setDifficulty('easy')}}> EASY </div>
-                        <div className="difficulty difficulty-medium medium" ref={mediumRef} onClick={() => {props.setDifficulty('medium')}}> MEDIUM </div>
-                        <div className="difficulty difficulty-hard hard" ref={hardRef} onClick={() => {props.setDifficulty('hard')}}> HARD </div>
-                        <div className="difficulty difficulty-master master" ref={masterRef} onClick={() => {props.setDifficulty('master')}}> INSANE </div>
-                    </div>
-                </div>
-
-                <div className="app-text"> Options  </div>
-
-                <div className="content-box">
-                    <div className="box-items">
-                        <div className="items-vis">
-                            <input className="item-option" type="checkbox" value="false"  id="choose"/>
-                            <label htmlFor="choose" className="label-item" onClick={() => props.setOptions(options => ({...options, timer: !props.options.timer}))}> </label>
-                        </div>
-                        <span className="items-text"> Add Timer </span>
-                    </div>
-                    <div className="box-items">
-                        <div className="items-vis">
-                            <input className="item-option" type="checkbox" value="true" id="choose2"/>
-                            <label htmlFor="choose2" className="label-item" onClick={() => props.setOptions(options => ({...options, backlit: !props.options.backlit}))}> </label>
-                        </div>
-                        <span className="items-text"> Tile backlit </span>
-                    </div>
-                </div>
-
-                <div className="app-text">  Select theme </div>
+                <div className="app-section-main">
                 
-                <div className="content-box">
-                    <div className="box-items" ref={themesBoxRef}> 
-                        <div className="items-icons" data-theme="day" onClick={() => {props.setTheme('day')}} >
-                            <FontAwesomeIcon icon={faSun}  className="icon"></FontAwesomeIcon>
-                        </div>
-                        <div className="items-icons" data-theme="night" onClick={() => {props.setTheme('night')}} >
-                            <FontAwesomeIcon icon={faMoon} className="icon"></FontAwesomeIcon>
+
+                    <div className="app-section-box" data-type="difficulty">
+                        <div className="app-text"> Choose a difficulty </div>
+
+                        <div className="content-box">
+                            <div className="box-difficulty">
+                                <div className="difficulty difficulty-easy easy" ref={easyRef} onClick={() => {props.setDifficulty('easy')}}> EASY </div>
+                                <div className="difficulty difficulty-medium medium" ref={mediumRef} onClick={() => {props.setDifficulty('medium')}}> MEDIUM </div>
+                                <div className="difficulty difficulty-hard hard" ref={hardRef} onClick={() => {props.setDifficulty('hard')}}> HARD </div>
+                                <div className="difficulty difficulty-master master" ref={masterRef} onClick={() => {props.setDifficulty('master')}}> INSANE </div>
+                            </div>
                         </div>
                     </div>
+                    
+                    <div className="app-section-box" data-type="options">
+                        <div className="app-text"> Options  </div>
+
+                        <div className="content-box" data-type="content-options">
+                            <div className="box-items">
+                                <div className="items-vis">
+                                    <input className="item-option" type="checkbox" value="false"  id="choose"/>
+                                    <label htmlFor="choose" className="label-item" onClick={() => props.setOptions(options => ({...options, timer: !props.options.timer}))}> </label>
+                                </div>
+                                <span className="items-text"> Add Timer </span>
+                            </div>
+                            <div className="box-items">
+                                <div className="items-vis">
+                                    <input className="item-option" type="checkbox" value="true" id="choose2"/>
+                                    <label htmlFor="choose2" className="label-item" onClick={() => props.setOptions(options => ({...options, backlit: !props.options.backlit}))}> </label>
+                                </div>
+                                <span className="items-text"> Tile backlit </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="app-section-box" data-type="theme">
+                        <div className="app-text">  Select theme </div>
+                        
+                        <div className="content-box">
+                            <div className="box-items" ref={themesBoxRef}> 
+                                <div className="items-icons" data-theme="day" onClick={() => {props.setTheme('day')}} >
+                                    <FontAwesomeIcon icon={faSun}  className="icon"></FontAwesomeIcon>
+                                </div>
+                                <div className="items-icons" data-theme="night" onClick={() => {props.setTheme('night')}} >
+                                    <FontAwesomeIcon icon={faMoon} className="icon"></FontAwesomeIcon>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
 
                 {props.difficulty && (
