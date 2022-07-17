@@ -120,3 +120,97 @@
         /* transform: rotateZ(0deg) rotateY(0deg) rotateX(0deg); */
     }
 }
+
+
+@media screen and (orientation: landscape) and (max-width: 1100px) {
+    .tool-box-all {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tool-box {
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        grid-template-areas: 
+            "option-info       option-pencilmark"
+            "option-btn-back   option-btn-forth";
+        align-items: center;
+        justify-content: center;
+        justify-items: center;
+    }
+    
+    .tool {
+        width: 10vw;
+        height: 10vw;
+    }
+
+    .tool[data-name="info"] {
+        grid-area: option-info;
+    }
+
+    .tool[data-name="back"] {
+        grid-area: option-btn-back;
+    }
+
+    .tool[data-name="forth"] {
+        grid-area: option-btn-forth;
+    }
+
+    .tool[data-name="pencil"] {
+        grid-area: option-pencilmark;
+    }
+
+}
+
+
+
+
+@media screen and (orientation: landscape) and (min-width: 1101px) {
+
+    .tool-box-all {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tool-box {
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        grid-template-areas: 
+            "option-info       option-pencilmark"
+            "option-btn-back   option-btn-forth";
+        align-items: center;
+        justify-content: center;
+        justify-items: center;
+    }
+    
+    .tool-icon {
+        font-size: 1.8rem;
+    }
+
+    .tool {
+        width: 10vw;
+        height: 10vw;
+    }
+
+    .tool[data-name="info"] {
+        grid-area: option-info;
+    }
+
+    .tool[data-name="back"] {
+        grid-area: option-btn-back;
+    }
+
+    .tool[data-name="forth"] {
+        grid-area: option-btn-forth;
+    }
+
+    .tool[data-name="pencil"] {
+        grid-area: option-pencilmark;
+    }
+}

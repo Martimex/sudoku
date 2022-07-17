@@ -332,7 +332,7 @@ input[type="checkbox"]:checked+input {
         grid-template-columns: repeat(3, 25% 50% 25%);
         grid-template-areas: "theme-section   difficulty-section   options-section";
         /* column-gap:  1rem; */
-        padding: 2rem;
+        padding: .8rem;
     }
 
     /* and... some styling ! */

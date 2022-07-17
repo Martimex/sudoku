@@ -559,29 +559,31 @@ function Sudoku(props) {
                 {props.options['timer'] === true && (
                     <Timer theme={props.theme} finalDifficulty={final_Difficulty} setTime={setTime} hours={hours} minutes={minutes} seconds={seconds} stopTimer={stopTimer} />
                 )}
-                <Toolbox difficulty={final_Difficulty} theme={props.theme} handlePencilmarks={setPencilMarksEnabled} isEnabled={pencilmarks_Enabled} 
-                         changeCurrentStep={setCurrentStep} currentStep={current_step} maxStep={step} travel={history_travel} historyTravel={setHistoryTravel}
-                         setCheckInfo={setCheckInfo} setStopTimer={setStopTimer}
-                />
-                <div className="sudoku-map">
-                    <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} style={mainGridStyle} difficulty={final_Difficulty} theme={props.theme} >
-                        {allSquares}
+                <div className="game-elems">
+                    <Toolbox difficulty={final_Difficulty} theme={props.theme} handlePencilmarks={setPencilMarksEnabled} isEnabled={pencilmarks_Enabled} 
+                            changeCurrentStep={setCurrentStep} currentStep={current_step} maxStep={step} travel={history_travel} historyTravel={setHistoryTravel}
+                            setCheckInfo={setCheckInfo} setStopTimer={setStopTimer}
+                    />
+                    <div className="sudoku-map">
+                        <div className="sudoku-board" ref={board} onClick={(e) => {markTile(e)}} /* style={mainGridStyle} */ difficulty={final_Difficulty} theme={props.theme} >
+                            {allSquares}
+                        </div>
                     </div>
-                </div>
-                {/* <Palette ref={paletteRef} /> */}
-                <div className="palette">
-                    <div className={`numbers-box numbers-${props.theme}-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(conditionsPassed(e)) { appendNumber(e); updateHistory(e); } }}>
-                        <div className="option option-1"> 1 </div>
-                        <div className="option option-2"> 2 </div>
-                        <div className="option option-3"> 3 </div>
-                        <div className="option option-4"> 4 </div>
-                        <div className="option option-5"> 5 </div>
-                        <div className="option option-6"> 6 </div>
-                        <div className="option option-7"> 7 </div>
-                        <div className="option option-8"> 8 </div>
-                        <div className="option option-9"> 9 </div>
-                        <div className="option option-0" ref={rubber}>  </div>
-                    </div> 
+                    {/* <Palette ref={paletteRef} /> */}
+                    <div className="palette">
+                        <div className={`numbers-box numbers-${props.theme}-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(conditionsPassed(e)) { appendNumber(e); updateHistory(e); } }}>
+                            <div className="option option-1"> 1 </div>
+                            <div className="option option-2"> 2 </div>
+                            <div className="option option-3"> 3 </div>
+                            <div className="option option-4"> 4 </div>
+                            <div className="option option-5"> 5 </div>
+                            <div className="option option-6"> 6 </div>
+                            <div className="option option-7"> 7 </div>
+                            <div className="option option-8"> 8 </div>
+                            <div className="option option-9"> 9 </div>
+                            <div className="option option-0" ref={rubber}>  </div>
+                        </div> 
+                    </div>
                 </div>
 
                 <div className="new-sudoku-box">
