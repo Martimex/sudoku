@@ -6,15 +6,19 @@
 }
 
 .loading-content {
-    position: relative; top: 25%;
-    height: 50%;
+    position: relative; top: 25vh;
+    max-height: 50vh;
+    display: grid;
+    grid-template-columns: 1;
+    grid-template-rows: auto;
+    align-items: center;
+    align-content: center;
+    justify-items: center;
+    justify-content: center;
 }
 
 .spinner-div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 3.5rem;
+    margin-bottom: 2.5rem;
 }
 
 .loading-spinner {
@@ -26,11 +30,32 @@
 }
 
 .loading-text {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     color: #ddd;
     font-size: 3.8rem;
     flex-wrap: wrap;
-    margin-top: 3.5rem;
+    margin-top: 2.5rem;
+}
+
+
+@media screen and (orientation: landscape) and (max-width: 1100px) {
+
+    .loading-spinner {
+        width: 10rem;
+        height: 10rem;
+        font-size: 8rem;
+    }
+
+    .spinner-div {
+        margin-bottom: 1.5rem;
+    }
+
+    .loading-text {
+        font-size: 3rem;
+        margin-top: 1.5rem;
+    }
+    
+}
+
+@media screen and (orientation: landscape) and (min-width: 1101px) {
+    /* All fine ! */
 }

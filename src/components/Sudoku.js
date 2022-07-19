@@ -362,6 +362,7 @@ function Sudoku(props) {
     }
 
     useEffect(() => {
+        document.body.style.overflow = 'auto'; // Important for lower-sized devices !
         if(newSudokuLoading !== 0) {
             // 1. Make some cleanups first !
             setActive(0);
