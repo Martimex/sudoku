@@ -518,6 +518,9 @@ function Sudoku(props) {
     useEffect(() => {
         console.warn('RECOVER TIMING - SUDOKU COMP')
         setStopTimer(!stopTimer);
+        if(!checkInfo) {
+            document.body.style.overflow = 'auto';
+        }
     }, [checkInfo])
 
     useEffect(() => {

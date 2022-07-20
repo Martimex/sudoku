@@ -161,3 +161,80 @@
 .info-box-desc-icon[datatype='file'] {
     color: hsl(116, 40%, 50%);
 }
+
+
+/**/
+
+@media screen and (orientation: landscape) and (max-width: 1100px) {
+
+    .info-box-grid-content {
+        padding: .4rem;
+        font-size: .9rem;
+    }
+
+    .info-box-desc-icon {
+        font-size: 1.2rem;
+    }
+    
+    .info-box-author {
+        padding:  1rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    .grid-container-icon-box {
+        font-size: 1.2rem;
+        width: 1.4rem;
+        height: 1.4rem;
+    }
+
+    .grid-container-title {
+        font-size: 1.5rem;
+    }
+
+    .info-close {
+        font-size: 1.2rem;
+    }
+
+}
+
+@media screen and (orientation: landscape) and (min-width: 1101px) {
+    .info-box {
+        padding: .75rem;
+    }
+    
+    .info-box-grid-content {
+        padding: .7rem;
+        font-size: 1.2rem;
+    }
+
+    .info-box-desc-icon {
+        font-size: 1.2rem;
+    }
+    
+    .info-box-author {
+        padding:  2rem;
+        font-size: 1.3rem;
+    }
+    
+    .info-box-author-text {
+        margin: 0 .5rem;
+    }
+
+    .grid-container-icon-box {
+        font-size: 1.6rem;
+        width: 2rem;
+        height: 2rem;
+        padding: .4rem;
+        margin: .3rem;
+        border-right: #ddd .2rem solid;
+        border: #ddd .15rem solid; 
+    }
+
+    .grid-container-title {
+        font-size: 1.8rem;
+    }
+
+    .info-close {
+        font-size: 1.6rem;
+    }
+}
