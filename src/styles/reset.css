@@ -112,10 +112,36 @@
 @media screen and (orientation: landscape) and (max-width: 1100px) {
 
     .reset-box, .win-screen, .info-box {
-        max-width: 60%;
+        max-width: 50%;
+    }
+
+    .reset-title, .screen-title {
+        font-size: 1.2rem;
+    }
+
+    .message-box, .screen-description {
+        font-size: 1rem;
+    }
+
+    .choose-box {
+        padding: .6rem;
     }
 }
 
 @media screen and (orientation: landscape) and (min-width: 1101px) {
+    .reset-box, .win-screen, .info-box {
+        max-width: 40%;
+    }
 
+    .reset-title, .screen-title {
+        font-size: 1.5rem;
+    }
+
+    .message-box, .screen-description {
+        font-size: 1.2rem;
+    }
+
+    .choose-box {
+        padding: 1.3rem;
+    }
 }
