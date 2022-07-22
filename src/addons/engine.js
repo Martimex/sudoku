@@ -3290,7 +3290,7 @@ const engine = {
                 ordered[(row * 9) + column].classList.remove('active');
             } 
 
-            if(ordered[(row * 9) + column].classList.contains('pencilmark_tile') && typeof(game_history[current_step][row][column]) === 'object') {
+            if((ordered[(row * 9) + column].classList.contains('pencilmark_tile')) && (typeof(game_history[current_step][row][column]) === 'object')) {
                 console.log('Lets deal with array now')
                 //console.log(ordered[(row * 9) + column].childNodes, game_history[current_step][row][column])
                 

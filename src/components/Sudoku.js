@@ -170,6 +170,7 @@ function Sudoku(props) {
             
             console.log(active.textContent, e.target.textContent);
             (parseInt(active.textContent) === parseInt(e.target.textContent)) ? active.textContent = '' : active.textContent = e.target.textContent;
+            if(!parseInt(active.textContent)) {active.textContent = '';} // minor change when using rubber
         }
         else {
             console.log(active.childNodes);
@@ -277,7 +278,8 @@ function Sudoku(props) {
                 currentHistory_copy.history[activeTile_Row][activeTile_Col] = '';
             } else{
                 console.log('now just applied');
-                currentHistory_copy.history[activeTile_Row][activeTile_Col] = parseInt(e.target.textContent);
+                parseInt(e.target.textContent)? currentHistory_copy.history[activeTile_Row][activeTile_Col] = parseInt(e.target.textContent) : currentHistory_copy.history[activeTile_Row][activeTile_Col] = '';
+                /* currentHistory_copy.history[activeTile_Row][activeTile_Col] = parseInt(e.target.textContent); */
                 engine.removeOutDatedPencilmarks(currentHistory_copy.history, activeTile_Row, activeTile_Col, parseInt(e.target.textContent));
             }
         }
