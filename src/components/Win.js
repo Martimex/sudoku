@@ -8,6 +8,12 @@ import { faHome, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 function Win(props) {
 
+    useEffect(() => {
+        document.body.scrollTop = 0; // Safari
+        document.documentElement.scrollTop = 0; // Chrome, Firefox, IE and Opera
+        document.body.style.overflow = 'hidden';
+    })
+
     return(
         <div className="blurred-screen" >
             <div className={`win-screen win-${props.final_difficulty}`}>
@@ -28,7 +34,7 @@ function Win(props) {
                 </div>
 
                 <div className="choose-box">
-                    <div className={`choose-button win-icon-${props.final_difficulty}`} onClick={() => {props.goHome()}} > 
+                    <div className={`choose-button win-icon-${props.final_difficulty}`} onClick={() => {document.body.style.overflow = 'auto'; props.goHome()}} > 
                         <FontAwesomeIcon icon={faHome} />
                     </div>
                     <div className={`choose-button win-icon-${props.final_difficulty}`} onClick={() => {props.getNewSudoku()}}> 

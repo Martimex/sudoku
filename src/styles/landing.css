@@ -247,6 +247,10 @@ input[type="checkbox"]:checked+input {
         font-size: .8rem;
     }
 
+    .difficulty {
+        padding: 1.5rem;
+    }
+
     .box-difficulty {
         grid-template-columns: repeat(2, 10vw);
         grid-template-rows: repeat(2, 10vw);
