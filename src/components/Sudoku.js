@@ -556,7 +556,7 @@ function Sudoku(props) {
     }, [history_travel])
 
     return (
-        <div className={`sudoku-${props.theme}`} ref={sudoku}>
+        <div className={`sudoku-${props.theme} sudoku-main`} ref={sudoku}>
             <div className={`all all-${props.theme}`} ref={all}>
                 <div className="sudoku-title">
                     Sudoku {final_Difficulty} 
