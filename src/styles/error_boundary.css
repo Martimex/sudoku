@@ -1,0 +1,42 @@
+.err-bg {
+    background: #111;
+    position: absolute; top: 0; left: 0;
+    height: 100vh; width: 100vw;
+}
+
+.err-content-box, .err-err_info-box {
+    padding: 0 20vmax;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.err-title {
+    font-size: 10vmin;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    margin-bottom: 9vmin;
+    font-weight: 700;
+}
+
+.err-content-desc {
+    font-size: 1.25rem;
+    font-weight: 650;
+}
+
+.err-err_info-desc {
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.err-err_info-desc, .err-title, .err-content-desc {
+    color:rgb(146, 61, 55);
+}
+
+@media screen and (orientation: portrait) {
+    .err-content-box, .err-err_info-box {
+        padding: 0 5vmax;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

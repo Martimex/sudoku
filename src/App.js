@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Landing from './Landing';
 import Sudoku from './components/Sudoku';
+import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
 function App() {
@@ -31,15 +32,17 @@ function App() {
 
   return(
     <div className="App">
-      {state === 'landing' && (
-        <Landing playSudoku={triggerPlay} difficulty={difficulty} setDifficulty={setDifficulty}
-        options={options} setOptions={setOptions}
-        theme={theme} setTheme={setTheme} />
-      )}
+      <ErrorBoundary>
+        {state === 'landing' && (
+          <Landing playSudoku={triggerPlay} difficulty={difficulty} setDifficulty={setDifficulty}
+          options={options} setOptions={setOptions}
+          theme={theme} setTheme={setTheme} />
+        )}
 
-      {state === 'sudoku' && (
-        <Sudoku backToLanding={triggerBack}  difficulty={difficulty} options={options} theme={theme} />
-      )}
+        {state === 'sudoku' && (
+          <Sudoku backToLanding={triggerBack}  difficulty={difficulty} options={options} theme={theme} />
+        )}
+      </ErrorBoundary>
     </div>
   );
 }
