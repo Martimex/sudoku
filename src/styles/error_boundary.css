@@ -29,7 +29,7 @@
 }
 
 .err-err_info-desc, .err-title, .err-content-desc {
-    color:rgb(146, 61, 55);
+    color:hsl(4, 45%, 39%);
 }
 
 @media screen and (orientation: portrait) {

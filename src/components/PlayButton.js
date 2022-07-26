@@ -1,5 +1,3 @@
-import react, {useRef} from "react";
-import Landing from '../Landing.js';
 import anime from 'animejs/lib/anime.es.js';
 import React from "react";
 import '../styles/landing.css';

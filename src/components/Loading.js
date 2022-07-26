@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Sudoku from './Sudoku';
 import '../styles/loading.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";

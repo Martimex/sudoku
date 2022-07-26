@@ -12,7 +12,6 @@
     top: 0%; left: 0%;
     width: 100%;
     height: 100%;
-    /* background-image: linear-gradient(135deg, #000,#000, #000); */
     background-color: #000;
     color: #ddd;
 }
@@ -38,8 +37,6 @@
     display: grid;
     grid-template-columns: repeat(2, 5rem);
     grid-template-rows: repeat(2, 5rem);
-    /* grid-template-columns: repeat(2, clamp(5rem, 40%, 50vh));
-    grid-template-rows: repeat(2, clamp(5rem, 40%, 50vh)); */
     padding: .75rem;
 }
 
@@ -61,28 +58,24 @@
 .difficulty-easy {
     background-image: var(--bg-easy);
     border-color: hsl(142, 75%, 35%);
-    /* color: hsl(114, 57%, 53%); */
     border-style: solid none none solid;
 }
 
 .difficulty-medium {
     background-image: var(--bg-medium);
     border-color: hsl(66, 75%, 45%);
-    /* color: hsl(42, 57%, 53%); */
     border-style: solid solid none none;
 }
 
 .difficulty-hard {
     background-image: var(--bg-hard);
     border-color: hsl(22, 75%, 35%);
-    /* color: hsl(360, 57%, 53%); */
     border-style: none none solid solid;
 }
 
 .difficulty-master {
     background-image: var(--bg-insane);
     border-color: hsl(274, 75%, 35%);
-    /* color: hsl(248, 57%, 53%); */
     border-style: none solid solid none;
 }
 
@@ -208,7 +201,7 @@ input[type="checkbox"]:checked+input {
 }
 
 /* Landscape orientation - any size mobiles from small to large viewports */ 
-@media screen and (orientation: landscape) and (max-width: 1100px) {     /*or: (max-height: 760px)*/ 
+@media screen and (orientation: landscape) and (max-width: 1100px) { 
     /* Transform portrait (default) flow into horizontal grid */
 
     .app-section-box[data-type="difficulty"] {
@@ -228,7 +221,6 @@ input[type="checkbox"]:checked+input {
         grid-template-rows: 1;
         grid-template-columns: repeat(3, 25% 50% 25%);
         grid-template-areas: "theme-section   difficulty-section   options-section";
-        /* column-gap:  1rem; */
         padding: .3rem;
     }
 
@@ -260,7 +252,6 @@ input[type="checkbox"]:checked+input {
         display: grid;
         justify-content: center;
         align-items: center;
-        /* padding: 3rem; */
     }
 
     .content-box {
@@ -314,7 +305,7 @@ input[type="checkbox"]:checked+input {
 
 
 /* Huge sized screens with landscape (non-mobiles) - ideal for desktops*/
-@media screen and (orientation: landscape) and (min-width: 1101px) {  /*or (min-width: 1121px)*/
+@media screen and (orientation: landscape) and (min-width: 1101px) { 
 
     /* Transform portrait (default) flow into horizontal grid */
 
@@ -335,7 +326,6 @@ input[type="checkbox"]:checked+input {
         grid-template-rows: 1;
         grid-template-columns: repeat(3, 25% 50% 25%);
         grid-template-areas: "theme-section   difficulty-section   options-section";
-        /* column-gap:  1rem; */
         padding: .8rem;
     }
 
@@ -363,7 +353,6 @@ input[type="checkbox"]:checked+input {
         display: grid;
         justify-content: center;
         align-items: center;
-        /* padding: 3rem; */
     }
 
     .content-box {

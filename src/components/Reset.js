@@ -1,5 +1,4 @@
-import React, { useEffect, createRef, useRef } from "react";
-import  Sudoku from './Sudoku.js';
+import React, { useEffect, useRef } from "react";
 import '../styles/reset.css';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,9 +10,6 @@ function Reset(props) {
     const theme_ref = useRef(null);
 
     useEffect(() => {
-/*         const top_scroll_offset = document.body.getBoundingClientRect().top;
-        console.error(top_scroll_offset);
-        theme_ref.current.style.top = `${top_scroll_offset * (-1)}px`; */
         document.body.scrollTop = 0; // Safari
         document.documentElement.scrollTop = 0; // Chrome, Firefox, IE and Opera
         document.body.style.overflow = 'hidden';
@@ -30,7 +26,7 @@ function Reset(props) {
                     to replace it ? All progress will be lost
                 </div>
                 <div className="choose-box">
-                    <div className="choose-button choose-decline" onClick={() => {/* props.setStopTimer(false); */ document.body.style.overflow = 'auto'; props.setconfirmReset(false); }}>
+                    <div className="choose-button choose-decline" onClick={() => {document.body.style.overflow = 'auto'; props.setconfirmReset(false); }}>
                         <FontAwesomeIcon icon={faBackspace} />
                     </div>
                     <div className="choose-button choose-confirm" onClick={() => {props.proceedReset()}}>

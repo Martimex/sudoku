@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
-import  Sudoku from './Sudoku.js';
+import React, { useEffect } from "react";
 import '../styles/timer.css';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,11 +24,6 @@ function Timer(props) {
             return() => clearInterval(timerId);
         }
     }, [props.seconds, props.stopTimer])
-
-    /*     setInterval(() => {
-        seconds++;
-        document.querySelector('.timer-count').textContent = `${minutes}:${seconds}`;
-    }, 1000) */
 
     return (
         <div className="timer-box">

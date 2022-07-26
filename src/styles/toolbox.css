@@ -22,28 +22,23 @@
 
 .tool-easy {
     border-color: hsl(116, 73%, 40%);
-    /* color: hsl(142, 75%, 35%); */
 }
 
 .tool-medium {
     border-color: hsl(55, 73%, 40%);
-   /*  color: hsl(66, 75%, 45%); */
 }
 
 .tool-hard {
     border-color: hsl(12, 73%, 40%);
-    /* color: hsl(22, 75%, 35%);  */
 }
 
 .tool-master {
     border-color: hsl(182, 73%, 40%);
-   /*  color: hsl(274, 75%, 35%); */
 }
 
 .tool-icon {
     font-size: 1.5rem;
     pointer-events: none;
-    /* margin: .6rem .2rem; */
 }
 
 .desc {
@@ -57,22 +52,18 @@
 
 .animation-box-easy {
     border: .3rem solid hsl(116, 73%, 40%);
-   /*  background-image: radial-gradient(hsl(111, 40%, 50%), hsl(122, 15%, 30%)); */
 }
 
 .animation-box-medium {
     border: .3rem solid hsl(55, 73%, 40%);
-    /* background-image: radial-gradient(hsl(66, 40%, 50%), hsl(55, 15%, 30%)); */
 }
 
 .animation-box-hard {
     border: .3rem solid hsl(12, 73%, 40%);
-    /* background-image: radial-gradient(hsl(12, 40%, 50%), hsl(1, 15%, 30%)); */
 }
 
 .animation-box-master {
     border: .3rem solid hsl(182, 73%, 40%);
-    /* background-image: radial-gradient(hsl(182, 40%, 50%), hsl(172, 15%, 30%)); */
 }
 
 .animation-box-easy::before, .animation-box-medium::before,
@@ -86,38 +77,32 @@
 
 .tool-blocked {
     filter: grayscale(100%);
-    /* pointer-events: none; */
 }
 
 @keyframes borderSpin {
     0% {
         border: .3rem dotted hsl(12, 60%, 45%);
         border-radius: 30%;
-        /* transform: rotateZ(0deg) rotateY(0deg) rotateX(0deg); */
     }
 
     25% {
         border: .3rem dotted hsl(82, 60%, 45%);
         border-radius: 40%;
-        /* transform: rotateZ(30deg) rotateY(30deg) rotateX(30deg); */
     }
 
     50% {
         border: .3rem dotted  hsl(152, 60%, 45%);
         border-radius: 50%;
-       /*  transform: rotateZ(60deg) rotateY(60deg) rotateX(60deg); */
     }
 
     75% {
         border: .3rem dotted hsl(222, 60%, 45%);
         border-radius: 40%;
-        /* transform: rotateZ(90deg) rotateY(90deg) rotateX(90deg); */
     }
 
     100% {
         border: .3rem dotted  hsl(292, 60%, 45%);
         border-radius: 30%;
-        /* transform: rotateZ(0deg) rotateY(0deg) rotateX(0deg); */
     }
 }
 

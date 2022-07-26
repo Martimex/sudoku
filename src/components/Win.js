@@ -1,5 +1,4 @@
-import React, { useEffect, createRef, useRef } from "react";
-import  Sudoku from './Sudoku.js';
+import React, { useEffect } from "react";
 import '../styles/win.css';
 import '../styles/reset.css';
 

@@ -22,10 +22,8 @@
 }
 
 .loading-spinner {
-    /* position:absolute; top:25%;  */
     width: 12rem; height: 12rem;
-     color: #ddd;
-    /* background: #ddd; */
+    color: #ddd;
     font-size: 10rem;
 }
 

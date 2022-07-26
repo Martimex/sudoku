@@ -18,7 +18,7 @@
     border: .3rem solid #222;
 }
 
-.info-night[datatype='title']/* , .info-night[datatype='outro'] */ {
+.info-night[datatype='title'] {
     background-image: linear-gradient(90deg, #000, #222, #000);
 }
 
@@ -78,15 +78,7 @@
     margin: 0 .5rem;
 }
 
-/* .info-box-author-logo {
-
-} */
-
 .grid-container {
-/*     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap; */
     display: grid;
     grid-template-rows: 1;
     grid-template-columns: 25% 50% 25%;
@@ -226,8 +218,6 @@
         height: 2rem;
         padding: .4rem;
         margin: .3rem;
-        border-right: #ddd .2rem solid;
-        border: #ddd .15rem solid; 
     }
 
     .grid-container-title {

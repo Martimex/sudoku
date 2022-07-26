@@ -1,5 +1,3 @@
-import react from "react";
-import Sudoku from './Sudoku.js';
 import '../styles/square.css';
 import Tile from './Tile.js';
 

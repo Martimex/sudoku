@@ -1,5 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
-import App from './App';
+import React, {useEffect, useRef} from "react";
 import './styles/landing.css';
 import PlayButton from './components/PlayButton.js';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,11 +6,10 @@ import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 
 import anime from 'animejs/lib/anime.es.js';
 
-// Landing will get initial values to determine which kind of sudoku (+ user preferences) apply
+// Landing will get initial values to determine which kind of sudoku (+ user preferences) applies
 
 const visualObject = {
     // First array value refers to "initial values", second one to "new value"
-    //borderStyle: ['none', 'none none double double'],
     borderRadius: ['0%', '15%'],
     color_active: {
         easy: ['hsl(144, 57%, 53%)'],
@@ -66,12 +64,6 @@ const themeObject = {
 
 function Landing(props) {
 
-/*     const [difficulty, setDifficulty] = useState(null); // string
-    const [timer, setTimer] = useState(false);
-    const [counter, setCounter] = useState(false);
-    const [theme, setTheme] = useState('night'); */
-
-
     const layoutRef = useRef(null);
 
     const easyRef = useRef(null);
@@ -82,9 +74,6 @@ function Landing(props) {
     const themesBoxRef = useRef(null);
 
     function changeVisuals(refEl, value) {
-        //for(let prop in visualObject) {
-        //    refEl.style[`${prop}`] = visualObject[`${prop}`][value];
-        //}
 
         anime({
             targets: refEl,
@@ -123,9 +112,7 @@ function Landing(props) {
         const playButton = layoutRef.current.querySelectorAll('.start-play');
 
         const difficultyBoxes = layoutRef.current.querySelectorAll('.difficulty');
-        //console.log(difficultyBoxes);
         const inactiveBoxes = [...difficultyBoxes].filter((box) => {return !box.classList.contains('chosen_difficulty') } )
-        console.log(inactiveBoxes);
         const allModes = themesBoxRef.current.childNodes;
         const modesArr = [...allModes];
 

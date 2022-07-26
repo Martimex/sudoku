@@ -9,8 +9,6 @@ function App() {
   const [state, setState] = useState('landing');
 
   const [difficulty, setDifficulty] = useState(null); // string
-  //const [timer, setTimer] = useState(false);
-  //const [counter, setCounter] = useState(false);
   const [theme, setTheme] = useState('night');
 
   const [options, setOptions] = useState({

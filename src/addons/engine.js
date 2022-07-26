@@ -1,9 +1,3 @@
-import  Sudoku from '../components/Sudoku.js';
-import Square from '../components/Square.js';
-import Tile from '../components/Tile.js';
-import anime from 'animejs/lib/anime.es.js';
-import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from 'react-dom';
-
 /*
     IMPORTANT REBUILD DEFINITIONS:
     ☢️ - this line is harmful. Replace textContent manipulations for currentBoard workarounds (board state inside array) and finally,
@@ -86,7 +80,6 @@ const store = {
 
 const engine = {
 
-    version: '1.0.0',
     squareRows: 3,
     squareColumns: 3,
     rows: 9,
@@ -134,23 +127,10 @@ const engine = {
         }
     },
 
-    con: function(ordered) {
-        for(let i=0; i<ordered.length; i++) {
-            console.log(ordered[i].dataset.order);
-        }
-    },
-
     checkRowCompatibility: function(numbers_array, thisEl, ordered) {
-        const squareRows = 3; const squareColumns = 3;
-        const rowNo = (Math.floor(thisEl.dataset.order / (squareColumns * squareRows)));
-        for(let i=0; i<(squareColumns * squareRows); i++) {
-            if(numbers_array.includes(parseInt(ordered[(rowNo * (squareColumns * squareRows)) + i]))) {
-                // Usuń wartość z tablicy
-                const index = numbers_array.indexOf(parseInt(ordered[(rowNo * (squareColumns * squareRows)) + i].textContent)); 
-                // Above line is not an issue, since checkRowCompatibil1ty is NOT USED !
-                numbers_array.splice(index, 1);
-            }
-        }
+        /* As Sudoku grid is filled with numbers, engine goes row by row, meaning
+            this checker function is not needed (as opposed to checkColumnCompatibility and checkSquareCompatibility)
+        */
     },
 
     checkColumnCompatibility: function(numbers_array, success_board, row_no, col_no) {  // Works perfectly
@@ -195,7 +175,6 @@ const engine = {
 
             // How many keys have the lowest array length ?
             for(let key in possibilitiesObj) {
-                //console.warn(key);
                 if((possibilitiesObj[key].length === lowestArrLength) && (!usedDigits.includes(parseInt(key)))) {
                     dangerZoneDigits.push(key);
                 }
@@ -219,7 +198,6 @@ const engine = {
                     possibilitiesObj[key].splice(index, 1);
                 }
             }
-            // 1
             delete possibilitiesObj[parseInt(usedDigits[usedDigits.length - 1])];
         }
 
@@ -227,62 +205,51 @@ const engine = {
     },
 
     setBoard: function() {
-       // console.error('SETBOARD COMPLETED')
+        if(success_board.length) {
+            while(success_board.length) success_board.pop();
+        }
 
+        for(let success_board_row = 0; success_board_row < 9; success_board_row++) {
+            success_board.push([]);
+            for(let success_board_tile_in_row = 0; success_board_tile_in_row < 9; success_board_tile_in_row++) {
+                success_board[success_board_row].push('');
+            }
+        } 
 
-        //return new Promise((resolve, reject) => {
-           /*  const allTiles = document.querySelectorAll('.tile');
-            const allTilesArray = [...allTiles];
-            const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property */
-            if(success_board.length) {
-                while(success_board.length) success_board.pop();
+        for(let currRow=0; currRow<9; currRow++) {  // current row
+            let possibilitiesObj = {  // key means digit to use; arr of values refers to which row tile no. that digit could be assigned
+                1: [],
+                2: [],
+                3: [],
+                4: [],
+                5: [],
+                6: [],
+                7: [],
+                8: [],
+                9: [],
             }
 
-            for(let success_board_row = 0; success_board_row < 9; success_board_row++) {
-                success_board.push([]);
-                for(let success_board_tile_in_row = 0; success_board_tile_in_row < 9; success_board_tile_in_row++) {
-                    success_board[success_board_row].push('');
+            for(let currTile_inRow = 0; currTile_inRow <this.columns; currTile_inRow++) { 
+                let allDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                this.checkColumnCompatibility(allDigits, success_board, currRow, currTile_inRow);
+                this.checkSquareCompatibility(allDigits, success_board, currRow, currTile_inRow);
+                for(let digit of allDigits) {
+                    possibilitiesObj[digit].push(currTile_inRow + 1);
                 }
-            } 
-
-            //console.log(ordered);
-            for(let currRow=0; currRow<9; currRow++) {  // current row
-                let possibilitiesObj = {  // key means digit to use; arr of values refers to which row tile no. that digit could be assigned
-                    1: [],
-                    2: [],
-                    3: [],
-                    4: [],
-                    5: [],
-                    6: [],
-                    7: [],
-                    8: [],
-                    9: [],
-                }
-
-                for(let currTile_inRow = 0; currTile_inRow <this.columns; currTile_inRow++) { 
-                    let allDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-                    this.checkColumnCompatibility(allDigits, success_board, currRow, currTile_inRow);
-                    this.checkSquareCompatibility(allDigits, success_board, currRow, currTile_inRow);
-                    for(let digit of allDigits) {
-                        possibilitiesObj[digit].push(currTile_inRow + 1);
-                    }
-                }
-
-                const isSuccess = this.applyRow(currRow, success_board, possibilitiesObj);
-
-                if(!isSuccess) {
-                    for(let row_to_undo = 0; row_to_undo <= 1; row_to_undo++) {
-                        for(let tile_in_row = 0; tile_in_row < 9; tile_in_row++) {
-                            success_board[currRow - row_to_undo][tile_in_row] = '';
-                        }
-                    }
-                    currRow = currRow - 2;
-                }
-
             }
 
-          //  resolve();
-        //})
+            const isSuccess = this.applyRow(currRow, success_board, possibilitiesObj);
+
+            if(!isSuccess) {
+                for(let row_to_undo = 0; row_to_undo <= 1; row_to_undo++) {
+                    for(let tile_in_row = 0; tile_in_row < 9; tile_in_row++) {
+                        success_board[currRow - row_to_undo][tile_in_row] = '';
+                    }
+                }
+                currRow = currRow - 2;
+            }
+
+        }
     },
 
     createInitialGameHistory: function() {
@@ -315,189 +282,127 @@ const engine = {
     },
 
     hideDigits: function({difficulty, theme, options}) {
-
-        //console.time();
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
-        console.log(ordered);
-        //return new Promise((resolve, reject) => {
-            if(initial_board.length) {
-                while(initial_board.length) initial_board.pop();
+
+        if(initial_board.length) {
+            while(initial_board.length) initial_board.pop();
+        }
+
+        for(let initial_board_row = 0; initial_board_row < 9; initial_board_row++) {
+            initial_board.push([]);
+            for(let initial_board_tile_in_row = 0; initial_board_tile_in_row < 9; initial_board_tile_in_row++) {
+                initial_board[initial_board_row].push(success_board[initial_board_row][initial_board_tile_in_row]);
             }
+        } 
 
-            for(let initial_board_row = 0; initial_board_row < 9; initial_board_row++) {
-                initial_board.push([]);
-                for(let initial_board_tile_in_row = 0; initial_board_tile_in_row < 9; initial_board_tile_in_row++) {
-                    initial_board[initial_board_row].push(success_board[initial_board_row][initial_board_tile_in_row]);
-                }
-            } 
+        const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
 
-            console.log(difficulty, theme, options);
-            console.log(rules[difficulty]);
+        // Remove counterparts
+        // 1. First randomize, whether the middle tile in middle square should be hidden or not
+        const randHide = Math.floor(Math.random() * 2);
+        const initialCounterPartsRemove = 18;
+        if(randHide) {initial_board[4][4] = ''; } //  + invoke score checking function
 
-            /*const allTiles = document.querySelectorAll('.tile');
-            const allTilesArray = [...allTiles];
+        let randomElemsToHide = [];
+        for(let i=0; i<40; i++) {
+            randomElemsToHide.push(i);
+        }
 
-            const ordered = this.orderTiles(allTilesArray); */
+        for(let c=0; c<initialCounterPartsRemove; c++) {
+            let ind = Math.floor(Math.random() * randomElemsToHide.length);
+            let rand = randomElemsToHide[ind];
+            let rand_row = Math.floor(rand / 9);
+            let rand_col = rand % 9; 
 
-            const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
+            let partDigit = [...initial_board[rand_row][rand_col]];
+            let counterPartDigit = [...initial_board[8 - rand_row][8 - rand_col]];
 
-            //console.log(ordered);
+            initial_board[rand_row][rand_col] = '';  
+            initial_board[8 - rand_row][8 - rand_col] = ''; 
 
-            // Remove counterparts
-                // 1. First randomize, whether the middle tile in middle square should be hidden or not
-                const randHide = Math.floor(Math.random() * 2);
-                const initialCounterPartsRemove = 18;
-                console.log(randHide);
-                if(randHide) {initial_board[4][4] = ''; } //  + invoke score checking function
-
-                let randomElemsToHide = [];
-                for(let i=0; i<40; i++) {
-                    randomElemsToHide.push(i);
-                }
-
-                for(let c=0; c<initialCounterPartsRemove; c++) {
-                    let ind = Math.floor(Math.random() * randomElemsToHide.length);
-                    let rand = randomElemsToHide[ind];
-                    let rand_row = Math.floor(rand / 9);
-                    let rand_col = rand % 9; 
-
-                    let partDigit = [...initial_board[rand_row][rand_col]];
-                    let counterPartDigit = [...initial_board[8 - rand_row][8 - rand_col]];
-
-                    // let partDigit = ordered[rand].textContent;  // 
-                    // let counterPartDigit = ordered[counterPart].textContent;  // 
-
-                    initial_board[rand_row][rand_col] = '';  
-                    initial_board[8 - rand_row][8 - rand_col] = ''; 
-
-                    let isStillUnique = this.backtrack();
-                    //const hardestMethodNo = this.solveSudoku(); -> uncomment when rebuilding
-                    console.log('UNIQUE SUDOKU ?', isStillUnique);
-                    if((isStillUnique) /* && (rules[difficulty]['bestMethodsAllowed'].includes(hardestMethodNo)) -> uncomment when rebuilding */) {
-                        randomElemsToHide.splice(ind, 1);
-                        //console.warn('UNIQUE :D');
-                    } else {
-                        c = c - 1;
-                        initial_board[rand_row][rand_col] = partDigit[0];
-                        initial_board[8 - rand_row][8 - rand_col] = counterPartDigit[0];
-                    }  
+            let isStillUnique = this.backtrack();
+            //const hardestMethodNo = this.solveSudoku(); -> uncomment when rebuilding
+            if((isStillUnique) /* && (rules[difficulty]['bestMethodsAllowed'].includes(hardestMethodNo)) -> uncomment when rebuilding */) {
+                randomElemsToHide.splice(ind, 1);
+            } else {
+                c = c - 1;
+                initial_board[rand_row][rand_col] = partDigit[0];
+                initial_board[8 - rand_row][8 - rand_col] = counterPartDigit[0];
+            }  
 
 
-                }
+        }
 
-                //. To this point Sudoku can be 100% solved with only Single Candidate and Single Position (36 - 37 digits already removed)
-            
+        // To this point Sudoku can be 100% solved with only Single Candidate and Single Position (36 - 37 digits already removed)
 
+        let substr = 2;
+        let multiRemove_start = 81 - ((initialCounterPartsRemove * 2) + randHide);
+        let multiRemove_stop = 34;
+        let i;
 
-            let substr = 2;
-            let multiRemove_start = 81 - ((initialCounterPartsRemove * 2) + randHide);
-            console.log(multiRemove_start, randHide);
-            let multiRemove_stop = 34;
-            let i;
-            console.log(multiRemove_stop);
-
-            let remainTiles = [];
-            for(let board_row = 0; board_row < 9; board_row++) {
-                for(let tile_in_row = 0; tile_in_row < 9; tile_in_row++) {
-                    if(parseInt(initial_board[board_row][tile_in_row])) {
-                        remainTiles.push([board_row, tile_in_row]);
-                    }
+        let remainTiles = [];
+        for(let board_row = 0; board_row < 9; board_row++) {
+            for(let tile_in_row = 0; tile_in_row < 9; tile_in_row++) {
+                if(parseInt(initial_board[board_row][tile_in_row])) {
+                    remainTiles.push([board_row, tile_in_row]);
                 }
             }
+        }
 
-            console.log(initial_board);
+        for(i=multiRemove_start; i>multiRemove_stop - randHide; i = i - substr) {
 
-            for(i=multiRemove_start; i>multiRemove_stop - randHide; i = i - substr) {
+            let temp = [];
+            let tempDigit = [];
 
-                let temp = [];
-                let tempDigit = [];
-
-                for(let x=0; x<substr; x++) {
-                    let rand = Math.floor(Math.random() * remainTiles.length);
-                    //temp.push([]);
-                    console.log(x);
-                    console.log(remainTiles);
-                    temp.push([remainTiles[rand][0], remainTiles[rand][1]]); // Get tile cords
-                    tempDigit.push(initial_board[remainTiles[rand][0]][remainTiles[rand][1]]);
-                    initial_board[remainTiles[rand][0]][remainTiles[rand][1]] = '';
-                    remainTiles.splice(rand, 1);
-                }
-
-                let isStillUnique = this.backtrack();
-                console.log('HAS SUDOKU JUST ONE SOLUTION ?', isStillUnique);
-
-                if(!isStillUnique) {
-                    for(let x=0; x<temp.length; x++) {
-                        initial_board[temp[x][0]][temp[x][1]] = tempDigit[x];
-                        remainTiles.push([temp[x][0], temp[x][1]]);
-                    }
-                    i = i + substr;
-                }
-            } 
-
-            /* let j = {j: 0 + randHide};
-            ordered.forEach(el => {
-                return j.j++;
-            })
-
-            console.log('our iterator is: ', i, '  tiles uncover count is: ', j.j); */
-
-            /* const ordered_copy = [...ordered];
-            const randomized_ordered_copy = [];
-            const elAndDigit = [];
-            
-            for(let initial_no = 0; initial_no<ordered_copy.length;) {
-                let rand = Math.floor(Math.random() * ordered_copy.length);
-                randomized_ordered_copy.push(ordered_copy[rand]);
-                ordered_copy.splice(rand, 1);
+            for(let x=0; x<substr; x++) {
+                let rand = Math.floor(Math.random() * remainTiles.length);
+                temp.push([remainTiles[rand][0], remainTiles[rand][1]]); // Get tile cords
+                tempDigit.push(initial_board[remainTiles[rand][0]][remainTiles[rand][1]]);
+                initial_board[remainTiles[rand][0]][remainTiles[rand][1]] = '';
+                remainTiles.splice(rand, 1);
             }
 
-            const trials_used = {
-                used: 0,
-            } */
-            console.time();
-            const setUp = this.singleRemoval(initial_board, remainTiles, randInitial, i, randHide,  rules[difficulty]['renderingTrials'], 0); 
-            console.timeEnd();
-            // START OFF FROM HERE!
+            let isStillUnique = this.backtrack();
 
-            // Paint Sudoku with initials
-            for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
-                for(let sudoku_tile_in_row = 0; sudoku_tile_in_row<9; sudoku_tile_in_row++) {
-                    if(parseInt(initial_board[sudoku_row][sudoku_tile_in_row])) {
-                        ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = initial_board[sudoku_row][sudoku_tile_in_row];
-                    } else {
-                        ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = '';
-                    }
+            if(!isStillUnique) {
+                for(let x=0; x<temp.length; x++) {
+                    initial_board[temp[x][0]][temp[x][1]] = tempDigit[x];
+                    remainTiles.push([temp[x][0], temp[x][1]]);
+                }
+                i = i + substr;
+            }
+        } 
+
+        this.singleRemoval(initial_board, remainTiles, randInitial, i, randHide,  rules[difficulty]['renderingTrials'], 0); 
+
+        // Paint Sudoku with initials
+        for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
+            for(let sudoku_tile_in_row = 0; sudoku_tile_in_row<9; sudoku_tile_in_row++) {
+                if(parseInt(initial_board[sudoku_row][sudoku_tile_in_row])) {
+                    ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = initial_board[sudoku_row][sudoku_tile_in_row];
+                } else {
+                    ordered[(sudoku_row * 9) + sudoku_tile_in_row].textContent = '';
                 }
             }
-            //console.timeEnd();
+        }
 
-            console.time();
-            let isUnique = this.backtrack();
-            const hardestMethodNo = this.solveSudoku();
-            console.log('Are Sudoku preparations made nicely: ', setUp);
-            console.log('Hardest method no is... ', hardestMethodNo);
-            console.warn('isSudokuUnique? ', isUnique, success_board);
-           
-           
-            console.timeEnd();
+        //let isUnique = this.backtrack();
+        //console.warn('isSudokuUnique? ', isUnique, success_board);
+        const hardestMethodNo = this.solveSudoku();
+        //console.log('Hardest method no is... ', hardestMethodNo);
 
+        this.applyInitials(theme);
 
-            this.applyInitials(theme);
+        let difficulty_name;
 
-
-            let difficulty_name;
-
-            for(let key in rules) {
-                if(rules[key]['bestMethodsAllowed'].includes(hardestMethodNo)) {
-                    difficulty_name = key;
-                }
+        for(let key in rules) {
+            if(rules[key]['bestMethodsAllowed'].includes(hardestMethodNo)) {
+                difficulty_name = key;
             }
+        }
 
-           // resolve(difficulty_name);
-        //})
         return difficulty_name;
     },
 
@@ -507,15 +412,12 @@ const engine = {
 
         allTilesArray.forEach(tile => {
             if(tile.textContent) {  //  Not activated, so it wont be a problem
-                //console.log('add!');
                 tile.classList.add(`initial`, `initial-${theme}`);
             }
         })
     },
 
     applyInitials: function(theme) {
-        console.log('Fading...');
-        //console.log(ordered);
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
@@ -533,52 +435,9 @@ const engine = {
     },
 
     singleRemoval: function(initial_board, remainTiles, randInitial, singleRemove_start, randHide, trials, trials_used) {
-        // RECURSIVE WAY (STILL NOT GREAT)
-
-
-        /* for(let x=index; x<randomized_ordered_copy.length; x++) {
-            if(isFinished) {return true; }
-            trials_used['used'] = trials_used['used'] + 1 || 1;
-            console.log('used ', trials_used['used'], ' trials, out of ', trials);
-
-            if(trials_used['used'] >= trials) {
-                isFinished = true;
-            }
-
-            elAndDigit.push([randomized_ordered_copy[x], randomized_ordered_copy[x].textContent]);
-            randomized_ordered_copy[x].textContent = '';
-            let isStillUnique = this.backtrack();
-            //randomized_ordered_copy.splice(x, 1);
-
-            if(isStillUnique) {
-                //randomized_ordered_copy.splice(index, 0, elAndDigit[elAndDigit.length - 1][0])
-                this.singleRemoval(randomized_ordered_copy, elAndDigit, trials, trials_used, index + 1); // + 2 because of splicing new elem
-            }
-
-            else {
-                // Sudoku is not unique
-                //randomized_ordered_copy.splice(x, 0, elAndDigit[elAndDigit.length - 1][0])
-                randomized_ordered_copy[x].textContent = elAndDigit[elAndDigit.length - 1][1];
-                elAndDigit.pop();
-
-                if(x === randomized_ordered_copy.length - 1) {
-                    elAndDigit[elAndDigit.length - 1][0].textContent = elAndDigit[elAndDigit.length - 1][1];
-                    //randomized_ordered_copy.splice(0, 0, elAndDigit[elAndDigit.length - 1][0]);
-                    elAndDigit.pop();
-
-                    this.singleRemoval(randomized_ordered_copy, elAndDigit, trials, trials_used, index - 1); 
-                }
-            }
-        }
-
-        return false; */
         // ITERATIVE APPROACH
-
-        //let orderedCopy = [...ordered];
         let remainTilesCopy = [...remainTiles];
         let elAndDigit = [];
-        let f = remainTilesCopy;
-        console.log(f);
 
         const time_stop = 1750;
         const measure_start = Date.now();
@@ -600,45 +459,25 @@ const engine = {
                 initial_board[elAndDigit[elAndDigit.length -1][0]][elAndDigit[elAndDigit.length -1][1]] = elAndDigit[elAndDigit.length -1][2];
                 remainTilesCopy.splice(rand, 1);
                 x = x + 1;
-                console.log(remainTilesCopy.length);
                 if(remainTilesCopy.length <= (remainTiles.length / 2)) { // WE WANT TO SAVE TIME FOR RENDERING, THATS WHY IT LOOKS LIKE THAT
-                    //console.log(`CANNOT REMOVE MORE - ${x} from ${randInitial + randHide} remain`);
                     return;
                 }
             }
 
             let measure_stop = Date.now();
-            if(measure_stop - measure_start > time_stop) { console.warn('Process terminated - too much time ! ', measure_stop - measure_start); return; }
+            if(measure_stop - measure_start > time_stop) { return; }
 
             elAndDigit.pop(); 
-            
         }
-
-        //console.log(`DONE SUCCESSFULLY! with ${randInitial + randHide}`)
-
     },
 
     solveSudoku: function() {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
-        //
+    
         // Our array of methods
         const methodsArr = [singleCandidate, singlePosition, candidateLines, doublePairs,  nakedSubset, hiddenSubset, xWings, swordFish];
-
-        /* const dimensionObject = {
-            row: [
-
-            ],
-
-            column: [
-
-            ],
-
-            square: [
-
-            ],
-        } */
 
         let grid = [];
 
@@ -649,83 +488,7 @@ const engine = {
             el.textContent ? grid[grid.length -1].push(el.textContent) : grid[grid.length -1].push([]);  // ☢️  ☢️
         })
 
-        
-        console.log(grid);
         fillGrid(grid);
-        //fillDimensionObject(dimensionObject, grid); // too much time consuming, remove it later on
-
-        function fillDimensionObject(dimensionObject, grid) {
-            for( let r=0; r<9; r++) {
-                dimensionObject.row.push([]);
-                dimensionObject.column.push([]);
-                dimensionObject.square.push([]);
-
-                for(let iir=0; iir<9; iir++) {
-                    // For row
-                    if(typeof(grid[r][iir]) === 'object') {dimensionObject.row[dimensionObject.row.length - 1].push(grid[r][iir])} // push elems
-                    else {dimensionObject.row[dimensionObject.row.length - 1].push(parseInt(grid[r][iir]))}
-
-                    // For column
-                    if(typeof(grid[iir][r]) === 'object') {dimensionObject.column[dimensionObject.column.length - 1].push(grid[iir][r])} // push elems
-                    else {dimensionObject.column[dimensionObject.column.length - 1].push(parseInt(grid[iir][r]))}
-
-                    // For square - test if that works
-                    let sq_r_compressed = Math.floor(r / 3); // 0 to 2
-                    let sq_r_rest = r % 3; // 0 to 2
-                    let sq_c_compressed = Math.floor(iir / 3); // 0 to 2
-                    let sq_c_rest = iir % 3; // 0 to 2
-
-                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
-                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
-
-                    if(typeof(grid[sq_r][sq_c]) === 'object') {dimensionObject.square[dimensionObject.square.length - 1].push(grid[sq_r][sq_c])} // push elems
-                    else {dimensionObject.square[dimensionObject.square.length - 1].push(parseInt(grid[sq_r][sq_c]))}
-                }
-            }
-            console.log(dimensionObject);
-        }
-
-        function updateDimensionObject(dimensionObject, grid) {
-            for( let r=0; r<9; r++) {
-                for(let iir=0; iir<9; iir++) {
-                    // For row
-                    if(typeof(grid[r][iir]) === 'object') { // Modify only what's not certain - arrays
-                        console.log(dimensionObject.row[r][iir], grid[r][iir])
-                        dimensionObject.row[r][iir] = grid[r][iir]
-                        if(dimensionObject.row[r][iir].length === 1) {
-                            dimensionObject.row[r][iir].splice(0, 1, grid[r][iir]);
-                        }
-                    } 
-
-                    // For column
-                    if(typeof(grid[iir][r]) === 'object') { // Modify only what's not certain - arrays
-                        console.log(dimensionObject.column[r][iir], grid[iir][r])
-                        dimensionObject.column[r][iir] = grid[iir][r]
-                        if(dimensionObject.column[r][iir].length === 1) {
-                            dimensionObject.column[r][iir].splice(0, 1, grid[iir][r]);
-                        }
-                    } 
-
-                    // For square - test if that works
-                    let sq_r_compressed = Math.floor(r / 3); // 0 to 2
-                    let sq_r_rest = r % 3; // 0 to 2
-                    let sq_c_compressed = Math.floor(iir / 3); // 0 to 2
-                    let sq_c_rest = iir % 3; // 0 to 2
-
-                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
-                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
-
-                    if(typeof(grid[sq_r][sq_c]) === 'object') { // Modify only what's not certain - arrays
-                        console.log(dimensionObject.square[r][iir], grid[sq_r][sq_c]);
-                        dimensionObject.square[r][iir] = grid[sq_r][sq_c]
-                        if(dimensionObject.square[r][iir].length === 1) {
-                            //dimensionObject[r][iir] = null;
-                            dimensionObject.square[r][iir].splice(0, 1, grid[sq_r][sq_c]);
-                        }
-                    } 
-                }
-            }
-        }
 
         function fillGrid(grid) {
             // Fill grid initially
@@ -798,7 +561,6 @@ const engine = {
                         if((grid[gridRow][iir].length > 1) && (grid[gridRow][iir].includes(num))) {
                             let index = grid[gridRow][iir].indexOf(num);
                             grid[gridRow][iir].splice(index, 1);
-                            //console.warn(`Row checker has detected that number ${num} will not be in grid[${gridRow}][${iir}]`);
                             didHelp = true;
                         }
                     }
@@ -813,7 +575,6 @@ const engine = {
                         if((grid[iic][gridCol].length > 1) && (grid[iic][gridCol].includes(num))) {
                             let index = grid[iic][gridCol].indexOf(num);
                             grid[iic][gridCol].splice(index, 1);
-                            //console.warn(`Column checker has detected that number ${num} will not be in grid[${iic}][${gridCol}]`);
                             didHelp = true;
                         }
                     }
@@ -821,7 +582,6 @@ const engine = {
                 return didHelp;
             }
 
-            ///
             function testOnlyInRowOrCol(cordArr) {
                 let x_isUnique = true;
                 let y_isUnique = true;
@@ -839,12 +599,9 @@ const engine = {
         function singleCandidate() {
             let helpedSolving = null;
             // Single candidate checker !
-            const x = [...grid];
-            console.log(x);
             for(let r=0; r<9; r++) {
                 for(let iir=0; iir<9; iir++) {
                     if((grid[r][iir].length <= 1) && (typeof(grid[r][iir]) !== 'string')) { 
-                        //ordered[(r * 9) + iir].style.color = 'tomato';
                         ordered[(r * 9) + iir].textContent = grid[r][iir][0];  // ☢️
                         grid[r][iir] = grid[r][iir][0];
                         helpedSolving = true;
@@ -914,38 +671,26 @@ const engine = {
                     let sq_c = (sq_r_rest * 3) + sq_c_rest;
 
                     if((typeof(grid[r][iir]) === 'object') && (singPos_Row.length > 0)) {
-                        //console.log(singPos_Row);
                         let isUpd = applyOnePosition(grid, r, iir, singPos_Row, 'r');
                         if(isUpd) {helpedSolving = true};
-                        //console.log('upd  --- ', upd)
-                        //grid[r][iir] = upd;
                     }
                     if((typeof(grid[iir][r]) === 'object') && (singPos_Col.length > 0)) {
-                        //console.log(singPos_Col);
                         let isUpd = applyOnePosition(grid, iir, r, singPos_Col, 'c');
                         if(isUpd) {helpedSolving = true};
-                        //console.log('upd  --- ', upd)
-                        //grid[iir][r] = upd;
                     }
                     if((typeof(grid[sq_r][sq_c]) === 'object') && (singPos_Sqr.length > 0)) {
-                        //console.log(singPos_Sqr);
                         let isUpd = applyOnePosition(grid, sq_r, sq_c, singPos_Sqr, 's');
                         if(isUpd) {helpedSolving = true};
-                        //console.log('upd  --- ', upd)
-                        //grid[sq_r][sq_c] = upd;
                     }
                 }
             }
 
-            //console.log(dimensionObject);
-            console.log(helpedSolving);
             return helpedSolving;
         }
 
         function candidateLines()  {
             let helpedSolving = null;
             const allSquares = getSquares();
-            //console.log(allSquares); Checked: Works correctly
             for(let squareNo=0; squareNo<9; squareNo++) {
                 let exceptionDigits = new Set();
                 let digitsToCheck = new Set();
@@ -960,11 +705,8 @@ const engine = {
                         }
                     }
                 }
-                //console.log('digitsToCheck  ', digitsToCheck);
-                //console.log('exceptionDigits  ', exceptionDigits);
                 for(let num = 1; num <= 9; num++) { // Verify if that cant be improved (time-wise)
                     if((digitsToCheck.has(num)) && (!exceptionDigits.has(num))) {
-                        //console.log('we are checking num-', num);
                         const isBelonging = checkBelonging(num, grid, allSquares, squareNo);
                         if(isBelonging) {
                             helpedSolving = true;
@@ -976,31 +718,18 @@ const engine = {
         }
 
         function doublePairs() { // it also includes multiple lines technique (so it's 2 in 1, cool ! )
-            // Rzędy i kolumny możemy bezpiecznie pobierać z grida, a kwadraty ze specjalnej funkcji getSquares()
+            // Rows and columns can be safely gathered from grid, but squares from a special function: getSquares()
             let helpedSolving = null;
             const allSquares = getSquares();
-            //console.log(allSquares);
-            for(let square_in_line=0; square_in_line < 3; square_in_line++) {
 
-                // Set, z którego pobierzemy wszystkie liczby
+            for(let square_in_line=0; square_in_line < 3; square_in_line++) {
+                // Set, from which we get all numbers
                 let square_in_line_row_nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                 let square_in_line_col_nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                 let square_in_line_row_set = new Set();
                 let square_in_line_col_set = new Set();
 
                 // Create 2 pointers that changes their position over every iteration
-                /*  let pointer1 = tile_in_line;
-                let pointer2 = (tile_in_line + 1) % 3;
-                let not_detected = (tile_in_line + 2) %3;  */
-
-                /*    p1   p2    nd        nd   p1    p2       p2    nd    p1
-                    ////  ////  ////     ////  ////  ////     ////  ////  //// 
-                    /  /  /  /  /  / ->  /  /  /  /  /  /  -> /  /  /  /  /  /
-                    ////  ////  ////     ////  ////  ////     ////  ////  ////
-                */
-
-
-
 
                 for(let in_line = 0; in_line<3; in_line++) {
                     for(let il=0; il<allSquares[(square_in_line * 3) + in_line].length; il++) {
@@ -1016,10 +745,11 @@ const engine = {
                 }
 
 
-                // Pobierasz rząd / kolumnę z pointer1 i pointer2 i sprawdzasz, czy występuje jako opcja w trzech
-                // kwadratach, przez które przechodzi. Jeśli tak to szukaj kwadratu, w którego kratkach (wewnątrz linii
-                // not_detected) ona nie występuje. Jeśli taki kwadrat jest, to dla jego pozostałych linii można wykluczyć
-                // z opcji sprawdzaną cyfrę
+                /* Take the row/column from pointer1 and pointer2 and check if it occurs as an option in three
+                squares through which it passes. If so, look for a square in which grids (inside the line
+                not_detected) it does not occur. If such a square is, then for its remaining lines can be excluded
+                from the checked digit option
+                */
 
                 for(let el of square_in_line_row_set) {
                     if(square_in_line_row_nums.includes(el)) {
@@ -1035,12 +765,6 @@ const engine = {
                     }
                 }
 
-               /*  console.log('sq_row', square_in_line_row_set);
-                console.log('sq_col', square_in_line_col_set);
-
-                console.log('nums_row', square_in_line_row_nums);
-                console.log('nums_col', square_in_line_col_nums); */
-
                 for(let x=0; x<square_in_line_row_nums.length; x++) {
                    const didHelp =  lookForDoublePairs(grid, allSquares, square_in_line_row_nums[x], square_in_line, 'row');
                    if(didHelp) { helpedSolving = true;}
@@ -1054,14 +778,12 @@ const engine = {
         }
 
         function nakedSubset(isHidden) {
-            // Has to be applied for rows, columns and squares || we are looking for pair, triples, quads
+            // If isHidden parameter is specified, it means we are looking for Hidden Subset. If not specified, we are checking Naked Subset
+            // Has to be applied for rows, columns and squares || we are looking for pair, triples, [not quads yet !]
             let helpedSolving = null;
             const allSquares = getSquares();
 
-            if(isHidden) {console.log('%c ITS HIDDEN SUBSET...', 'background: #ff8c00; color: black;'); }
-            else {console.log('%c ITS NAKED SUBSET...', 'background: #abe; color: black;');}
-
-            const nakedSubset_size = [2, 3]; // We only work for double / tripple subsets + CHANGE IT LATER TO: [2, 3] !!
+            const nakedSubset_size = [2, 3]; // We only work for double / tripple subsets
            
             const dimensionObj = {
                 row: {
@@ -1096,13 +818,9 @@ const engine = {
                 },
             }
 
-            //console.error(Object.keys(dimensionObj)[1]);
-            //console.error(Object.keys(dimensionObj).length);
-            
-
-            for(let subset_iter=0; subset_iter<nakedSubset_size.length; subset_iter++) { // Dla wybranej długości subsetu
-                for(let dimension_no=0; dimension_no<Object.keys(dimensionObj).length;  dimension_no++) { // Dla wybranego dimension (rząd / kolumna / kwadrat)
-                    for(let dimension_item=0; dimension_item<9; dimension_item++) { // Dla zawartości wspomnianego dimension (linia - row, col || box - square)
+            for(let subset_iter=0; subset_iter<nakedSubset_size.length; subset_iter++) { // For chosen subset length
+                for(let dimension_no=0; dimension_no<Object.keys(dimensionObj).length;  dimension_no++) { // For chosen dimension (row / column / square)
+                    for(let dimension_item=0; dimension_item<9; dimension_item++) { // For content of above dimension (line - row, col || box - square)
                         dimensionObj[Object.keys(dimensionObj)[dimension_no]][nakedSubset_size[subset_iter]].dimArr.push([]);
                         dimensionObj[Object.keys(dimensionObj)[dimension_no]][nakedSubset_size[subset_iter]].uniqueOptionsAsNaked_dim.push([]);
                         let isHelpful = testNakedSubset(grid, allSquares, Object.keys(dimensionObj)[dimension_no], dimensionObj[Object.keys(dimensionObj)[dimension_no]][nakedSubset_size[subset_iter]], nakedSubset_size[subset_iter], dimension_no, dimension_item, isHidden);
@@ -1111,75 +829,21 @@ const engine = {
                 }
             }
 
-            // Najpierw zastosujmy podział na row, column, square, a PÓŹNIEJ wrzucaj do pętli 9 wywołań (jako kolejne rzędy / kolumny / kwadraty)
-            // Więc najpierw zastosujmy obiekt, po których kluczach będziemy iterować (NAJPIERW DIMENSION, POTEM ITER)
-            // Dzięki temu skrócimy też kod i będzie wyglądał bardziej logicznie
-
             return helpedSolving;
         }
 
         function hiddenSubset() {
-            // Has to be applied for rows, columns and squares || we are looking for pair, triples, quads
+            // Has to be applied for rows, columns and squares || we are looking for pair, triples [not] quads
+            // This short function is for hidden version of Subsets' technique
             let helpedSolving = null;
-            const x = nakedSubset('hidden');
-
-            if(x) {helpedSolving = true;}
-
-            /* const allSquares = getSquares();
-            console.log('%c When no other method helps...', 'background: #ff8c00; color: black;')
-
-            const hiddenSubset_size = [2, 3];
-            
-            const dimensionObj = {
-                row: {
-                    2: {
-                        dimArr: [],
-                    },
-                    3: {
-                        dimArr: [],
-                    },
-                },
-                column: {
-                    2: {
-                        dimArr: [],
-                    },
-                    3: {
-                        dimArr: [],
-                    },
-                },
-                square: {
-                    2: {
-                        dimArr: [],
-                    },
-                    3: {
-                        dimArr: [],
-                    },
-                },
-            }
-
-            for(let subset_iter=0; subset_iter<hiddenSubset_size.length; subset_iter++) { // Dla wybranej długości subsetu
-                for(let dimension_no=0; dimension_no<Object.keys(dimensionObj).length; dimension_no++) { // Dla rzędu/ kolumny / kwadratu
-                    for(let dimension_item=0; dimension_item<9; dimension_item++) { // Dla zawartości wspomnianego dimension (linia - row, col || box - square)
-                        dimensionObj[Object.keys(dimensionObj)[dimension_no]][hiddenSubset_size[subset_iter]].dimArr.push([]);
-                        //dimensionObj[Object.keys(dimensionObj)[dimension_no]][nakedSubset_size[subset_iter]].uniqueOptionsAsNaked_dim.push([]);
-                        let isHelpful = testHiddenSubset(grid, Object.keys(dimensionObj)[dimension_no], dimensionObj[Object.keys(dimensionObj)[dimension_no]][hiddenSubset_size[subset_iter]], hiddenSubset_size[subset_iter], dimension_no, dimension_item);
-                        if(isHelpful) {helpedSolving = true;}
-                    }
-                }
-            } */
-
+            const testHidden = nakedSubset('hidden');
+            if(testHidden) {helpedSolving = true;}
             return helpedSolving;
         }
 
         function xWings(isSwordfish) {
             let helpedSolving = null;
-            
-            if(isSwordfish) {
-                console.log(`%c Welcome to Swordfish !`, 'background: hsla(12, 60%, 50%); color: #000;');
-            } else {
-                console.log(`%c xWings needed...`, 'background: hsla(55, 60%, 65%, 50%); color: hsl(166, 70%, 70%);');
-            }
-
+        
             const dimensionObj = {
                 row: {
                     numsTwiceInDim: [],
@@ -1199,17 +863,13 @@ const engine = {
                 // For each dimension (row , column)
                 for(let currentLine_no = 0; currentLine_no < 9; currentLine_no++) {
                     // For each line in chosen dimension (line in row, line in column)
-                    const twiceInDimNums = {
-
-                    }               
+                    const twiceInDimNums = { };             
                     for(let tileInLine_no = 0; tileInLine_no < 9; tileInLine_no ++) {
                         // For each tile in line ( tile in line ... in row, tile in line ... in column)
                         if(detectedDimensions[currentDimension_no] === 'row') {
                             if(typeof(grid[currentLine_no][tileInLine_no]) === 'object') {
                                 // We can surmise it's length is two or more
-                                //dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim'][currentLine_no].push([...grid[currentLine_no][tileInLine_no]]);
                                 if(grid[currentLine_no][tileInLine_no].length > 1) {
-                                    //twiceInDimNums[grid[currentLine_no][tileInLine_no]] = [];
                                     for(let no = 0; no<grid[currentLine_no][tileInLine_no].length; no++) {
                                         if(!twiceInDimNums.hasOwnProperty(grid[currentLine_no][tileInLine_no][no])) {
                                             twiceInDimNums[grid[currentLine_no][tileInLine_no][no]] = [tileInLine_no];
@@ -1225,7 +885,6 @@ const engine = {
                             if(typeof(grid[tileInLine_no][currentLine_no]) === 'object') {
                                 // We can surmise it's length is two or more
                                 if(grid[tileInLine_no][currentLine_no].length > 1) {
-                                    //twiceInDimNums[grid[tileInLine_no][currentLine_no]] = [];
                                     for(let no = 0; no<grid[tileInLine_no][currentLine_no].length; no++) {
                                         if(!twiceInDimNums.hasOwnProperty(grid[tileInLine_no][currentLine_no][no])) {
                                             twiceInDimNums[grid[tileInLine_no][currentLine_no][no]] = [tileInLine_no];
@@ -1235,22 +894,14 @@ const engine = {
                                     }
                                 }
                             }
-                            /* if(typeof(grid[tileInLine_no][currentLine_no]) === 'object') {
-                                dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim'][currentLine_no].push([...grid[tileInLine_no][currentLine_no]]);
-                            } else {
-                                dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim'][currentLine_no].push([]);
-                            } */
-
                         }
                     }
-                    //console.log(twiceInDimNums);
 
                     dimensionObj[detectedDimensions[currentDimension_no]].numsTwiceInDim.push([]);
                     dimensionObj[detectedDimensions[currentDimension_no]].numsTwiceInDim_Indexes.push([]);
 
                     for(let num in twiceInDimNums) {
                         if(twiceInDimNums[num].length === 2) {
-                            //console.log('num is present exactly twice in this line');
                             dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim'][currentLine_no].push(parseInt(num));
                             dimensionObj[detectedDimensions[currentDimension_no]]['numsTwiceInDim_Indexes'][currentLine_no].push(twiceInDimNums[num]);
                         }
@@ -1261,141 +912,24 @@ const engine = {
                 if(testIfHelps) {helpedSolving = true;}
             }
 
-            console.log(dimensionObj);
-
-            // Now we got initial (necessary) data items covered in dimension Obj
-            // Therefore we can init helper - solver function (it will happen exaclty twice: for row, and for column)
-
-            /* 
-                RULES:
-                - DIMENSIONS: ROW && COLUMN || 
-                - 
-            */
-
-
-
             return helpedSolving;
         }
 
         function swordFish() {
             let helpedSolving = null;
-            const s = xWings('swordfish');
-
-            if(s) { helpedSolving = true; }
-
+            const testSwordfish = xWings('swordfish');
+            if(testSwordfish) { helpedSolving = true; }
             return helpedSolving;
         }
 
 
-        // while kończy się, kiedy nasza ostatnia najtrudniejsza metoda zwróci false - wtedy już nie można bardziej rozwiązać sudoku zaimplementowanymi obecnie metodami
-        // REMOVE AFTER DEV HIDDEN SUBSET:
-        /* grid = [
-            [5, 2, 8, 6, [1, 3, 7], [1, 3, 7], [1, 7], 4, 9],
-            [1, 3, 6, 4, 9, [7, 8], [7, 8], 2, 5],
-            [7, 9, 4, 2, [1, 8], 5, 6, 3, [1, 8]],
-            [[3, 4, 6, 9], [5, 6, 8], [3, 5], 1, [3, 4, 7], [3, 7], 2, [5, 9], [4, 7, 8]],
-            [[4, 9], [1, 5], 7, 8, 2, 6, 3, [5, 9], [1, 4]],
-            [[4, 3], [1, 8], 2, 5, [3, 4, 7], 9, [1, 8], 6, [4, 7]],
-            [2, 4, [1, 5], 3, [1, 5, 8], [1, 8], 9, 7, 6],
-            [8, [5, 6], 9, 7, [5, 6], 2, 4, 1, 3],
-            [[3, 6], 7, [1, 3], 9, [1, 6], 4, 5, 8, 2],
-        ] WORKED ! */
-        
-        /* grid = [
-            [3, 7, [2,5,6], 4, [2,5,6], 8, 1, [2,5,6,9], [2, 9]],
-            [[1,2,6], [5,6,8], [1,2,5,6,8], 9, [2,5,6], 3, 7, [2,5,6], 4],
-            [9, 4, [2,5,6], 1, [2,5,6,7], [2,5,6,7], [5,6], 8, 3],
-            [4, 2, [1,7], [3,7,8], [1,3,6,7,8,9], [1,6,7], [3,8], [1,7,9], 5],
-            [[1,6,7], [3,6,9], [1,3,6,7], 5, [2,8], 4, [2,8], [1,7,9], [7,9]],
-            [8, [5,9], [1,5,7], [3,7], [1,2,3,7,9], [1,2,7], [2,3], 4, 6],
-            [[2,7], 1, [2,3,7,8], [3,7,8], 4, 9, [5,6], [5,6], [7,8]],
-            [5, [3,8], 9, 6, [1,3,7,8], [1,7], 4, [2,7], [2,7,8]],
-            [[6,7], [6,8], 4, 2, [5,7,8], [5,7], 9, 3, 1],
-        ] WORKS, BUT UPDATE GRID NEEDS TO BE REMOVED, JUST BECAUSE FOR TESTING PURPOSES WE ARE NOT DEALING WITH SUDOKU PAINTINGS, WHICH
-          UPDATE GRID FUNCTION ACTUALLY DOES, AND AT THE VERY END, IT THROWS ERROR, ONCE THE NEW METHOD FIND NEW DIGIT */
-
-        /* grid = [
-            [2, [3,6], [3,5,6], [5,8], 4, [3,5,6,9], 1, [8,9], 7],
-            [9, [3,6,7], [1,3,5,6,7], [1,7], [5,6,8], [1,3,5,6], 2, 4, [3,8]],
-            [8, 4, [1,3,7], 2, [3,7], [1,3,9], 5, 6, [3,9]],
-            [7, 1, 2, 4, 9, 8, 3, 5, 6],
-            [6, [3,8], [3,8], [1,7], [2,5], [1,2,5], 4, [7,9], [1,9]],
-            [5, 9, 4, 6, [3,7], [1,3], [7,8], 2, [1,8]],
-            [4, 5, [6,8], 3, [6,8], 7, 9, 1, 2],
-            [1, [2,6,7,8], [6,7,8], 9, [2,6,8], 4, [6,7,8], 3, 5],
-            [3, [2,6,7,8], 9, [5,8], 1, [2,5,6], [6,7,8], [7,8], 4],
-        ] WE DIDN'T GET NOTICED BY CONSOLE MESSAGE, BUT IT WORKS AS EXPECTED */
-
-        /* grid = [
-            [8, [2,5], 1, [2,7], [3,5], 6, [3,7], 9, 4],
-            [3, [2,5], [4,6], [2,4,7], [1,5], 9, [1,6,7], 8, [1,2,7] ],
-            [9, 7, [4,6], [2,4], 8, [1,3], 5, [2,6], [1,2,3]],
-            [5, 4, 7, [8,9], 6, 2, [1,8], 3, [1,9]],
-            [6, 3, 2, [8,9], [1,4], [1,4], [7,8], 5, [7,9]],
-            [1, 9, 8, 3, 7, 5, 2, 4, 6],
-            [[4,7], 8, 3, 6, 2, [4,7], 9, 1, 5],
-            [[4,7], 6, 5, 1, 9, 8, [3,4,7], [2,7], [2,3,7]],
-            [2, 1, 9, 5, [3,4], [3,4,7], [4,6,7], [6,7], 8],
-        ] IT WORKS, BUT INSTEAD OF THREE DOUBLE HIDDEN SUBSET THE REMOVAL, THE HIDDEN NORMAL SUBSET DOES, SO WE DO NOT KNOW THE
-        EXACT BEHAVIOUR OF THREE DOUBLE HIDDEN SUBSET - IT EITHER WOULD NEVER BE USEFUL OR ONLY USEFUL FOR VERY RARE, SPECIFIC CASES*/
-
-        /* grid = [
-            [9, [6,8], [2,4], [2,4], 5, 1, 7, 3, [6,8]],
-            [1, [4,6], 7, 3, 9, 8, 2, [4,6], 5],
-            [5, [3,4,8], [2,3,4], [2,4], 7, 6, [4,8], 9, 1],
-            [8, 1, [6,9], 7, 2, 4, 3, 5, [6,9]],
-            [2, [3,4], [3,4,9], 1, 6, 5, [4,8,9], [4,8], 7],
-            [[4,6], 7, 5, 9, 8, 3, [4,6], 1, 2],
-            [[4,6], 2, 1, 5, 3, 7, [4,6,8,9], [4,6,8], [4,6,8,9]],
-            [7, 5, 8, 6, 4, 9, 1, 2, 3],
-            [3, 9, [4,6], 8, 1, 2, 5, 7, [4,6]],
-        ]  //UNCOMMENT FOR TESTING PURPOSES - IT NEEDS SOME DEEPER CHECKINGS - edit: Works cool as for x-wings ! */
-
-       /*  grid = [
-            [7, [2,5], 3, 8, [1,5], 6, [1,2,4], 9, [2,4]],
-            [6, 1, 4, 9, 2, 3, 7, [5,8], [5,8]],
-            [9, 8, [2,5], [1,5], 7, 4, [1,2], 6, 3],
-            [[2,5], 3, [6,8], [1,6], [1,4,8], [8,9], [2,4,5,8], 7, [2,4,5,8,9]],
-            [1, 7, 9, 2, [4,8], 5, 6, 3, [4,8]],
-            [[2,5], 4, [6,8], [6,7], 3, [7,8,9], [2,5,8], 1, [2,5,8,9]],
-            [8, [2,5], 1, [4,5,7], 9, [2,7], 3, [2,4,5], 6],
-            [3, 9, 7, [4,5], 6, [2,8], [2,4,5,8], [2,4,5,8], 1],
-            [4, 6, [2,5], 3, [5,8], 1, 9, [2,5,8], 7],
-        ] // if you comment all methods besides x-wings, it's actually finding the right number ! */
-
-        /* grid = [
-            [1, 9, 5, 3, 6, 7, 2, 4, 8],
-            [[2,4], 7, 8, [1,2,4], 5, [1,4], 3, 6, 9],
-            [3, [2,4], 6, [2,4], 9, 8, 1, 5, 7],
-            [[2,6], [1,2,6], 3, 7, 8, [1,4], 5, 9, [2,4]],
-            [7, [1,2], 9, [1,4], [2,3], 5, [4,8], [3,8], 6],
-            [5, 8, 4, 9, [2,3], 6, 7, 1, [2,3]],
-            [8, 3, 2, 5, 4, 9, 6, 7, 1],
-            [9, [4,6], 7, [6,8], 1, 3, [4,8], 2, 5],
-            [[4,6], 5, 1, [6,8], 7, 2, 9, [3,8], [3,4]],
-        ] // for Swordfish - IT WORKS PERFECTLY FINE ! */
-
-        /* grid = [
-            [5, 6, 3, [1,2,4,7], [4,7], [1,2], 9, 8, [1,4]],
-            [1, 8, 4, 9, 5, 3, 2, 6, 7],
-            [[2,9], [2,9], 7, [1,4], 6, 8, [1,5], [4,5], 3],
-            [[2,7,9], [1,2,5,7,9], [1,2], 6, [1,9], [2,5], 4, 3, 8],
-            [4, [1,5], 6, 8, 3, 7, [1,5], 9, 2],
-            [3, [1,2,5,9], 8, [2,5], [1,9], 4, 6, 7, [1, 5]],
-            [6, 4, [1,5], 3, 8, [1,5], 7, 2, 9],
-            [8, [1,7], 9, [1,7], 2, 6, 3, [4,5], [4,5]],
-            [[2,7], 3, [2,5], [4,5,7], [4,7], 9, 8, 1, 6],
-        ] // For Swordfish - Perfect ! It gathered all 3 unnecessary numbers ! */
+        // while finishes executing, when our last - hardest - technique returns false. At this point sudoku cannot be solved more, using already implemented techinques
 
         let currMethodNo = 0;
         let bestMethod = 0;
         while(currMethodNo < methodsArr.length) {
             let doesItHelp = methodsArr[currMethodNo]();
-            if(doesItHelp) {
-                /* if(currMethodNo === 2) {console.warn(':)')} */
-                console.log('back to method first'); 
-                const y = [...grid];
-                console.log(y);
+            if(doesItHelp) { 
                 if(currMethodNo > bestMethod) {
                     bestMethod = currMethodNo;
                 }
@@ -1404,10 +938,7 @@ const engine = {
             }
             else if(!doesItHelp) {
                 currMethodNo++;
-                console.log('need harder method');
             }
-            //updateGrid(grid);
-            //updateDimensionObject(grid, dimensionObject);
         }
         const isGridFullyFilled = testGridFullyFilled(grid); 
         if(!isGridFullyFilled) {
@@ -1415,7 +946,6 @@ const engine = {
         }
 
         function testGridFullyFilled(grid) {
-            //console.log(grid);
             for(let row = 0; row<9; row++) {
                 for(let col = 0; col<9; col++) {
                     if(typeof(grid[row][col]) === 'object') {
@@ -1426,69 +956,11 @@ const engine = {
             return true;
         }
 
-/*         function testHiddenSubset(grid, dimensionObj_dim, dimensionObj_dim_subset_l,  hiddenSubset_l, dimension_no, dimension_item) {
-            console.log(';;;;;;;;;;');
-
-            
-            for(let dimension_item_tile=0; dimension_item_tile<9; dimension_item_tile++) { // Czyli dla każdego kafelka w linii / boxie
-                dimensionObj_dim_subset_l.dimArr[dimension_item].push([]);
-                if(dimensionObj_dim === 'row') {
-                    if(typeof(grid[dimension_item][dimension_item_tile]) === 'object') {
-                        dimensionObj_dim_subset_l.dimArr[dimension_item][dimension_item_tile].push(...grid[dimension_item][dimension_item_tile]);
-                    }
-                }
-                else if(dimensionObj_dim === 'column') {
-                    if(typeof(grid[dimension_item_tile][dimension_item]) === 'object') {
-                        dimensionObj_dim_subset_l.dimArr[dimension_item][dimension_item_tile].push(...grid[dimension_item_tile][dimension_item]);
-                    }
-                }
-                else { // dimensionObj_dim === 'square'
-                    let sq_r_compressed = Math.floor(dimension_item / 3); // 0 to 2
-                    let sq_r_rest = dimension_item % 3; // 0 to 2
-                    let sq_c_compressed = Math.floor(dimension_item_tile / 3); // 0 to 2
-                    let sq_c_rest = dimension_item_tile % 3; // 0 to 2
-    
-                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
-                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
-
-                    if(typeof(grid[sq_r][sq_c]) === 'object') {
-                        dimensionObj_dim_subset_l.dimArr[dimension_item][dimension_item_tile].push(...grid[sq_r][sq_c]);
-                    }
-                }
-            }
-            
-            console.log(dimensionObj_dim_subset_l.dimArr[dimension_item]); // options for all tiles in current line / box
-            // Gather all numbers from current line / box and how much times they happen
-            const allNumsAsOptions = {};
-
-            for(let tileNo = 0; tileNo <dimensionObj_dim_subset_l.dimArr[dimension_item].length; tileNo++) {
-                for(let option_index = 0; option_index <dimensionObj_dim_subset_l.dimArr[dimension_item][tileNo].length; option_index++) {
-                    allNumsAsOptions[dimensionObj_dim_subset_l.dimArr[dimension_item][tileNo][option_index]] = (allNumsAsOptions[dimensionObj_dim_subset_l.dimArr[dimension_item][tileNo][option_index]]+1) || 1;
-                }
-            }
-
-            console.log(allNumsAsOptions); // hiddenSubset_l - current length of subset we look for  (tripples / doubles)
-            const digitsToCheck = [];
-
-            for(let key in allNumsAsOptions) {
-                if(allNumsAsOptions[key] === hiddenSubset_l) {
-                    digitsToCheck.push(parseInt(key));
-                } 
-                else if(allNumsAsOptions[key] < hiddenSubset_l) {
-                    digitsToCheck.push(key);
-                }
-            }
-
-            console.log(digitsToCheck);
-
-        } */
-
         function checkForXWingsOrSwordfish(grid, dimensionObj, currentDim, isSwordfish) {
             let isHelpful = null;
             let pointersCount = 2;
             if(isSwordfish) {
                 pointersCount = 3;
-                //console.warn('its Swordfish');
             }
 
             if(!isSwordfish) {
@@ -1513,11 +985,6 @@ const engine = {
 
                                     let didHelp = checkCounterpartRemoval(currentDim, pointersIndexes_arr, dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos][staticInd], dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd], pointersCount);
                                     if(didHelp) {isHelpful = true;}
-                                    // Do tej funkcji jako argumentów potrzebujemy:
-                                    // Dimension - czy to rząd, czy kolumna
-                                    // Nr indeksów wszystkich wskaźników, tworzących X-wing (2 wskaźniki) lub swordfish (3 wskaźniki)
-                                    // Cyfrę, dla której znaleźliśmy x-wings / swordfish
-                                    // Indeksy wystąpienia tej cyfry we wskaźnikach
                                 }
                             }
                         }
@@ -1542,8 +1009,7 @@ const engine = {
                                     }
 
                                     if(sameIndexCount === 1) {
-                                        // Pobierz unikalne indeksy wskaźników static i dynamic, dla których występuje ta cyfra - i sprawdź
-                                        // czy wskaźnik conditional zawiera je wszystkie
+                                        // Gather unique indexes for pointers 'static' and 'dynamic', for which this number occurs - and check if pointer 'conditional' has them all
                                         let dynamicInd = dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos].indexOf(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles]);
                                         let conditionalInd = dimensionObj[currentDim]['numsTwiceInDim'][pointer_conditional_pos].indexOf(dimensionObj[currentDim]['numsTwiceInDim'][pointer_dynamic_pos][allPointerDoubles]);
 
@@ -1559,8 +1025,6 @@ const engine = {
                                             })
 
                                             let staticAndDynamicUniqueIndexes = [...noDuplicatesDynamicArr, ...noDuplicatesStaticArr]
-                                            
-                                            //console.log(staticAndDynamicUniqueIndexes, 'versus: ', conditionalPointerIndexes);
 
                                             let sameCount = 0;
 
@@ -1576,19 +1040,11 @@ const engine = {
                                                 let staticAndDynamicIndexes = dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_static_pos][staticInd].concat(dimensionObj[currentDim]['numsTwiceInDim_Indexes'][pointer_dynamic_pos][dynamicInd]);
                                                 let pointersUniqueIndexes_set = new Set(staticAndDynamicIndexes);
                                                 let pointersUniqueIndexes_array = Array.from(pointersUniqueIndexes_set);
-                                                console.log(pointersUniqueIndexes_array);
-                                                //console.error('SwordFish can possibly HELP !');
 
                                                 let pointersIndexes_arr = [pointer_static_pos, pointer_dynamic_pos, pointer_conditional_pos];
-
                                                 let didHelp = checkCounterpartRemoval(currentDim, pointersIndexes_arr, dimensionObj[currentDim]['numsTwiceInDim'][pointer_static_pos][staticInd], pointersUniqueIndexes_array, pointersCount, isSwordfish);
                                                
                                                 if(didHelp) {isHelpful = true;}
-                                                // Do tej funkcji jako argumentów potrzebujemy:
-                                                // Dimension - czy to rząd, czy kolumna
-                                                // Nr indeksów wszystkich wskaźników, tworzących X-wing (2 wskaźniki) lub swordfish (3 wskaźniki)
-                                                // Cyfrę, dla której znaleźliśmy x-wings / swordfish
-                                                // Indeksy wystąpienia tej cyfry we wskaźnikach
                                             }
                                         }
                                     }
@@ -1604,31 +1060,23 @@ const engine = {
 
         function checkCounterpartRemoval(currentDim, pointersIndexes_arr, digit, digitIndexes_arr, pointersCount, isSwordfish) {
             let isHelpful = false;
-            //console.log(`current dim is: `, currentDim, ' pointers indexes are: ', pointersIndexes_arr, ' digit is: ', digit, ' and digit indexes are: ', digitIndexes_arr);
+
             // Now let's finish things off with potential removals
-            
 
             if(currentDim === 'row') {
-                //const counterPartDim = 'column';
                 for(let pointer_no_counterpart = 0; pointer_no_counterpart <  pointersCount; pointer_no_counterpart++) {
                     // For each pointer counterpart
                     for(let tile_in_counterpart = 0; tile_in_counterpart < 9; tile_in_counterpart++) {
                         // For each tile in chosen counterpart
-                        // Jeżeli sprawdzany kafelek posiada tą cyfrę jako opcję i nie jest ona częścią x-wings
+                        // If checked tile has this number as an option, and it's not part of the x-wings
                         if(typeof(grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]]) === 'object') {
                             if((grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].includes(digit)) && (!pointersIndexes_arr.includes(tile_in_counterpart))) {
                                 let index = grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].indexOf(digit);
                                 grid[tile_in_counterpart][digitIndexes_arr[pointer_no_counterpart]].splice(index, 1);
-                                if(!isSwordfish) { console.error('X-wing is theeere in row and removed number: ', digit, ` from grid[${tile_in_counterpart}][${digitIndexes_arr[pointer_no_counterpart]}]`);}
-                                else { console.error('SWORDFISH HELPS in row and removed number: ', digit, ` from grid[${tile_in_counterpart}][${digitIndexes_arr[pointer_no_counterpart]}]`);}
                                 isHelpful = true;
                             }
                         }
                     }
-                    /* for(let pointers_index_no = 0; pointers_index_no < pointersIndexes_arr.length; pointers_index_no++) {
-                        // For pointers indexes
-
-                    } */
                 }
             } else {
                 // if currentDim === 'column'
@@ -1638,8 +1086,6 @@ const engine = {
                             if((grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].includes(digit)) && (!pointersIndexes_arr.includes(tile_in_counterpart))) {
                                 let index = grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].indexOf(digit);
                                 grid[digitIndexes_arr[pointer_no_counterpart]][tile_in_counterpart].splice(index, 1);
-                                if(!isSwordfish) {console.error(`X-wing is theeere in column and removed number `, digit, ` from grid[${digitIndexes_arr[pointer_no_counterpart]}][${tile_in_counterpart}]`);}
-                                else {console.error(`SWORDFISH HELPS in column and removed number `, digit, ` from grid[${digitIndexes_arr[pointer_no_counterpart]}][${tile_in_counterpart}]`);}
                                 isHelpful = true;
                             }
                         }
@@ -1651,12 +1097,9 @@ const engine = {
         }
         
         function testNakedSubset(grid, allSquares, dimensionObj_dim, dimensionObj_dim_subset_l,  nakedSubset_l, dimension_no, dimension_item, isHidden) {
-            //console.log(dimensionObj_dim);
             let didHelp = false;
-            //console.log(allSquares);
 
-            for(let dimension_item_tile=0; dimension_item_tile<9; dimension_item_tile++) { // Czyli dla każdego kafelka w linii / boxie
-                //console.log(dimensionObj_dim_subset_l.dimArr);
+            for(let dimension_item_tile=0; dimension_item_tile<9; dimension_item_tile++) { // For each tile in line / box
                 dimensionObj_dim_subset_l.dimArr[dimension_item].push([]);
                 if(dimensionObj_dim === 'row') {
                     if(typeof(grid[dimension_item][dimension_item_tile]) === 'object') {
@@ -1681,43 +1124,7 @@ const engine = {
                         dimensionObj_dim_subset_l.dimArr[dimension_item][dimension_item_tile].push(...grid[sq_r][sq_c]);
                     }
                 }
-               /*  rowArr.push([]); colArr.push([]); squareArr.push([]);
-               
-                // row Arr
-                if(typeof(grid[row][iir]) === 'object') {
-                    rowArr[rowArr.length - 1].push(...grid[row][iir]);
-                }
-                // col Arr
-                if(typeof(grid[iir][row]) === 'object') {
-                    colArr[colArr.length - 1].push(...grid[iir][row]);
-                }
-                // square Arr
-                if(typeof(grid[sq_r][sq_c]) === 'object') {
-                    squareArr[squareArr.length - 1].push(...grid[sq_r][sq_c]);
-                }
-
-                console.log(rowArr, colArr, squareArr); */
             }
-
-
-            // We have all necessary options gathered in arrays, so now look for naked subsets 'double'
-            /* let nakedDoubles_row = rowArr.filter((el, index) => {
-                if(el.length === 2) {el.sort(function(a, b) {return a - b}); return el; }
-            })
-            let nakedDoubles_col = colArr.filter((el, index) => {
-                if(el.length === 2) {el.sort(function(a, b) {return a - b}); return el; }
-            })
-            let nakedDoubles_square = squareArr.filter((el, index) => {
-                if(el.length === 2) {el.sort(function(a, b) {return a - b}); return el; }
-            })
-
-            console.log(nakedDoubles_row, nakedDoubles_col, nakedDoubles_square); */
-
-            // We have all necessary options gathered in arrays, so now look for naked subsets 'double'
-            //let nakedSubset_size = [2, 3]; // We only work for double / tripple subsets
-            /*let uniqueOptionsAsNaked_row = [];
-            let uniqueOptionsAsNaked_col = [];
-            let uniqueOptionsAsNaked_square = []; */
 
             let numsObj = {};
 
@@ -1728,19 +1135,14 @@ const engine = {
                     }
                 } 
             }
-            
-            //console.log(numsObj);
 
-            if(isHidden) { // Change it back to (isHidden) only !
-                // add there numsObj !
-                //WORK ON THIS FUNCTION AND DON'T WORRY ABOUT ERRORS CAUSED - IF THIS PART IS NOT FULLY FINISHED, THEN ERRORS WILL OCCUR
-                // modify checkIfUnique function or create new one, since we'll need different approach for hidden subset (comparing to naked one)
+            if(isHidden) {
+                // allHiddenSubset_Digits -> array of arrays, in which are all elements of each own subset  
                 const allHiddenSubset_Digits = checkIfHiddenUnique(dimensionObj_dim_subset_l.dimArr[dimension_item], nakedSubset_l, numsObj);
-                //console.log(allHiddenSubset_Digits); // tablica tablic, w której znajdują się wszystkie elementy własnego subsetu
 
-                // Na podstawie allSubsetsHidden modyfikujemy grid
+                // Modify grid based on allHiddenSubset_Digit
                 for(let hiddenSubsetsfound = 0; hiddenSubsetsfound<allHiddenSubset_Digits.length; hiddenSubsetsfound++) {
-                    // Dla każdego znalezionego hidden subsetu i jego 2 / 3 unikalnych cyfr (to zazwyczaj tylko 1 taki subset)
+                    // For each found hidden subset and it's 2 to 3 unique digits (there's usually 1 such subset)
                     for(let tile_in_dimension = 0; tile_in_dimension < 9; tile_in_dimension++) {
                         let uniquesInTile = 0;
                         for(let uniqueDigit = 0; uniqueDigit<allHiddenSubset_Digits[hiddenSubsetsfound].length; uniqueDigit++) {
@@ -1760,29 +1162,20 @@ const engine = {
                 
                             let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
                             let sq_c = (sq_r_rest * 3) + sq_c_rest;
-                            // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                            // Remove numbers from grid and point out, that the function helps us
                             if((dimensionObj_dim === 'row') && (typeof(grid[dimension_item][tile_in_dimension]) === 'object')) {
                                 if((grid[dimension_item][tile_in_dimension].length > 1) && (grid[dimension_item][tile_in_dimension].length !== options_updated.length)) {
-                                    let cp = [...grid[dimension_item][tile_in_dimension]]
                                     grid[dimension_item][tile_in_dimension] = options_updated;
-                                    console.error(`HIDDEN tripple NORMAL subset =ROW= modifies nums ${cp} and grid[${dimension_item}][${tile_in_dimension}] is now: `, options_updated);
-                                    //console.error(`ROW:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
                                     didHelp = true;
                                 }
                             } else if((dimensionObj_dim === 'column') && (typeof(grid[tile_in_dimension][dimension_item]) === 'object'))  {
                                 if((grid[tile_in_dimension][dimension_item].length > 1) && (grid[tile_in_dimension][dimension_item].length !== options_updated.length)) {
-                                    let cp = [...grid[tile_in_dimension][dimension_item]];
                                     grid[tile_in_dimension][dimension_item] = options_updated;
-                                    console.error(`HIDDEN tripple NORMAL subset =COLUMN= modifies nums ${cp} and grid[${dimension_item}][${tile_in_dimension}] is now: `, options_updated);
-                                    //console.error(`COLUMN:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
                                     didHelp = true;
                                 }
-                            } else if((dimensionObj_dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                            } else if((dimensionObj_dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  {
                                 if((grid[sq_r][sq_c].length > 1) && (grid[sq_r][sq_c].length !== options_updated.length)) {
-                                    let cp = [...grid[sq_r][sq_c]];
                                     grid[sq_r][sq_c] = options_updated;
-                                    console.error(`HIDDEN tripple NORMAL subset =SQUARE= modifies nums ${cp} and grid[${sq_r}][${sq_c}] is now: `, options_updated);
-                                    //console.error(`SQUARE:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
                                     didHelp = true;
                                 }
                             }
@@ -1793,24 +1186,18 @@ const engine = {
             }
 
             else {
-                //for(let subset_iter = 0; subset_iter< nakedSubset_size.length; subset_iter++) {
-                for(let no=0; no<9; no++) { // dla każdego elementu w danym dimension (9 el w linii / boxie)
+                for(let no=0; no<9; no++) { // for each element in a given dimension (9 elems in line / box)
                     // Test for each row || column || square
-                    //console.log(dimensionObj_dim_subset_l.dimArr[dimension_item]);
-                    //console.log(dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item]); // empty array when we invoke checkIfUnique
                     if(dimensionObj_dim_subset_l.dimArr[dimension_item][no].length === nakedSubset_l) {
                         const isUniqueTileOptions = checkIfUnique(dimensionObj_dim_subset_l.dimArr[dimension_item], dimensionObj_dim_subset_l.dimArr[dimension_item][no], dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item], nakedSubset_l);
-                        //                                        wszystkie elementy linii / boxa                 , sprawdzany el. pod kątem subsetu(na 100% ma dobry length),  cały zestaw znalezionych subsetów                           , obecna długość subsetu
                         if(isUniqueTileOptions) {
                             dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item].push(dimensionObj_dim_subset_l.dimArr[dimension_item][no]);
-                            //console.log( dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item])
                         }
                     }  
                 }
 
-
                 for(let found_subsets = 0; found_subsets < dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item].length;  found_subsets++) {
-                    // For every unique subset found (example is: [2, 4]) TEN SUBSET MUSI WYSTĄPIĆ 2 LUB 3 RAZY !!!
+                    // For every unique subset found (example is: [2, 4]) This subset has to happen either 2 or 3 times !
                     let same_subset = 0;
                     for(let tile_no = 0; tile_no < 9; tile_no++) {
                         let same_digit = 0;
@@ -1818,17 +1205,14 @@ const engine = {
                             for(let n=0; n<nakedSubset_l;  n++) {
                                 if(dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item][found_subsets][n] === dimensionObj_dim_subset_l.dimArr[dimension_item][tile_no][n]) {
                                     same_digit++;
-                                    if(nakedSubset_l === same_digit) { // Jeśli mamy taki sam subset, który porównujemy z unikalną wersją (uniqueOptionsAsNaked_dim)
+                                    if(nakedSubset_l === same_digit) { // If we have the same subset, which we compare with the unique version (uniqueOptionsAsNaked_dim)
                                         same_subset++;
                                     }
-                                    if(nakedSubset_l < same_subset) {console.error('CANT GO IN')}
-                                    if(nakedSubset_l === same_subset) { // Jeśli ilość znalezionych (takich samych) subsetów jest równa ich długości (funkcja prawdopodobnie pomoże nam)
-                                        same_subset++; // WE HAVE TO ENSURE THAT IT HAPPENS JUST ONCE !!!
-                                        // It means we found legit subset pair / tripple ! So function *probably* help + just remove subset numbers
-                                        // from other (non-subset pair/tripple) tiles (if those exists - that's why *probably*).
-                                        //console.log('All subsets for dim ', dimensionObj_dim, '  no  ', dimension_item , " : ", dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item]);
+                                    if(nakedSubset_l < same_subset) { /* Don't do anything with it, since it might throw an error */}
+                                    if(nakedSubset_l === same_subset) { // If the number of (exactly the same) found subsets is equals to their length (the function would probably help)
+                                        same_subset++; // We have to ensure that it happens only once !
+                                        // It means we found legit subset pair / tripple ! So function *probably* helps + just remove subset numbers from other (non-subset pair/tripple) tiles (if those exists - that's why *probably*)
                                         const didItRemoved = removeSubsetDigits(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimensionObj_dim_subset_l.uniqueOptionsAsNaked_dim[dimension_item][found_subsets], dimension_item, tile_no, dimensionObj_dim);
-                                        //                                      grid, cały rz/kol/kw obecnie badany - jako linia / box   cały subset, który ma swój odpowiednik(/i), np: [2, 4]                   nr rz/kol/kw 0 do 8 | nr kafelka,  | "rząd" / "kol" / "kw"
                                         if(didItRemoved) {didHelp = true;}
                                     }
                                 }
@@ -1837,39 +1221,16 @@ const engine = {
                     }
                 }
             }
-            
-            /* // Test for each column
-            if(colArr[no].length === nakedSubset_size[subset_iter]) {
-                const isUniqueTileOptions_col = checkIfUnique(colArr, colArr[no], uniqueOptionsAsNaked_col, nakedSubset_size[no]);
-                if(isUniqueTileOptions_col) {
-                    uniqueOptionsAsNaked_col.push(colArr[no]);
-                }
-            }
-            // Test for each square
-            if(squareArr[no].length === nakedSubset_size[subset_iter]) {
-                const isUniqueTileOptions_square = checkIfUnique(squareArr, squareArr[no], uniqueOptionsAsNaked_square, nakedSubset_size[no]);
-                if(isUniqueTileOptions_square) {
-                    uniqueOptionsAsNaked_square.push(squareArr[no]);
-                }
-            } */
-            
-            // Teraz w uniqueOptionsAsNaked_... mamy tylko unikalne wartości o określonej długości, np. [2, 4] - bez duplikatów.
-            // Sprawdźmy teraz czy dla całego row odszukamy więcej niż 1 wystąpienie. Jeśli znajdziem
-
-            // For row || column || square
-           
 
             // Now we can focus on subset methods that are length specific :
             // 1) Incomplete tripple subset -> {3, 6} {3, 6, 9} {3, 6, 9} || {2, 7} {2, 8} {2, 7, 8}
             // 2) Three double subsets -> {4, 9} {2, 4} {2, 9}
 
             // 1)
-            //console.log(dimensionObj_dim_subset_l.dimArr[dimension_item]);
             if(nakedSubset_l === 3) {
                 let isIncompleteTrippleSubset = checkIncompleteTrippleSubset(grid, dimensionObj_dim_subset_l.dimArr[dimension_item], dimension_item, dimensionObj_dim, isHidden);
                 if(isIncompleteTrippleSubset) {didHelp = true;}
             }
-
 
             // 2)
             if(nakedSubset_l === 2) {
@@ -1878,10 +1239,7 @@ const engine = {
             }
 
             function checkThreeDoubleSubsets(grid, thisDimOptions, dim_no, dim, isHidden) {
-                //if(isHidden) return;
-                // isHidden - check if we are looking for hidden subsets. If so, in this case we don't care about subsets lengths anymore,
-                //            since some numbers might 'hide' actual subset digits
-
+                // isHidden - check if we are looking for hidden subsets. If so, in this case we don't care about subsets lengths anymore, since some numbers might 'hide' actual subset digits
 
                 let didHelp = false;
 
@@ -1913,8 +1271,6 @@ const engine = {
                         if(thisDimOptions[index].length === 2) return true;
                     })
                 }
-            
-                //console.log(isHidden, doubleInDimArr);
 
                 if(doubleInDimArr.length < 3) { return false;}
 
@@ -1940,8 +1296,6 @@ const engine = {
                             // Finally set checkeddoubleno index properly
                             compared_double_no = doubleInDimArr.length; // finish checking - it cannot happen more than once for doubles !
                             checked_double_no--;
-
-                            //console.log(`%c get rid of double subset exact dupliactes`, 'background: white; color: black;');
                         }
 
                         function checkExactDuplicates(checked_el, compared_el) {
@@ -1951,7 +1305,6 @@ const engine = {
                                 areExact = true;
                                 for(let index = 0; index < 2; index++) {
                                     // Compare indexes of those elems and check if those are not exast same duplicates
-                                    //console.log(checked_el[index], compared_el[index])
                                     if(parseInt(checked_el[index]) !== parseInt(compared_el[index])) {
                                         areExact = false;
                                     }
@@ -1962,8 +1315,6 @@ const engine = {
                         }
                     }
                 }
-
-                //console.log('DoubleDim is now: ', doubleInDimArr);
 
                 if(doubleInDimArr.length < 3) { return false;}
 
@@ -1977,11 +1328,8 @@ const engine = {
                         doubleNums[doubleInDimArr[doubleNo][doubleNo_index]] = (doubleNums[doubleInDimArr[doubleNo][doubleNo_index]]+1) || 1;
                     }
                 }
-                
-                //console.log(doubleNums);
 
-                // 2. Remove doubles, which has num / nums that exists more or less than exactly 2 times && then check for 3 or above length
-                // (only for naked subset) - hidden has its own version
+                // 2. Remove doubles, which has num / nums that exists more or less than exactly 2 times && then check for 3 or above length (only for naked subset) - hidden has its own version
                 if(isHidden) {
                     for(let double_el = 0; double_el<doubleInDimArr.length; double_el++) {
                         let twiceInDim = 0;
@@ -1991,7 +1339,6 @@ const engine = {
                             }
                         }
                         if(twiceInDim !== 2) {
-                            //console.warn('REMOVED AND PREVENT')
                             doubleInDimArr.splice(double_el, 1);
                             indexArr.splice(double_el, 1);
                             double_el--;
@@ -2001,7 +1348,6 @@ const engine = {
                 else {
                     for(let key in doubleNums) {
                         if(doubleNums[key] !== 2) {
-                            //console.log(doubleNums[key], '  but thats illegal');
                             for(let doubleNo = 0 ; doubleNo < doubleInDimArr.length; doubleNo++) {
                                 if(doubleInDimArr[doubleNo].includes(parseInt(key))) {
                                     doubleInDimArr.splice(doubleNo, 1);
@@ -2011,11 +1357,6 @@ const engine = {
                         }
                     }
                 }    
-
-                const copy = [...doubleInDimArr];
-                console.log(isHidden, copy);
-                //console.log('OBJ: ',doubleNums,  '  ||  Before: ', copy, '  -  After: ', doubleInDimArr);
-                //(doubleInDimArr.length === 3)? console.log('WE GOT A THREE DOUBLE') : console.log('not enough, length is just ', doubleInDimArr.length)
 
                 if(doubleInDimArr.length === 3) {
                     let uniqueDigits;
@@ -2029,17 +1370,15 @@ const engine = {
                                 }
                             }
                         }
-                        console.log(doubleNums)
-                        console.log(uniqueDigits, uniqueDigits.size);
-                        if(uniqueDigits.size !== 3) { console.error('Saved from HIDDEN crashing - set: ', uniqueDigits); return false; } // In some specific cases set get a length of 4 - this line prevents from errors
+
+                        if(uniqueDigits.size !== 3) {return false; } // In some specific cases set get a length of 4 - this line prevents from errors
 
                     } else {
                         uniqueDigits = new Set([].concat(...doubleInDimArr));
-                        if(uniqueDigits.size !== 3) { console.error('Saved from crashing - set: ', uniqueDigits); return false; } // In some specific cases set get a length of 4 - this line prevents from errors
+                        if(uniqueDigits.size !== 3) {return false; } // In some specific cases set get a length of 4 - this line prevents from errors
                     }
                    
-                    //console.log(uniqueDigits);
-                    // Yay, we have found three double subset ! Now just check if it helps removing anything
+                    // We have found three double subset ! Now just check if it helps removing anything
                     if(isHidden) {
                         // CAN THROW ERRORS, SO DON'T LET IT GO (FOR NOW) !
                         // Three HIDDEN doubles CAN THROW ERRORS, BEWARE OF THAT
@@ -2059,24 +1398,18 @@ const engine = {
                                     const isHiddenSubset = checkHiddenSubset(grid[dim_no][dimension_tile], uniqueDigits);
                                     if(isHiddenSubset) {
                                         grid[dim_no][dimension_tile] = isHiddenSubset;
-                                        //console.log('unique Digits: ', uniqueDigits);
-                                        console.error(`Three HIDDEN doubles =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
                                         didHelp = true;
                                     }
                                 } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
                                     const isHiddenSubset = checkHiddenSubset(grid[dimension_tile][dim_no], uniqueDigits);
                                     if(isHiddenSubset) {
                                         grid[dimension_tile][dim_no] = isHiddenSubset;
-                                        //console.log('unique Digits: ', uniqueDigits);
-                                        console.error(`Three HIDDEN doubles =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
                                         didHelp = true;
                                     }
                                 } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
                                     const isHiddenSubset = checkHiddenSubset(grid[sq_r][sq_c], uniqueDigits);
                                     if(isHiddenSubset) {
                                         grid[sq_r][sq_c] = isHiddenSubset;
-                                        //console.log('unique Digits: ', uniqueDigits);
-                                        console.error(`Three HIDDEN doubles subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
                                         didHelp = true;
                                     }
                                 }
@@ -2094,29 +1427,23 @@ const engine = {
                 
                             let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
                             let sq_c = (sq_r_rest * 3) + sq_c_rest;
-                            // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                            // Remove digits from grid, and point out that the function helped
                             if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
                                 const isNotaSubset = checkNotASubset(grid[dim_no][dimension_tile], uniqueDigits);
                                 if(isNotaSubset) {
                                     grid[dim_no][dimension_tile] = isNotaSubset;
-                                    console.log('unique Digits: ', uniqueDigits);
-                                    //console.error(`Three doubles =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
                                     didHelp = true;
                                 }
                             } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
                                 const isNotaSubset = checkNotASubset(grid[dimension_tile][dim_no], uniqueDigits);
                                 if(isNotaSubset) {
                                     grid[dimension_tile][dim_no] = isNotaSubset;
-                                    console.log('unique Digits: ', uniqueDigits);
-                                    //console.error(`Three doubles =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
                                     didHelp = true;
                                 }
-                            } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                            } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  {
                                 const isNotaSubset = checkNotASubset(grid[sq_r][sq_c], uniqueDigits);
                                 if(isNotaSubset) {
                                     grid[sq_r][sq_c] = isNotaSubset;
-                                    console.log('unique Digits: ', uniqueDigits);
-                                    //console.error(`Three doubles subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
                                     didHelp = true;
                                 }
                             }
@@ -2129,22 +1456,14 @@ const engine = {
                     if(currTileOptions.length < 1) { return false; }
                     let currTileOptions_copy = [...currTileOptions];
                     let didRemove = false;
-                    /* let contains = 0;
-                    numsToKeep.forEach((num) => {
-                        if(currTileOptions_copy.includes(num)) {
-                            contains++;
-                        }
-                    }) */
 
-                    //if(contains === 2) {
-                        for(let x=0; x<currTileOptions_copy.length; x++) {
-                            if(!numsToKeep.has(currTileOptions_copy[x])) {
-                                currTileOptions_copy.splice(x, 1);
-                                x--;
-                                didRemove = true;
-                            }
+                    for(let x=0; x<currTileOptions_copy.length; x++) {
+                        if(!numsToKeep.has(currTileOptions_copy[x])) {
+                            currTileOptions_copy.splice(x, 1);
+                            x--;
+                            didRemove = true;
                         }
-                    // }
+                    }
 
                     if((didRemove) && (currTileOptions_copy.length > 0)) {
                         return currTileOptions_copy;
@@ -2171,11 +1490,8 @@ const engine = {
             }
 
             function checkIncompleteTrippleSubset(grid, thisDimOptions, dim_no, dim, isHidden) {
-                // isHidden - check if we are looking for hidden subsets. If so, in this case we don't care about subsets lengths anymore,
-                //            since some numbers might 'hide' actual subset digits
-
-
-
+                // isHidden - check if we are looking for hidden subsets. If so, in this case we don't care about subsets lengths anymore, since some numbers might 'hide' actual subset digits
+          
                 let didHelp = false;
 
                 // isHidden?
@@ -2188,13 +1504,7 @@ const engine = {
                     else {return false;}
                 })
 
-                //const xd = [...trippleInDimArr];
-                //console.log(thisDimOptions);
-                //console.log(xd);
-
-
                 // If we don't find anything that meets above criteria (-> no tripples || quads / quints found)
-
                 if(trippleInDimArr.length === 0 && (!isHidden)) {return false;}
 
                 let numsObj = {};
@@ -2205,73 +1515,11 @@ const engine = {
                             numsObj[thisDimOptions[tileNo][option_index]] = (numsObj[thisDimOptions[tileNo][option_index]]+1) || 1;
                         }
                     }   
-                    
-                    //console.log(numsObj);
 
-                    let uniqueNumbers = []; // czyli tablica dla cyfr, których opcje wystąpiły tylko 2 lub 3 razy na cały box / linię
+                    let uniqueNumbers = []; // array of digits, which options happened only twice or three times within whole line / box
                     for(let key in numsObj) {
                         if(numsObj[key] === 2 || numsObj[key] === 3)  uniqueNumbers.push(parseInt(key));
                     }
-
-                    /* trippleInDimArr = trippleInDimArr.filter((val, index) => {
-                        let count = 0;
-                        //let uniqueSet = new Set();
-                        for(let tripple_no=0; tripple_no<trippleInDimArr[index].length; tripple_no++) {
-                            if(uniqueNumbers.includes(trippleInDimArr[index][tripple_no])) { 
-                                count++; 
-                                //uniqueSet.add(trippleInDimArr[tripple_no]);
-                            }
-                        }
-                        if(count === 3) {return true;}
-                        else {return false;} 
-                    }) */
-
-                   // console.log(trippleInDimArr)
-
-                   /*  for(let hiddenCandidate_no = 0; hiddenCandidate_no<trippleInDimArr.length; hiddenCandidate_no++) {
-                        // For each tile in line / box
-                        let hiddenSubset_elems = [];
-                        for(let optionsEl = 0; optionsEl < thisDimOptions.length; optionsEl++) {
-                            // For each option number in currently checked tile in line / box
-                            let sameNumsCount = 0;
-                            for(let optionsEl_option = 0; optionsEl_option<thisDimOptions[optionsEl].length; optionsEl_option++) {
-                                //console.log(thisDimOptions[optionsEl][optionsEl_option], numsObj[thisDimOptions[optionsEl][optionsEl_option]]);
-                                if((trippleInDimArr[hiddenCandidate_no].includes(thisDimOptions[optionsEl][optionsEl_option])) 
-                                    && (uniqueNumbers.includes(thisDimOptions[optionsEl][optionsEl_option]))) 
-                                {
-                                    sameNumsCount++;
-
-                                }
-                            }
-                            if((sameNumsCount === 2) || (sameNumsCount === 3)) {
-                                //console.log(thisDimOptions[optionsEl]);
-                                hiddenSubset_elems.push(thisDimOptions[optionsEl])
-                            }
-                        }
-                        
-                        console.log('trippleInDimArr: ', trippleInDimArr);
-                        const areThreeUniquesInHiddenSubset = testThreeUniquesInHiddenSubset(hiddenSubset_elems);
-
-                        function testThreeUniquesInHiddenSubset(hiddenSubset_elems) {
-                            let subsetTilesWithEnoughUniques = 0;
-                            if(hiddenSubset_elems.length !== 3) {return false;} 
- 
-                            for(let el=0; el<hiddenSubset_elems.length; el++) { // For each subset elem (to check)
-                                let uniqueDigitInSubset = 0;
-                                for(let uniqueNo = 0; uniqueNo < uniqueNumbers.length; uniqueNo++) {
-                                    if(hiddenSubset_elems[el].includes(uniqueNumbers[uniqueNo])) {
-                                        uniqueDigitInSubset++
-                                    }
-                                }
-                                if((uniqueDigitInSubset === 2) || (uniqueDigitInSubset === 3)) {
-                                    subsetTilesWithEnoughUniques++;
-                                }   
-                            }
-                           
-                            console.warn('subsetTilesWithEnoughUniques: ', subsetTilesWithEnoughUniques)
-                            if(subsetTilesWithEnoughUniques === 3) { return true; }
-                            else {return false;}
-                        } */
 
                     let uniqueNumInTilesNo = [];
 
@@ -2284,23 +1532,6 @@ const engine = {
                         }
                     }
 
-                    /* 
-                     FOR TEST PURPOSES ONLY
-                    uniqueNumbers = [3, 7, 8, 4, 5, 6];
-                    uniqueNumInTilesNo = [[0,3,5], [0,3,5], [2,6], [3,5], [6,7], [7,8]];
-
-                    numsObj = {
-                        1: 4,
-                        3: 3,
-                        4: 2,
-                        5: 2,
-                        6: 2,
-                        7: 3,
-                        8: 2,
-                    } */
-
-                    //console.log(numsObj);
-
                     let uniqueSubsetDigits = [];
                     for(let uniqueNumbersInd = 0; uniqueNumbersInd < uniqueNumbers.length; uniqueNumbersInd++) {
                         if(uniqueNumbers.length < 3) { return false; }
@@ -2308,29 +1539,22 @@ const engine = {
                         for(let cordsToTest = 1; cordsToTest < uniqueNumInTilesNo.length; cordsToTest++) {
                             const thisUniqueNumberCords = uniqueNumInTilesNo[0];
                             let theSameAs_tUNC = 0;
-                            //let twoSameUsed = false;
                             for(let cordNo = 0; cordNo < thisUniqueNumberCords.length; cordNo++) {
                                if(uniqueNumInTilesNo[cordsToTest][cordNo] !== undefined) {
-                                    //console.log(thisUniqueNumberCords, uniqueNumInTilesNo[cordsToTest][cordNo])
                                     if(thisUniqueNumberCords.includes(uniqueNumInTilesNo[cordsToTest][cordNo])) {
                                         theSameAs_tUNC++;
                                     }
                                 }
                             }
 
-                            //console.log(uniqueNumInTilesNo[0] === uniqueNumInTilesNo[1]);
-                            //console.log(uniqueNumbers[uniqueNumbersInd], numsObj[uniqueNumbers[uniqueNumbersInd]])
                             if(theSameAs_tUNC === 3) {
                                 potentialSubset.push(cordsToTest);
-                                //console.log('true');
                             }
                             else if((theSameAs_tUNC === 2) && (uniqueNumInTilesNo[cordsToTest].length === 2)) {
                                 potentialSubset.push(cordsToTest);
-                                //console.log('true');
                             }
-                            //console.log('-----');
                         }
-                        //console.error(potentialSubset)
+
                         if(potentialSubset.length === 3) {
                             uniqueSubsetDigits.push([]);
                             uniqueSubsetDigits[uniqueSubsetDigits.length - 1].push(uniqueNumbers[potentialSubset[0]], uniqueNumbers[potentialSubset[1]], uniqueNumbers[potentialSubset[2]]);
@@ -2343,13 +1567,8 @@ const engine = {
                             uniqueNumbersInd--;
                         }
 
-                        //console.log(uniqueSubsetDigits);
                         if(uniqueSubsetDigits.length > 0) {
-                            //console.error('ITS WORKING FINE!')
-                            //console.error('LENGTH');
                             for(let foundSubset = 0; foundSubset<uniqueSubsetDigits.length; foundSubset++) {
-                                console.log(uniqueSubsetDigits);
-                                console.log(thisDimOptions);
                                 const uniqueTiles = [];
                                 let onlyUniques_confirmed = [];
                                 for(let dimension_tile=0; dimension_tile<9; dimension_tile++) {
@@ -2369,7 +1588,6 @@ const engine = {
                                 }
     
                                 if(uniqueTiles.length > 0) {
-                                    //console.error('we got em');
                                     for(let uniqueTile = 0; uniqueTile<uniqueTiles.length; uniqueTile++) {
                                         // Now let's just update grid with what we've found there
                                         let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
@@ -2379,110 +1597,27 @@ const engine = {
                             
                                         let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
                                         let sq_c = (sq_r_rest * 3) + sq_c_rest;
-                                        // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                                        // Remove digits from grid, and point out that the function helped
                                         if((dim === 'row') && (typeof(grid[dim_no][uniqueTiles[uniqueTile]]) === 'object')) {
                                             if((grid[dim_no][uniqueTiles[uniqueTile]].length > 1) && (grid[dim_no][uniqueTiles[uniqueTile]].length !== onlyUniques_confirmed[uniqueTile].length)) {
-                                                console.warn(`HIDDEN tripple subset =ROW= modifies nums ${grid[dim_no][uniqueTiles[uniqueTile]]} and grid[${dim_no}][${uniqueTiles[uniqueTile]}] is now: `, onlyUniques_confirmed[uniqueTile]);
                                                 grid[dim_no][uniqueTiles[uniqueTile]] = onlyUniques_confirmed[uniqueTile];
                                                 didHelp = true;
                                             }
                                         } else if((dim === 'column') && (typeof(grid[uniqueTiles[uniqueTile]][dim_no]) === 'object'))  {
                                             if((grid[uniqueTiles[uniqueTile]][dim_no].length > 1) && (grid[uniqueTiles[uniqueTile]][dim_no].length !== onlyUniques_confirmed[uniqueTile].length)) {
-                                                console.warn(`HIDDEN tripple subset =COLUMN= modifies nums ${grid[uniqueTiles[uniqueTile]][dim_no]} and grid[${dim_no}][${uniqueTiles[uniqueTile]}] is now: `, onlyUniques_confirmed[uniqueTile]);
                                                 grid[uniqueTiles[uniqueTile]][dim_no] = onlyUniques_confirmed[uniqueTile];
                                                 didHelp = true;
                                             }
-                                        } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
+                                        } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  {
                                             if((grid[sq_r][sq_c].length > 1) && (grid[sq_r][sq_c].length !== onlyUniques_confirmed[uniqueTile])) {
-                                                console.warn(`HIDDEN tripple subset =SQUARE= modifies nums ${grid[sq_r][sq_c]} and grid [${sq_r}][${sq_c}] is now: `, onlyUniques_confirmed[uniqueTile]);
                                                 grid[sq_r][sq_c] = onlyUniques_confirmed[uniqueTile];
                                                 didHelp = true;
                                             }
                                         }
                                     }
                                 }
-                    }
-                   
-                            
+                            }  
                         }
-                        //console.warn('MAIN:  ', trippleInDimArr[hiddenCandidate_no], '   SUB: ', hiddenSubset_elems[0], hiddenSubset_elems[1], hiddenSubset_elems[2]);
-                        //console.warn('MAIN CONDITIONS ARE MET');
-                        // Great, we have found hidden subset. Just check if it would help us
-                        // Czyli z tych elementów subsetu, usuń wszystkie wystąpienia cyfr, które w tablicy numsObj występują więcej
-                        // niż 3 razy
-                        /* for(let dimension_tile =0; dimension_tile<9; dimension_tile++) {
-                            const isEqualCopy = checkEqualCopy(thisDimOptions[dimension_tile], hiddenSubset_elems);
-
-                            if(isEqualCopy) {
-                                const isRemovalOption = checkRemovalOption(thisDimOptions[dimension_tile], numsObj);
-                                if(isRemovalOption) {
-                                    // Jeśli tak, to isRemovalOption zawiera już zaktualizowaną wersję kafelka
-                                    // Now let's just update grid with what we've found there
-                                    let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
-                                    let sq_r_rest = dim_no % 3; // 0 to 2
-                                    let sq_c_compressed = Math.floor(dimension_tile / 3); // 0 to 2
-                                    let sq_c_rest = dimension_tile % 3; // 0 to 2
-                        
-                                    let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
-                                    let sq_c = (sq_r_rest * 3) + sq_c_rest;
-                                    // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
-                                    if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
-                                        if(grid[dim_no][dimension_tile].length > 1) {
-                                            let cp = [...grid[dim_no][dimension_tile]]; // only for console.logs purposes
-                                            grid[dim_no][dimension_tile] = isRemovalOption;
-                                            console.error(`HIDDEN tripple subset =ROW= modifies nums ${cp} and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
-                                            didHelp = true;
-                                        }
-                                    } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
-                                        if(grid[dimension_tile][dim_no].length > 1) {
-                                            let cp = [...grid[dimension_tile][dim_no]]; // only for console.logs purposes
-                                            grid[dimension_tile][dim_no] = isRemovalOption;
-                                            console.error(`HIDDEN tripple subset =COLUMN= modifies nums ${cp} and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
-                                            didHelp = true;
-                                        }
-                                    } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
-                                        if(grid[sq_r][sq_c].length > 1) {
-                                            let cp = [...grid[sq_r][sq_c]]; // only for console.logs purposes
-                                            grid[sq_r][sq_c] = isRemovalOption;
-                                            console.error(`HIDDEN tripple subset =SQUARE= modifies nums ${cp} and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
-                                            didHelp = true;
-                                        }
-                                    }
-                                }
-                            }
-                        } */
-
-                        function checkEqualCopy(thisTile, subset_tiles) {
-                            // This time we need to check if thisTile belongs to subset_tiles
-                            for(let subsetTile_no=0; subsetTile_no<subset_tiles.length; subsetTile_no++) {
-                                // For each digit in current subset el
-                                let sameNums = 0;
-                                for(let option_no= 0; option_no<subset_tiles[subsetTile_no].length; option_no++) {
-                                    if(thisTile.includes(subset_tiles[subsetTile_no][option_no])) {
-                                        sameNums++;
-                                    }
-                                }
-                                if(sameNums === subset_tiles[subsetTile_no].length) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        }
-
-                        function checkRemovalOption(thisTile, numsObj) {
-                            const thisTile_updated = [...thisTile];
-                            let didRemove = false;
-                            for(let option_no = 0; option_no<thisTile_updated.length; option_no++) {
-                                if(!uniqueNumbers.includes(thisTile_updated[option_no])) {
-                                    thisTile_updated.splice(option_no, 1);
-                                    option_no--;
-                                    didRemove = true;
-                                }
-                            }
-                            if((didRemove) && (thisTile_updated.length !== thisTile.length) && (thisTile_updated.length > 0)) {return thisTile_updated;}
-                            else { return false;}
-                        }
-
                     }
                 }
 
@@ -2492,8 +1627,6 @@ const engine = {
     
                         let incompleteTrippleCandidates = [];
     
-                        // If hidden - make an exception and push detected quad / quint... as a candidate
-                        //if(isHidden) { incompleteTrippleCandidates.push(trippleInDimArr[trippleCandidateNo]); }
                         // There we will push elems that contains the same numbers as currently checked trippleInDimArr tile
                         for(let trippleOptionsEl = 0; trippleOptionsEl<thisDimOptions.length; trippleOptionsEl++) {
                             // For each elem inside current dimension
@@ -2503,22 +1636,13 @@ const engine = {
                             }
                         }
     
-                        /* let uniqueNums = new Set();
-                        for(let i = 0; i<incompleteTrippleCandidates.length; i++) {
-                            uniqueNums.add(...incompleteTrippleCandidates[i]);
-                        } */
-    
                         // Now we have a candidates (of length 2 or 3 to test with current tripple)
-                        //console.log(incompleteTrippleCandidates);
-                        if((incompleteTrippleCandidates.length === 3) /* && (uniqueNums.size === 3) */) {
-                            // Yess, our function helps (probably) !!
+                        if(incompleteTrippleCandidates.length === 3) {
+                            // Our function helps (probably) !
     
-                            // CONTINUE FROM HERE...
-                            //console.log(trippleInDimArr);
                             for(let dimension_tile = 0; dimension_tile<9; dimension_tile++) {
                                 // For every tile in current dimension
                                 const detectedTileOptions_copy = [...thisDimOptions[dimension_tile]];
-                                //console.log(dimensionObj_dim_subset_l.dimArr[dimension_item][dimension_tile])
                                 for(let candidate_no = 0; candidate_no<incompleteTrippleCandidates.length; candidate_no++) {
                                     // For each gathered digit from incompleteTrippleCandidates (we know its length equals 3)
                                     if(thisDimOptions[dimension_tile].includes(trippleInDimArr[trippleCandidateNo][candidate_no])) {
@@ -2532,10 +1656,6 @@ const engine = {
                                 if((detectedTileOptions_copy.length > 0) && ((thisDimOptions[dimension_tile]).length !== detectedTileOptions_copy.length)) {
                                     // If it is not a subset tile and our loops has actually removed at least one element
     
-                                    //console.log('remaining options, excluding: ',trippleInDimArr[trippleCandidateNo], '  would be: ', detectedTileOptions_copy);
-                                    //console.log('all options in tile: ', thisDimOptions[dimension_tile])
-                                    console.log('%c Incomplete tripple subset HELPS !', 'background: yellow; color: black; font-weight: 650');
-    
                                     // Now let's just update grid with what we've found there
                                     let sq_r_compressed = Math.floor(dim_no / 3); // 0 to 2
                                     let sq_r_rest = dim_no % 3; // 0 to 2
@@ -2544,23 +1664,20 @@ const engine = {
                         
                                     let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
                                     let sq_c = (sq_r_rest * 3) + sq_c_rest;
-                                    // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                                    // Remove digits from grid, and point out that the function helped
                                     if((dim === 'row') && (typeof(grid[dim_no][dimension_tile]) === 'object')) {
                                         if(grid[dim_no][dimension_tile].length > 1) {
                                             grid[dim_no][dimension_tile] = detectedTileOptions_copy;
-                                            //console.error(`Incomplete tripple subset =ROW= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dim_no][dimension_tile]);
                                             didHelp = true;
                                         }
                                     } else if((dim === 'column') && (typeof(grid[dimension_tile][dim_no]) === 'object'))  {
                                         if(grid[dimension_tile][dim_no].length > 1) {
                                             grid[dimension_tile][dim_no] = detectedTileOptions_copy;
-                                            //console.error(`Incomplete tripple subset =COLUMN= removes nums and grid[${dim_no}][${dimension_tile}] is now: `, grid[dimension_tile][dim_no]);
                                             didHelp = true;
                                         }
                                     } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
                                         if(grid[sq_r][sq_c].length > 1) {
                                             grid[sq_r][sq_c] = detectedTileOptions_copy;
-                                            //console.error(`Incomplete tripple subset =SQUARE= removes nums and grid [${sq_r}][${sq_c}] is now: `, grid[sq_r][sq_c]);
                                             didHelp = true;
                                         }
                                     }
@@ -2584,9 +1701,6 @@ const engine = {
             }
 
             function checkIfHiddenUnique(ourArr, subset_size, numsObj) {
-                // ourArr = allTiles options in current line / box (please don't modify it there - keep it as it is)
-                // subset_size = current subset size we take into account (we only work for subset that is two-length or three-length) any length elems 
-                // numsObj = object that indicates how many times each digit happens in current tile
                 const hiddenSubsetDigits = [];            
                 const ourArr_copy = [...ourArr];
 
@@ -2601,9 +1715,9 @@ const engine = {
                     }
 
                     if(uniquesContained.length === subset_size) {
-                        // Czyli jeśli posiadamy 3 cyfry, które występują tylko 3 razy w danej linii / boxie
-                        // Teraz szukamy dalej dwóch pozostałych el, które też posiadają te 3 cyfry
-                        // Najpierw jednak określimy tablicę, która będzie pushować całe kafelki które są potencjalnymi subsetami
+                        // If we have 3 digits, which happens only 3 times in a given line / box - now we look for two remain elems, which happens three times in a given line / box
+
+                        // First of all, specify the array, which will push whole tiles, that are potential subsets
                         let potentialSubsetElems = [ourArr_copy[el_no]];
                         let potentialSubsetElems_indexes = [el_no];
 
@@ -2622,11 +1736,11 @@ const engine = {
                         }
 
                         if(potentialSubsetElems.length === subset_size) {
-                            // Tak, mamy gotowy hidden subset !
+                            // We have ready hidden subset !
                             hiddenSubsetDigits.push([]);
                             hiddenSubsetDigits[hiddenSubsetDigits.length - 1].push(...uniquesContained);
-                            // Teraz usuń indeksy znalezionych elementów z KOPII ourArray,
-                            // Użyj odwróconej pętli, aby poprawnie splice'ować elementy !
+                            //  Now remove indexes of found elements from ourArray COPY
+                            //  Use reversed loop to splice elements correctly
                             for(let index = (potentialSubsetElems_indexes.length - 1); index >= 0; index--) {
                                 ourArr_copy.splice(potentialSubsetElems_indexes[index], 1);
                             }
@@ -2638,11 +1752,6 @@ const engine = {
             }
 
             function checkIfUnique(ourArr, el, uOAN, subset_size) {
-                // ourArr - wszystkie elementy linii / boxa
-                // el - sprawdzany el. pod kątem subsetu(na 100% ma dobry length) 
-                // uOAN - cały zestaw znalezionych subsetów
-                // subset_size - obecna długość subsetu
-                // isHidden - czy robimy checkout dla nakedSubset czy dla hiddenSubset
                 if(uOAN.length < 1) {return true; }
                 for(let x=0; x<uOAN.length; x++) {
                     for(let y=0; y<subset_size; y++) {
@@ -2655,21 +1764,14 @@ const engine = {
             }
 
             function removeSubsetDigits(grid, thisdimension, subset, row, iir, dim) {
-                // grid | cały rz/kol/kw obecnie badany - jako linia / box  | cały subset, który ma swój odpowiednik(/i), np: [2, 4] |  nr rz/kol/kw 0 do 8 | nr kafelka,  | "rząd" / "kol" / "kw"
                 let didHelp = false;
-                //console.warn(' A NEW SUBSET FOR DIM ', dim, '  no  ', row, ' CAME IN: ', subset);
                 // Remove subset digits that don't belong to any subset-part tiles, but are available in non-subset tiles
                 for(let dig = 0; dig<subset.length; dig++) {
                     // for every digit in subset
                     for(let tile_in_dimension=0; tile_in_dimension<9; tile_in_dimension++) {
-                        // Work on now on pls!
-                        //console.log(thisdimension[tile_in_dimension].includes(subset[dig]));
                         if(thisdimension[tile_in_dimension].includes(subset[dig])) { // If we own that digit as an option in tile aswell
                             const isNotANakedSubset = checkNotANakedSubset(thisdimension[tile_in_dimension], subset);
-                            //                                             obecny kafelek w bad. rz/kol/kw | cały subset, który ma swój odpowiednik(/i), np: [2, 4]
-
                             if(isNotANakedSubset) {  // Now check if iterated tile does not belong to detected subset !
-                                //console.error('ITS  + ', dim)
                                 let sq_r_compressed = Math.floor(row / 3); // 0 to 2
                                 let sq_r_rest = row % 3; // 0 to 2
                                 let sq_c_compressed = Math.floor(tile_in_dimension / 3); // 0 to 2
@@ -2677,29 +1779,23 @@ const engine = {
                     
                                 let sq_r = (sq_r_compressed * 3) + sq_c_compressed;
                                 let sq_c = (sq_r_rest * 3) + sq_c_rest;
-                                // Usuń z grida cyfry i zaznacz, że funkcja nam pomogła
+                                // Remove numbers from grid, and point out that the function helped
                                 if((dim === 'row') && (typeof(grid[row][tile_in_dimension]) === 'object')) {
                                     if(grid[row][tile_in_dimension].length > 1) {
                                         let index = grid[row][tile_in_dimension].indexOf(subset[dig]);
                                         grid[row][tile_in_dimension].splice(index, 1);
-                                        console.warn(`ROW:: a naked subset and remove ${subset[dig]} from grid[${row}][${tile_in_dimension}]`);
-                                        //console.error(`ROW:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
                                         didHelp = true;
                                     }
                                 } else if((dim === 'column') && (typeof(grid[tile_in_dimension][row]) === 'object'))  {
                                     if(grid[tile_in_dimension][row].length > 1) {
                                         let index = grid[tile_in_dimension][row].indexOf(subset[dig]);
                                         grid[tile_in_dimension][row].splice(index, 1);
-                                        console.warn(`COLUMN:: a naked subset and remove ${subset[dig]} from grid[${row}][${tile_in_dimension}]`);
-                                        //console.error(`COLUMN:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
                                         didHelp = true;
                                     }
                                 } else if((dim === 'square') && (typeof(grid[sq_r][sq_c]) === 'object'))  { // dim === 'square
                                     if(grid[sq_r][sq_c].length > 1) {
                                         let index = grid[sq_r][sq_c].indexOf(subset[dig]);
                                         grid[sq_r][sq_c].splice(index, 1);
-                                        console.warn(`SQUARE:: a naked subset and remove ${subset[dig]} from grid[${sq_r}][${sq_c}]`);
-                                        //console.error(`SQUARE:: iir a naked subset and remove ${subset[dig]} from grid[${row}][${iir}]`);
                                         didHelp = true;
                                     }
                                 }
@@ -2713,8 +1809,6 @@ const engine = {
                         testTile.sort();
                         subset.sort();
                         for(let i=0; i<subset.length; i++) {
-                            //console.log(testTile[i], testTile);
-                            //console.log(subset[i], subset);
                             if(parseInt(testTile[i]) !== parseInt(subset[i])) { return true;}
                         }
                         return false; // given elems have the same digits as a options, so these are definitely subset items
@@ -2724,25 +1818,8 @@ const engine = {
             }
 
             return didHelp;
-            /* for(let elNo = 0; elNo<rowArr.length; ) {
-                let areTheSame = checkIfSame(rowArr[elNo], rowArr[elNo + 1]);
-                if(areTheSame) {
-                    //
-                } else {
-                    elNo++;
-                }
-            }
-
-            function checkIfSame(arr1, arr2) {
-                for(let i=0; i<arr1.length; i++) {
-                    if(arr1[i] !== arr2[i]) { return false; }
-                }
-                return true;
-            } */
-            
         }
 
-        //console.log(dimensionObject);
         function lookForDoublePairs(grid, allSquares, digit, line_no, dimension) {
             let didHelp = false;
             for(let tiles_in_line=0; tiles_in_line<3; tiles_in_line++) {
@@ -2759,9 +1836,8 @@ const engine = {
                 let noDetect = (line_no * 3) + ((tiles_in_line + 2) % 3);
 
                 
-                // Cyfra "digit" z noDetect może wystąpić tylko i wyłącznie w ramach jednego kwadratu
-                // Row pattern is: grid[(square_no * 3) + tile_in_square_line][noDetect];
-                // Column pattern is: grid[noDetect][(square_no * 3) + tile_in_square_line];
+                // Digit from noDetect might happen only for one square
+
                 let digitInSquareNo = [];
                 for(let square_no=0; square_no<3; square_no++) {
                     for(let tile_in_square_line=0; tile_in_square_line<3; tile_in_square_line++) {
@@ -2771,21 +1847,20 @@ const engine = {
                                 digitInSquareNo.push(square_no);
                                 if(digitInSquareNo.length > 1) {
                                     if(digitInSquareNo[0] !== digitInSquareNo[digitInSquareNo.length - 1]) {
-                                        return false; //return false; Wróć na początek pętli
+                                        return false; //return to the start of the loop
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if(digitInSquareNo.length < 1) { return false;} //return false; Wróć na początek pętli
+                if(digitInSquareNo.length < 1) { return false;} //return to the start of the loop
 
-                // Od tego momentu wiemy już, że noDetect spełnia swoje warunki - musimy sprawdzić, czy pointer1 i pointer2 również spełniają
-                // swoje warunki
+                // From now we now, that noDetect meet its' own requirements -  we have to check if pointer1 and pointer2 are meeting their own conditions
 
-                // Teraz sprawdź, czy w kwadracie, w którym  nasz noDetect posiada cyfrę, czy w pozostałych liniach w ramach tego kwadratu
-                // znajduje się ta liczba. Jeśli nie, to znaczy, że ta funkcja nam nie pomoże, więc MOŻEMY WRÓCIĆ NA POCZĄTEK PĘTLI, jeśli
-                // tak, to przechodzimy dalej;
+                // Now check, if in square in which our noDetect has a number, or in remain lines (that are in the same square) there is that number.
+                // If there's no such number, that means the function would not help, so we can go back to the start of the loop
+                // If there's desired number, we can move on:
 
                 let isTargetSqaureContainingDigit = false;
                 
@@ -2805,12 +1880,12 @@ const engine = {
                     }
                 }
 
-                if(!isTargetSqaureContainingDigit) { return false; } //return false; Wróć na początek pętli
+                if(!isTargetSqaureContainingDigit) { return false; } //return to the start of the loop
 
-                // Na koniec sprawdzamy, czy ta cyfra występuje w pozostałych kwadratach dla linii, na które wskazują pointer1 i pointer2.
-                // Muszą pojawić się minimum 2 razy dla każdego z tych wskaźników - jedno wystąpienie w pierwszym, a drugie w drugim 
-                // kwadracie, w którym noDetect nie posiada cyfry. Jeśli nie, to znaczy, że ta funkcja nam nie pomoże, więc
-                // MOŻEMY WRÓCIĆ NA POCZĄTEK PĘTLI, jeśli tak:::
+                // At the very end we need to check, if that number happens in other squares inside the same lines, onto which pointer1 and pointer2 are pointing onto.
+                // They has to appear at least twice for pointers - one in first, and other one in second square, in which noDetect doesn't have a number.
+                // If not, it means the function would not help us, so we can move back to the start of the loop 
+                // If yes, let's move on:
 
                 const remainSquareNo = [0, 1, 2].filter((value) => {
                     return value !== digitInSquareNo[0]; // expected: should always remove 1 elem, so two remains
@@ -2841,11 +1916,11 @@ const engine = {
                     if(el === true) {return el}; 
                 })
 
-                if(!isFinalConditionMet) { return false; } //return false; Wróć na początek pętli
+                if(!isFinalConditionMet) { return false; } //return to the start of the loop
 
 
-                //::: to z kwadratu, gdzie noDetect posiada cyfry, z linii gdzie wskazują w tym kwadracie wskaźniki, usuwamy wszystkie wystąpienia
-                // tej cyfry. Zaznaczamy że funkcja pomogła nam znaleźć rozwiązanie. NIE USUWAMY ŻADNEJ CYFRY Z RZĘDU, GDZIE WSKAZUJE NODETECT.
+                // ... from square, where noDetect has numbers, from lines, where the pointers points out in this square, we remove all occurences of
+                // this number. We indicate, that the function helped. DON'T REMOVE ANY NUMBER FROM ROW, WHERE noDetect points out.
             
                 for(let targetSquareTile = 0; targetSquareTile < 3; targetSquareTile++) {
                     let pointer1_checkedTile = dimension === 'row'? grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile] : grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1];
@@ -2856,11 +1931,9 @@ const engine = {
                             if(dimension === 'row') {
                                 let index = grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile].indexOf(digit);
                                 grid[pointer1][(digitInSquareNo[0] * 3) + targetSquareTile].splice(index, 1);
-                                console.warn(dimension, ' helped us find Double Pairs - the digit is: ', digit, ` and the tile cords is: grid[${pointer1}][${(digitInSquareNo[0] * 3) + targetSquareTile}]`);
                             } else {
                                 let index = grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1].indexOf(digit);
                                 grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer1].splice(index, 1);
-                                console.warn(dimension, ' helped us find Double Pairs - the digit is: ', digit, ` and the tile cords is: grid[${(digitInSquareNo[0] * 3) + targetSquareTile}][${pointer1}]`);
                             }
                             didHelp = true;
                         }
@@ -2870,11 +1943,9 @@ const engine = {
                            if(dimension === 'row') {
                                 let index = grid[pointer2][(digitInSquareNo[0] * 3) + targetSquareTile].indexOf(digit);
                                 grid[pointer2][(digitInSquareNo[0] * 3) + targetSquareTile].splice(index, 1);
-                                console.warn(dimension, ' helped us find Double Pairs - the digit is: ', digit, ` and the tile cords is: grid[${pointer2}][${(digitInSquareNo[0] * 3) + targetSquareTile}]`);
                            } else {
                                 let index = grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer2].indexOf(digit);
                                 grid[(digitInSquareNo[0] * 3) + targetSquareTile][pointer2].splice(index, 1);
-                                console.warn(dimension, ' helped us find Double Pairs - the digit is: ', digit, ` and the tile cords is: grid[${(digitInSquareNo[0] * 3) + targetSquareTile}][${pointer2}]`);
                            }
                            
                            didHelp = true;
@@ -2910,8 +1981,8 @@ const engine = {
 
         function testOrdered(ordered, {row, index_in_row}, num) {
             for(let k=0; k<9; k++) {
-                if(num === parseInt(ordered[row * 9 + k].textContent) /* ☢️ && (grid[row][k].length <= 1) */) return false; // CHECK ROW || if False = We have this number in a row already
-                if(num === parseInt(ordered[k * 9 + index_in_row].textContent) /* ☢️ && (grid[k][index_in_row].length <= 1) */) return false; // CHECK COLUMN || if False =  We have this number in a column already
+                if(num === parseInt(ordered[row * 9 + k].textContent) /* ☢️  */) return false; // CHECK ROW || if False = We have this number in a row already
+                if(num === parseInt(ordered[k * 9 + index_in_row].textContent) /* ☢️  */) return false; // CHECK COLUMN || if False =  We have this number in a column already
             }
     
             // Check square at last
@@ -2919,7 +1990,6 @@ const engine = {
             for(let square_row=0; square_row<3; square_row++) {
                 for(let square_column=0; square_column<3; square_column++) {
                     if(num === parseInt(ordered[(((Math.floor(row / 3) * 3) + square_row) * 9) + (Math.floor(index_in_row / 3) * 3) + square_column].textContent) // ☢️
-                    /* &&  (grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column].length <= 1) */
                     ) return false; // CHECK SQUARE || if False = We have this number in a square already
                 }
             }
@@ -2928,16 +1998,10 @@ const engine = {
         }
 
         function occuredOnce(arr, length, sign) {
-            // Tu jest błąd (?)
             
             let onlyOnce = [];
 
             arr.sort(function(a, b) { return a - b; });
-
-            /* if(sign === 'r') {console.log('Row: ', arr);}
-            else if(sign === 'c') {console.log('Column: ', arr);}
-            else {console.log('square: ', arr);} */
-
 
             if(arr[0] != arr[1]) {
                 onlyOnce.push(arr[0]);
@@ -2955,9 +2019,6 @@ const engine = {
         function applyOnePosition(grid, dim_1, dim_2, singPos, dim) {
             for(let x=0; x<singPos.length; x++) {
                 if(grid[dim_1][dim_2].includes(singPos[x])) {
-                    //if(dim === 'r') {ordered[(dim_1 * 9) + dim_2].style.color = 'aqua'};
-                    //if(dim === 'c') {ordered[(dim_1 * 9) + dim_2].style.color = 'green'};
-                    //if(dim === 's') {ordered[(dim_1 * 9) + dim_2].style.color = 'burlywood'};
                     ordered[(dim_1 * 9) + dim_2].textContent = singPos[x];  // ☢️
                     grid[dim_1][dim_2] = singPos[x];
                     return true;
@@ -2966,176 +2027,11 @@ const engine = {
             return false;
         }
 
-        console.log(grid);
-
-       /*  for(let k=0; k<grid[row].length; k++) {
-            if(num === parseInt(grid[row][k])) return false; // CHECK ROW || if False = We have this number in a row already
-            if(num === parseInt(grid[k][index_in_row])) return false; // CHECK COLUMN || if False =  We have this number in a column already
-        }
-
-        // Check square at last
-
-        for(let square_row=0; square_row<3; square_row++) {
-            for(let square_column=0; square_column<3; square_column++) {
-                if(num === parseInt(grid[(Math.floor(row / 3) * 3) + square_row][(Math.floor(index_in_row / 3) * 3) + square_column])) return false; // CHECK SQUARE || if False = We have this number in a square already
-            }
-        } */
         return bestMethod;
     },
 
-    fadeDigits: function({difficulty, theme, options}) {
-        console.log(difficulty, theme, options);
-        console.log(rules[difficulty]);
-
-        const allTiles = document.querySelectorAll('.tile');
-        const allTilesArray = [...allTiles];
-        // const ordered = this.orderTiles(allTilesArray); // sort out the tiles by their dataset-order property
-
-        // Lines inside quote are for TESTING ONLY
-            const ordered = this.orderTiles(allTilesArray);
-            const b = [];
-            ordered.map((el, index) => {
-                if(index % 9 === 0) {
-                    b.push([]);
-                }
-
-                if(el.classList.contains('initial')) {
-                    b[b.length - 1].push(el.textContent)  // ☢️
-                } else {
-                    b[b.length - 1].push(parseInt(el.textContent))  // ☢️
-                }
-            })
-
-            console.log(b);
-        //
-
-
-
-        const engine_operations_vars = {
-            squares_min_filled: 0,
-            digits_min_shown: 0,
-            all_digits_shown: [9, 9, 9, 9, 9, 9, 9, 9, 9],
-            add: 1,
-            substr: 0,
-        }
-        /*let squares_min_filled = 0;
-        let digits_min_shown = 0;
-
-        let all_digits_shown = [9, 9, 9, 9, 9, 9, 9, 9, 9]; // index + 1 refers to the digit name && value is the quanity
-        let add = 1;
-        let substr = 0;
-        */
-        const currentBoard = this.gatherTilesData(allTilesArray);
-        /* console.log(JSON.parse(JSON.stringify(currentBoard))); */
-        //console.log(currentBoard);
-
-        const randInitial = Math.floor(Math.random() * ((rules[difficulty].initialNumbers.max - rules[difficulty].initialNumbers.min) + 1)) + rules[difficulty].initialNumbers.min;
-        //console.log(randInitial);
-
-        this.performEngineOperations(engine_operations_vars, currentBoard, randInitial, difficulty);
-
-       // console.log(engine_operations_vars.all_digits_shown);
-
-        //console.log(currentBoard)
-
-        allTilesArray.forEach(tile => {
-            console.log('test')
-            if(tile.textContent) { console.log('yes'); tile.classList.add(`initial`, `initial-${theme}`); }  // ☢️
-        })
-
-        //console.log(currentBoard);
-    },
-
-    performEngineOperations: function(eov, currentBoard, randInitial, difficulty) {
-        for(let i=(this.rows*this.columns); i>randInitial; i--) {
-            /* Perform engine operations */
-            if(!currentBoard.length) {console.warn('exhausted elems'); return;}
-
-            let randSquare = Math.floor(Math.random() * currentBoard.length);
-            let randTile_inSquare = Math.floor(Math.random() * currentBoard[randSquare].length);
-
-            eov.all_digits_shown[(parseInt(currentBoard[randSquare][randTile_inSquare].textContent) - 1)]--;  // ☢️
-
-            const number_to_keep = parseInt(currentBoard[randSquare][randTile_inSquare].textContent);  // ☢️
-            currentBoard[randSquare][randTile_inSquare].textContent = '';   // ☢️
-            currentBoard[randSquare].splice(randTile_inSquare, 1);
-
-            if((eov.all_digits_shown[number_to_keep - 1]  - eov.substr) <= rules[difficulty].conditions.digit_shown_min) {
-                //console.log('violated ', number_to_keep.toString())
-                // Now remove all currentboard items, that has the same number attached, apart from the one we got now
-                for(let arr of currentBoard) {
-                    arr.forEach((elem, index) => {
-                        if((arr[index].textContent === number_to_keep.toString()) /* ☢️ && (arr[index] !== currentBoard[randSquare][randTile_inSquare]) */) {
-                            //console.log(arr)
-                            arr.splice(index, 1);
-                        }
-                    })
-                }
-
-                eov.digits_min_shown++;
-
-                //console.log(eov.digits_min_shown, rules[difficulty].conditions.max_digits_min_shown);
-                //console.log(typeof(eov.digits_min_shown), typeof(rules[difficulty].conditions.max_digits_min_shown));
-
-                if(eov.digits_min_shown === rules[difficulty].conditions.max_digits_min_shown) {
-                    eov.substr++;
-                    //console.log('prevent');
-                    //console.log('txtContent ', number_to_keep.toString())
-                    // If we are at limit, and we should increment minimal step by 1 \\ It fires just once
-                    for(let x=0; x<eov.all_digits_shown.length; x++) {
-                        if((eov.all_digits_shown[x] <= rules[difficulty].conditions.digit_shown_min + 1) && ((x + 1) !== number_to_keep)) {
-                            // Usuń taką liczbę z wszystkich tablic currentBoard
-                            //console.log((x + 1), ' vs ', number_to_keep)
-                            for(let arr of currentBoard) {
-                                arr.forEach((elem, index) => {
-                                    //console.log(arr[index].textContent);
-                                    if(parseInt(arr[index].textContent) === (x + 1)) {  // ☢️
-                                       // console.log('REMOVE: ', arr[index].textContent);
-                                        arr.splice(index, 1);
-                                    }
-                                })
-                            }
-                        }
-                    }
-                }
-            } 
-
-            /* currentBoard[randSquare][randTile_inSquare].textContent = '';
-            currentBoard[randSquare].splice(randTile_inSquare, 1); */
-
-            if(currentBoard[randSquare].length < (rules[difficulty].conditions.square_min_fill + eov.add)) {
-                currentBoard.splice(randSquare, 1);
-                eov.squares_min_filled++;
-
-                if(eov.squares_min_filled === rules[difficulty].conditions.max_squares_min_filled) {
-                    eov.add++;
-                    for(const [index, arr] of currentBoard.entries()) {
-                        if(arr.length < (rules[difficulty].conditions.square_min_fill + eov.add)) {
-                            //console.log('rem', index);
-                            currentBoard.splice(index, 1);
-                        }
-                    }
-                }
-            };
-            // === if square has 2 available tiles, dont remove anything more from this square
-            
-            /*
-                conditions: {
-                    square_min_fill: 0, // The least amount of initial digits that a square can have
-                    max_squares_min_filled: 1, // How much squares can be minimally filled ?
-                    //
-                    digit_shown_min: 1, // The least amount each digit can be shown on the board
-                    max_digits_min_shown: 2, // How much digits with least amount can be ?
-                },
-            */
-
-            //console.log('remains: ', i, 'options: ', currentBoard);
-        }
-    },
-
     backtrack: function (currGridState) {
-        //console.log('tracking....');
-        //
+
         let grid;
         let grid2;
 
@@ -3168,13 +2064,9 @@ const engine = {
             const checkUnassignedTile = engine.findUnassignedTile.bind(); 
             const isUnassigned = checkUnassignedTile(grid, pos);
 
-            if(!isUnassigned) { /* console.log(grid); */ return grid; }
+            if(!isUnassigned) { return grid; }
 
             const checkSafety = engine.testSafety.bind();
-
-            //console.log(pos.row, pos.index_in_row);
-
-            //console.log(start_num, end_num);
 
             for(let i=start_num; (start_num < end_num) ? i<=end_num : i>=end_num; (start_num < end_num) ? i++ : i--) {
                 const isSafe = checkSafety(grid, pos, i);
@@ -3189,41 +2081,14 @@ const engine = {
             }
 
             return false;
-
-            /* TO DO
-
-            1) Stwórz matrycę, która będzie bazowała na zmiennej 'grid', ale zamiast początkowych cyfr (initials) będzie posiadała znak
-            'x'. Ta matryca będzie edytowalną wersją 'grid', gdzie bez obaw będziemy mogli zmieniać wartości liczb nie podanych na początku
-            (non-initials), a przede wszystkim cofać się w razie gdy nie będzie już możliwych cyfr do wpisania w danej kratce
-
-            2) Stwórz mechanizm cofania się, czyli: "gdy w danej kratce nie pasuje już żadna liczba (num + 1 > 9), wtedy na podstawie matrycy
-            cofnij się wstecz o 1 pole, które nie jest znakiem 'x' i stamtąd od tej liczby, którą ta kratka posiada, próbuj zwiększać wartość
-            num (już od tej, którą posiada) w dawnej kratce dalej. Ponadto zaznacz, że gdy (index_in_row - 1 < 0) to wtedy ustaw index_in_row na 8,
-            a row = row - 1 !"
-
-            3) Możliwe rozwiązania zapisuj w nowo utworzonej tablicy rozwiązań, który w momencie, gdy sudoku zdoła ułożyć sudoku, to wtedy wpisze
-            do niej reprezentację mapy z rozwiązaniem (ustawionymi cyframi), a następnie od tego miejsca zacznie backtracking dalej w poszukiwaniu
-            dalszych rozwiązań, aż do momentu gdy cała iteracja planszy dobiegnie końca.
-
-            4) Na koniec wyświetl wynik - czy sudoku jest unikalne ??
-            
-            */
         }
 
         const opt_1To9 =  initBackTrack(grid, 1, 9);
         const opt_9To1 =  initBackTrack(grid2, 9, 1);
-
-        //console.log(opt_1To9);
-        //console.log(opt_9To1);
         
         const isSudokuUnique = this.checkOneSolution(opt_1To9, opt_9To1);
 
-        //console.log('HAS SUDOKU JUST ONE SOLUTION ?', isSudokuUnique);
-
-        console.log(opt_1To9);
-
         return isSudokuUnique;
-        //const isSafe = checkTileSafety()
     },
 
     checkOneSolution: function(opt_1To9, opt_9To1) {
@@ -3248,7 +2113,6 @@ const engine = {
     },
 
     testSafety: function(grid, {row, index_in_row}, num) {
-        //console.log('testSafety...');
         // Check row & column first
         for(let k=0; k<grid[row].length; k++) {
             if(num === parseInt(grid[row][k])) return false; // CHECK ROW || if False = We have this number in a row already
@@ -3272,28 +2136,18 @@ const engine = {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
-        console.log(game_history);
-        console.log(current_step);
-        //console.log(ordered);
 
-
-        // KONIECZNE BĘDZIE JESZCZE PRZYGOTOWANIE MECHANIZMU ZABEZPIECZAJĄCEGO, GDY GRACZ PO NADPISANIU HISTORII GRY, ZMIENI NAGLE KAFELEK
-        // Z "PENCILMARK TILE" NA "SINGLE DIGIT" TILE, PO CZYM COFNIE SIĘ W CZASIE DO POPRZEDNIEJ TURY -> EDIT: GOTOWE ✔️
-
-        console.log(game_history[current_step])
         for(let tile = 0; tile<ordered.length; tile++) {
             let row = Math.floor(tile / 9); 
             let column = tile%9;
 
-            // Przy używaniu podróży w czasie zmieniaj pozycję wskaźnika "active"
+            // During "time travelling" change the position of "active" class pointer
              if(ordered[(row * 9) + column].classList.contains('active')) {   
                 ordered[(row * 9) + column].classList.remove('active');
             } 
 
             if((ordered[(row * 9) + column].classList.contains('pencilmark_tile')) && (typeof(game_history[current_step][row][column]) === 'object')) {
-                console.log('Lets deal with array now')
-                //console.log(ordered[(row * 9) + column].childNodes, game_history[current_step][row][column])
-                
+            
                 let orderedPencilmarks = [];
                 for(let y=0; y<ordered[(row * 9) + column].childNodes.length; y++) {
                     if(parseInt(ordered[(row * 9) + column].childNodes[y].textContent)) {  // ☢️
@@ -3301,20 +2155,17 @@ const engine = {
                     }
                 }
 
-                console.log(orderedPencilmarks, game_history[current_step][row][column]);
                 if(orderedPencilmarks.length !== game_history[current_step][row][column].length) {
                     let pencilmarkToModify;
                     let longerArray = (orderedPencilmarks.length > game_history[current_step][row][column].length) ? orderedPencilmarks : game_history[current_step][row][column];
                     let shorterArray = (orderedPencilmarks.length > game_history[current_step][row][column].length) ? game_history[current_step][row][column] : orderedPencilmarks;
-                    // W pencilmarks tego kafelka nastąpił update. Zidentyfikuj zmianę w tym kafelku
+                    // In this tile pencilmarks has received an update. Identify the change in the tile
                     longerArray.some((val, ind) => {
                         if(!shorterArray.includes(val)) {
                             pencilmarkToModify = val;
                             return val;
                         }
                     })
-
-                    console.log(pencilmarkToModify);
 
                     let pencilmark_tile = ordered[(row * 9) + column].querySelector(`.no-${pencilmarkToModify}`);
                     (parseInt(pencilmark_tile.textContent)) ? pencilmark_tile.textContent = '' : pencilmark_tile.textContent = pencilmarkToModify;  // ☢️ ☢️ ☢️
@@ -3323,11 +2174,9 @@ const engine = {
 
             // When player change tile role from "pencilmark" to "single digit" and vice versa
             else if(ordered[(row * 9) + column].classList.contains('pencilmark_tile') || typeof(game_history[current_step][row][column]) === 'object') {
-                console.warn('entering dev state');
-                // ... TO DO
+
                 if(ordered[(row * 9) + column].classList.contains('pencilmark_tile')) {
                     // "Pencilmark tile" -> "Single digit tile"
-                    console.log("Pencilmark tile -> Single digit tile");
                     ordered[(row * 9) + column].classList.remove('pencilmark_tile');
                     while(ordered[(row * 9) + column].childNodes.length) {
                         ordered[(row * 9) + column].childNodes[ordered[(row * 9) + column].childNodes.length - 1].remove();
@@ -3338,21 +2187,16 @@ const engine = {
 
                 else if(typeof(game_history[current_step][row][column]) === 'object') {
                     // "Single digit tile -> Pencilmark tile"
-                    console.log("Single digit tile -> Pencilmark tile");
                     ordered[(row * 9) + column].textContent = '';   // ☢️
                     ordered[(row * 9) + column].classList.add('pencilmark_tile');
                     // Append divs to pencilmark tile
                     for(let x=1; x<=9; x++) {
                         let el = document.createElement('div');
-                        //if(x === parseInt(e.target.textContent)) {el.textContent = e.target.textContent};
-                        // ⛔ Uncaught TypeError: Cannot read properties of null (reading 'includes')
-                        console.log(game_history[current_step][row][column], x)
                         if(game_history[current_step][row][column] === null) {game_history[current_step][row][column] = ''}
-                        if(game_history[current_step][row][column].includes(x)) { // Throws errors 💀 - we need to test if it's still an issue here
+                        if(game_history[current_step][row][column].includes(x)) {
                             let ind = game_history[current_step][row][column].indexOf(x);
                             el.textContent = game_history[current_step][row][column][ind];  // ☢️
                         }
-                        //console.log(game_history[current_step][row][column].length);
                         el.classList.add('xd', `no-${x}`);
                         ordered[(row * 9) + column].appendChild(el);
                     }
@@ -3361,25 +2205,8 @@ const engine = {
 
             // This statements will not work for pencilmarks !
             else if(ordered[(row * 9) + column].textContent !== game_history[current_step][row][column]) {  // ☢️
-                console.log(ordered[(row * 9) + column], game_history[current_step][row][column])
                 ordered[(row * 9) + column].textContent = game_history[current_step][row][column];   // ☢️
             }
-
-            /* if(typeof(game_history[current_step][row][column]) !== 'string'  || (typeof(game_history[current_step][row][column]) === 'string' && !parseInt(game_history[current_step][row][column]))) {
-                // It means it's not initial tile - because those can never be modified by history travel
-                // Now determine whether a tile is normal digit appen
-                console.log(parseInt(game_history[current_step][row][column]), game_history[current_step][row][column])
-
-                if(typeof(game_history[current_step][row][column]) === 'string') {
-                    console.log('empty cell');
-                }
-                else if(typeof(game_history[current_step][row][column]) === 'number') {
-                    console.log(`it's number`);
-                }
-                else if(typeof(game_history[current_step][row][column]) === 'object') {
-                    console.log(`it is Pencilmark Array`)
-                }
-            } */
 
             if(!game_history[current_step][row][column]) {
                 // If we used rubber, this might happen. Instead of appending 'NaN', let's append ''
@@ -3388,10 +2215,7 @@ const engine = {
             }
         }
 
-        //console.log(game_history, activeTiles_history);
-
         // At the very end update active class
-        //console.log(ordered[activeTiles_history[current_step] - 1]);
         if(ordered[activeTiles_history[current_step] - 1]) {
             ordered[activeTiles_history[current_step] - 1].classList.add('active'); // For undo & redo 
             setActive(ordered[activeTiles_history[current_step] - 1])
@@ -3410,8 +2234,6 @@ const engine = {
                 this.applyHighlightEffect(ordered[activeTiles_history[current_step - 1] - 1], finalDifficulty, props);
             }
         }
-        //ordered[(activeTiles_history[current_step] + 1) - 1].classList.add('active'); // For redo
-    
     },
 
     resetSudoku: function(final_difficulty) {
@@ -3422,7 +2244,7 @@ const engine = {
         ordered.forEach(el => {
             el.textContent = '';  // ☢️
             el.style.color = '';
-            el.classList.remove(`active`, `initial`, `initial-night`, `initial-day`, `pencilmark_tile`, /* `tile-${final_difficulty}` */);
+            el.classList.remove(`active`, `initial`, `initial-night`, `initial-day`, `pencilmark_tile`);
         })
     },
 
@@ -3430,7 +2252,6 @@ const engine = {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
-        console.log(theme);
         if(theme === 'night') {
             for(let tile_no = 0; tile_no<ordered.length; tile_no++) {
                 ordered[tile_no].style.backgroundColor = `#000`;
@@ -3443,8 +2264,6 @@ const engine = {
     },
 
     applyHighlightEffect: function(e_target, finalDifficulty, props) {
-        //console.log(e, e.target);
-        //console.log(e.target, e.target.dataset.order, parseInt(Math.floor(e.target.dataset.order - 1) / 9), parseInt((e.target.dataset.order - 1) % 9));
         const activeTile_row = parseInt(Math.floor(e_target.dataset.order - 1) / 9);
         const activeTile_col = parseInt((e_target.dataset.order - 1) % 9);
 
@@ -3467,7 +2286,6 @@ const engine = {
     },
 
     applyHighlightForSquare: function(ordered, this_square_row, this_square_col, finalDifficulty, props) {
-        console.log(this_square_row, this_square_col);
         for(let sq_row=0; sq_row<3; sq_row++) {
             for(let sq_col=0; sq_col<3; sq_col++) {
                 ordered[((this_square_row + sq_row) * 9) + (this_square_col + sq_col)].style.backgroundColor = this.colors['highlight'][props.theme][finalDifficulty]; // For square
@@ -3524,10 +2342,6 @@ const engine = {
 
     },
 
-    interact: function() {
-        console.log('clicked');
-    },
- 
 }
 
 export { engine, success_board };

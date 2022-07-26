@@ -1,16 +1,14 @@
-import React, { useEffect, createRef, useRef } from "react";
-import  Sudoku from './Sudoku.js';
+import React from "react";
 import '../styles/error_boundary.css';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { hasError: false, message: '132' };
+        this.state = { hasError: false, message: 'to_be_announced' };
     }
 
     componentDidCatch(error, info) {
         // Show fallback UI
-        console.warn(error);
         this.setState({ hasError: true, message: error })
     }
 
@@ -31,7 +29,6 @@ class ErrorBoundary extends React.Component {
                             {`${this.state.message}`}
                         </p>
                     </div>
-
                 </div>
             )
         }
