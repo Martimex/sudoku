@@ -58,7 +58,11 @@ function Info(props) {
                     </div>
                     <div className="info-box-author">
                         <div className="info-box-author-text"> Created by: </div>
-                        <div className="info-box-author-logo"> ╱╲/\╱╲ </div>
+                        <div className="info-box-author-logo">
+                            <a href="https://github.com/Martimex">
+                                <img alt="author_logo" src="author.svg" ></img>
+                            </a> 
+                        </div>
                     </div>
 
                 </div>
