@@ -28,7 +28,7 @@ function Info(props) {
                             App Info 
                         </div>
                         <div className="grid-container-version">  
-                            1.0.0 
+                            {version_info[version_info.length - 1].name}
                         </div>
                     </div>
                 </div>
@@ -59,8 +59,8 @@ function Info(props) {
                     <div className="info-box-author">
                         <div className="info-box-author-text"> Created by: </div>
                         <div className="info-box-author-logo">
-                            <a href="https://github.com/Martimex">
-                                <img alt="author_logo" src="author.svg" ></img>
+                            <a className="author-logo-box" href="https://github.com/Martimex" target='_blank'>
+                                <img className="author-logo" alt="author_logo" src="author.svg" ></img>
                             </a> 
                         </div>
                     </div>
@@ -68,7 +68,7 @@ function Info(props) {
                 </div>
 
                 <div className={`info-box info-${props.theme} info-box-new-sizing`} datatype="outro">
-                    <div className="info-close" onClick={() => {props.setCheckInfo(false);}}> Close </div>
+                    <div className="info-close" onClick={() => {document.documentElement.requestFullscreen(); props.setCheckInfo(false);}}> Close </div>
                 </div>
             </div>
         </div>

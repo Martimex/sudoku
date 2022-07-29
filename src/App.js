@@ -17,6 +17,7 @@ function App() {
   })
 
   const triggerPlay = (...args) => {
+    document.documentElement.requestFullscreen();
     setState('sudoku');
   }
 
