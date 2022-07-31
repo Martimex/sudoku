@@ -14,6 +14,9 @@ const currentHistory = {
     history: [],
 };
 
+let availableDigits = { } // Stores how many times a number is used
+let availableDigits_history = []; // Array that stores history of available Digits through the game
+
 let game_History = [];
 let activeTiles_History = []; // Array that contains history of tiles, which were targeted by player (change onto them - each index = change)
 
@@ -92,6 +95,11 @@ function Sudoku(props) {
 
         if(e.target.classList.contains('numbers-box')) {return;}
 
+        if(current_step !== step) {
+            availableDigits_history.splice(current_step + 1);
+            availableDigits = {...availableDigits_history[availableDigits_history.length - 1]};
+        }
+
         if(!pencilmarks_Enabled) {
             if(active.classList.contains('pencilmark_tile')) {
                 active.classList.remove('pencilmark_tile');
@@ -100,11 +108,39 @@ function Sudoku(props) {
                 }
             }
             
+            // History travel still causes errors... (bugs)
+
+            if((!parseInt(e.target.textContent)) || (parseInt(active.textContent) === parseInt(e.target.textContent))) { // Erase or change number to exact same
+                availableDigits[parseInt(active.textContent)]++;
+            }
+            else if(parseInt(active.textContent) !== parseInt(e.target.textContent)) {  // Change a digit into another
+                availableDigits[parseInt(active.textContent)]++;
+                availableDigits[parseInt(e.target.textContent)]--;
+            }
+            else { // Simply add a digit to an empty tile
+                availableDigits[parseInt(e.target.textContent)]--;
+            }
+
+            // Push this availableDigits state into a availableDigits_history array
+            delete availableDigits.NaN; // prevent from some weird error happenning, which appended key 'NaN' to an object
+            let availableDigits_copy = JSON.parse(JSON.stringify({...availableDigits}));
+            availableDigits_history.push(availableDigits_copy);
+
+            // Finally, visually update used Digits' in numbers box
+            engine.switchAvailableDigits(availableDigits_history, availableDigits_history.length - 1, step);
+
+            // Update board view (?)
             (parseInt(active.textContent) === parseInt(e.target.textContent)) ? active.textContent = '' : active.textContent = e.target.textContent;
             if(!parseInt(active.textContent)) {active.textContent = '';} // minor change when using rubber, prevents from bugs
+        
         }
         else {
+
             if(active.classList.contains('pencilmark_tile')) {
+
+                let availableDigits_copy = JSON.parse(JSON.stringify({...availableDigits}));
+                availableDigits_history.push(availableDigits_copy);
+
                 for(let ind=0; ind<active.childNodes.length; ind++) {
                     if(active.childNodes[ind].classList.contains(`no-${parseInt(e.target.textContent)}`)) {
                         if(active.childNodes[ind].textContent) {
@@ -117,6 +153,18 @@ function Sudoku(props) {
                 }
             }
             else {
+    
+                if(parseInt(active.textContent)) { // Change from an existing digit into a pencilmark tile
+                    availableDigits[parseInt(active.textContent)]++;
+                }
+
+                delete availableDigits.NaN; // prevent from some weird error happenning, which appended key 'NaN' to an object
+                let availableDigits_copy = JSON.parse(JSON.stringify({...availableDigits}));
+                availableDigits_history.push(availableDigits_copy);
+    
+                // Finally, visually update used Digits' in numbers box
+                engine.switchAvailableDigits(availableDigits_history, availableDigits_history.length - 1, step);
+                
                 active.textContent = '';
                 active.classList.add('pencilmark_tile');
                 // Append divs to pencilmark tile
@@ -128,6 +176,10 @@ function Sudoku(props) {
                 }
             }
         }
+
+        // Błąd pojawia się, gdy np. zrobimy 2 ruchy, klikniemy "cofnij" a potem "ponów" i wykonamy jakąś turę (!) = probably solved
+        //console.log(availableDigits);
+        //console.log(availableDigits_history);
 
         anime({
             targets: active,
@@ -219,6 +271,8 @@ function Sudoku(props) {
 
         // Check winning condition
         checkSudokuSolved(game_History[game_History.length - 1], success_board);
+
+        //console.log(game_History.length, availableDigits_history.length);
     }    
 
     const checkSudokuSolved = (current_board, win_board) => {
@@ -272,6 +326,9 @@ function Sudoku(props) {
             engine.resetSudoku(final_Difficulty);
             game_History = [];
             activeTiles_History = [];
+            availableDigits = {};
+            availableDigits_history = [];
+            engine.cleanBlankNumberBoxes();
     
             setPencilMarksEnabled(false);
             tools['pencil'].isActive = false;
@@ -303,10 +360,13 @@ function Sudoku(props) {
                                 setNewSudokuLoading(0);
                                 // Create game history
                                 const history = engine.createInitialGameHistory();
+                                availableDigits = engine.reduceAvailableDigits(history);
                                 currentHistory.history = history;
                                 if(!game_History.length) {
+                                    availableDigits_history.push(availableDigits);
                                     game_History.push(history);
                                 }
+
                                 engine.applyInitials(props.theme);
                             })
                     } 
@@ -377,6 +437,7 @@ function Sudoku(props) {
     useEffect(() => {
         if(step > 0) { // Prevents from initial fire when component is being rendered
             engine.travelInTime(current_step, game_History, activeTiles_History, setActive, final_Difficulty, props);
+            availableDigits = engine.switchAvailableDigits(availableDigits_history, current_step, step);
         }
     }, [history_travel])
 

@@ -268,7 +268,31 @@ const engine = {
         return initialBoard;
     },
 
-    gatherTilesData: function(allTiles) {
+    reduceAvailableDigits: function(sudoku_grid) {
+        let newAvailableDigits = {
+            1: 9,
+            2: 9,
+            3: 9,
+            4: 9,
+            5: 9,
+            6: 9,
+            7: 9,
+            8: 9,
+            9: 9,
+        } 
+
+        for(let sudoku_row = 0; sudoku_row < 9; sudoku_row++) {
+            for(let sudoku_col = 0; sudoku_col < 9; sudoku_col++) {
+                if(parseInt(sudoku_grid[sudoku_row][sudoku_col]))  {
+                    newAvailableDigits[parseInt(sudoku_grid[sudoku_row][sudoku_col])]--;
+                }
+            }
+        }
+
+        return newAvailableDigits;
+    },
+
+/*     gatherTilesData: function(allTiles) {
         const arr = [];
 
         for(let a=0; a<this.rows; a++) {
@@ -279,7 +303,7 @@ const engine = {
             arr[Math.floor(b / this.rows)].push(allTiles[b]);
         }
         return arr;
-    },
+    }, */
 
     hideDigits: function({difficulty, theme, options}) {
         const allTiles = document.querySelectorAll('.tile');
@@ -2131,8 +2155,40 @@ const engine = {
         
     },
 
+    switchAvailableDigits: function(availableDigits_history, current_step, step) {
+        // 1. History - available digit adjusting
+        let availableDigits_current = {...availableDigits_history[current_step]}; // it's a copy of available Digits, so we have to make it reference in order to work properly !
+        if(current_step === step) {
+            availableDigits_current = {...availableDigits_history[availableDigits_history.length - 1]}
+        }
+        const numbersBox = document.querySelector('.numbers-box');
+        const allNumersBoxOptions = numbersBox.querySelectorAll('.option');
+        for(let key in availableDigits_current) {
+            if(availableDigits_current[key]) {
+                allNumersBoxOptions[parseInt(key - 1)].classList.remove('option-blank');
+                allNumersBoxOptions[parseInt(key - 1)].style.pointerEvents = 'auto';
+            } else if(availableDigits_current[key] === 0) {
+                allNumersBoxOptions[parseInt(key - 1)].classList.add('option-blank');
+                allNumersBoxOptions[parseInt(key - 1)].style.pointerEvents = 'none';
+            }
+        }
+
+        return availableDigits_current;
+    },
+
+    cleanBlankNumberBoxes: function() {
+        const numbersBox = document.querySelector('.numbers-box');
+        const allNumersBoxOptions = numbersBox.querySelectorAll('.option');
+        allNumersBoxOptions.forEach(el => {
+            el.classList.remove('option-blank');
+            el.style.pointerEvents = 'auto';
+        })
+    },
+
     // This one is a Toolbox specific function, which repaints the board whenever player 'travels in time'
-    travelInTime: function(current_step, game_history, activeTiles_history, setActive, finalDifficulty, props) {
+    travelInTime: function(current_step, game_history, activeTiles_history, setActive, finalDifficulty, props) {    
+
+        // 2. History - board repainting
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);

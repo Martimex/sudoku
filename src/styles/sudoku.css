@@ -126,6 +126,10 @@
     cursor: pointer;
 }
 
+.option-blank {
+    opacity: .3;
+}
+
 /* When we append a number to a given tile with pencilmark option turn on*/
 
 .pencilmark_tile {
