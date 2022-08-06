@@ -6,6 +6,22 @@
 
 <br><hr>
 
+**[1.1.1] Change info tab reference links**
+<br>
+_06.08.2022_
+
+* This update contains following changes:
+
+1. Toolbox Info tab has updated links. The second one now leads
+directly to a documentation file, the first transfersdirectly to a
+changelog page. First link is renamed to: "Check changelog";
+
+2. Landing page section for difficulty choose has the title changed -
+now it's "Try to get Sudoku". It's essential to outline that Sudoku
+difficulty is not 100% guaranteed.
+
+<br><hr>
+
 **[1.1.0] Add number box digit usage limit**
 <br>
 _31.07.2022_
