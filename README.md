@@ -267,7 +267,7 @@ I would like to thank everyone who supported me during the development journey o
 
 This game has been made under MIT License. Follow this link for it's detailed content: 
 
-https://github.com/Martimex/sudoku/blob/main/License
+https://github.com/Martimex/sudoku/blob/main/LICENSE
 
 ## Tools used
 
