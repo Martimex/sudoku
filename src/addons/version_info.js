@@ -15,6 +15,10 @@ const version_info = [
         name: '1.1.0',
         release: '31/07/22',
     },
+    {
+        name: '1.1.1',
+        release: '6/8/22',
+    },
 ];
 
 export default version_info;

@@ -47,13 +47,13 @@ function Info(props) {
                     <div className="info-box-grid-content" datatype="link">
                         <FontAwesomeIcon icon={faStar}  className="info-box-desc-icon" datatype={'star'} />
                         <div className="info-box-grid-content-name"> 
-                         <a className="info-link" href='https://github.com/Martimex' target={'_blank'}> Learn about Sudoku  </a>
+                         <a className="info-link" href='https://github.com/Martimex/sudoku/blob/main/Changelog.md' target={'_blank'}> Check changelog  </a>
                         </div>
                     </div>
                     <div className="info-box-grid-content" datatype="link">
                         <FontAwesomeIcon icon={faFile} className="info-box-desc-icon" datatype={'file'} />
                         <div className="info-box-grid-content-name"> 
-                            <a className="info-link" href="https://github.com/Martimex/sudoku" target={'_blank'}> See documentation </a> 
+                            <a className="info-link" href="https://github.com/Martimex/sudoku/blob/main/README.md" target={'_blank'}> See documentation </a> 
                         </div>
                     </div>
                     <div className="info-box-author">

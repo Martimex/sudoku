@@ -170,7 +170,7 @@ function Landing(props) {
                 
 
                     <div className="app-section-box" data-type="difficulty">
-                        <div className="app-text"> Choose a difficulty </div>
+                        <div className="app-text"> Try to get Sudoku </div>
 
                         <div className="content-box">
                             <div className="box-difficulty">
