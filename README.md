@@ -5,14 +5,14 @@
 
 In order to smoothly jump through the documentation sections, use the "list" icon on the top-left side of the page screen. 
 
-1. [*Introduction*] 
-2. [*Prerequisites*] 
-3. [*History & inspiration*] 
-4. [*Walkthrough*] 
-5. [*Future improvements*] 
-6. [*Conclusion*] 
-7. [*License*]
-8. [*Tools used*]
+1. [*Introduction*](#introduction)
+2. [*Prerequisites*](#prerequisites)
+3. [*History & inspiration*](#history)
+4. [*Walkthrough*](#walkthrough)
+5. [*Future improvements*](#improvements)
+6. [*Conclusion*](#conclusion)
+7. [*License*](#license)
+8. [*Tools used*](#tools)
 
 ## Introduction
 
@@ -35,7 +35,7 @@ _Quick note: Above issue will hopefully be fixed soon._
 
 ***3) Learn Sudoku fundamentals*** – as mentioned before, it is highly recommended to get a grasp of Sudoku rules and solving methods. Even if you feel like a veteran-level Sudoku solver, I still encourage you to check the **detailed Sudoku guide** (at least for its' comprehensively explained ‘techniques’ section). All methods covered there are essential in order to solve all kinds of Sudoku puzzles – from simplest up to the most complex ones.
 
-## History & inspiration
+## History
 
 Inspiration to create a sudoku application came spontaneously. Personally, I used to solve a lot of paper-version sudoku puzzles back then, when I had plenty of spare time. At the beginning of January 2022, I was having a conversation with my friends, and it turned out that many of them enjoy doing this activity too. Basically, it was a motivating factor to create a simple sudoku app that can be used by them. Despite the fact that the project was not scheduled by any means, a final action came real quick. 
 
@@ -243,7 +243,7 @@ Clicking the ‘house’ icon on the left would redirect you to the landing (hom
 By clicking the ‘plus’ icon, a new Sudoku is rendered – with the same, previously adjusted customization. It works exactly as a „reset button”, however without a confirmation screen being shown.
 
 
-## Future improvements
+## Improvements
 
 While ‘Sudoku World’ has already received a bunch of updates, it cannot be denied that there are parts that still need some sort of improvements.
 
@@ -269,12 +269,12 @@ This game has been made under MIT License. Follow this link for it's detailed co
 
 https://github.com/Martimex/sudoku/blob/main/LICENSE
 
-## Tools used
+## Tools
 
- - React JS
- - Node JS (runtime)
- - Anime.js
- - Font Awesome
- - Render (hosting provider)
+ - [React JS](https://github.com/facebook/react)
+ - [Node JS (runtime)](https://github.com/nodejs/node)
+ - [Anime.js](https://github.com/juliangarnier/anime)
+ - [Font Awesome](https://github.com/FortAwesome/Font-Awesome)
+ - [Render (hosting provider)](https://render.com/)
 
 © Martimex 2022
