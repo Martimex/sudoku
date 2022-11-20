@@ -4,31 +4,36 @@ import '../styles/timer.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 
-function Timer(props) {
+import { useSelector } from 'react-redux';
+
+function Timer({hours, minutes, seconds, setTime}) {
+
+    const timer_isStopped = useSelector(state => state.options.extras['timer'].isStopped);
 
     const tick = () => {
-        if(props.minutes === 59 && props.seconds === 59) {
-            props.setTime([props.hours + 1, 0, 0])
+        //console.log(props)
+        if(minutes === 59 && seconds === 59) {
+            setTime([hours + 1, 0, 0])
         }
-        else if(props.seconds === 59) {
-            props.setTime([props.hours, props.minutes + 1, 0]);
+        else if(seconds === 59) {
+            setTime([hours, minutes + 1, 0]);
         }
         else {
-            props.setTime([props.hours, props.minutes, props.seconds + 1]);
+            setTime([hours, minutes, seconds + 1]);
         }
     }
 
     useEffect(() => {
-        if(!props.stopTimer) {
+        if(!timer_isStopped) {
             const timerId = setInterval(() => tick(), 1000);
             return() => clearInterval(timerId);
         }
-    }, [props.seconds, props.stopTimer])
+    }, [seconds, timer_isStopped])
 
     return (
         <div className="timer-box">
             <FontAwesomeIcon icon={faClock} className={`timer-icon`} />
-            <div className="timer-count"> {props.hours}:{(props.minutes < 10 ? '0'+props.minutes : props.minutes)}:{(props.seconds < 10 ? '0'+props.seconds : props.seconds)} </div>
+            <div className="timer-count"> {hours}:{(minutes < 10 ? '0'+minutes : minutes)}:{(seconds < 10 ? '0'+seconds : seconds)} </div>
         </div>
     )
 }

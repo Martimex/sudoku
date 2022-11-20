@@ -8,9 +8,15 @@ function Tile(props) {
     ((props.parentId % props.squareColumns) * props.squareColumns) +
     (props.id % 3) + 1
     
-    return(
-        <div className={`tile tile-${props.difficulty}`} data-order={pattern}>
+   // const row = Math.floor((props.parentId % 3) * props.squareRows) + Math.floor(props.id / props.squareRows); // tile cord => row
+   // const column =  (props.squareColumns * Math.floor(props.parentId / 3)) + Math.floor((props.id % 3)); // tile cord => column
 
+   const column =   (pattern - 1) % (props.squareColumns * props.squareRows);
+   const row = Math.floor((pattern - 1) / (props.squareColumns * props.squareRows));
+
+    return(
+        <div className={`tile tile-${props.difficulty}`} data-row={row} data-column={column} data-order={pattern}>
+        
         </div>
     );
 }

@@ -4,6 +4,20 @@ import PlayButton from './components/PlayButton.js';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 
+// import redux stuff
+import {useSelector, useDispatch} from 'react-redux';
+import {
+    toggleExtras,
+    switchTheme,
+    switchDifficulty
+} from './features/options/optionsSlice.js';
+import {
+    changeView
+} from './features/appView/appViewSlice.js';
+import {
+    RESET_STATE
+} from './features/sudoku/sudokuSlice.js';
+
 import anime from 'animejs/lib/anime.es.js';
 
 // Landing will get initial values to determine which kind of sudoku (+ user preferences) applies
@@ -64,6 +78,10 @@ const themeObject = {
 
 function Landing(props) {
 
+    const dispatch = useDispatch();
+    const theme = useSelector(state => state.options.theme);
+    const difficulty = useSelector(state => state.options.difficulty);
+
     const layoutRef = useRef(null);
 
     const easyRef = useRef(null);
@@ -80,7 +98,7 @@ function Landing(props) {
             duration: 600,
             easing: 'easeInOutSine',
             borderRadius: visualObject.borderRadius[value],
-            color: (value === 1)? visualObject.color_active[`${props.difficulty}`] : (props.theme === 'night') ? visualObject.color_inactive[0] : visualObject.color_inactive[1],
+            color: (value === 1)? visualObject.color_active[`${difficulty}`] : (theme === 'night') ? visualObject.color_inactive[0] : visualObject.color_inactive[1],
             fontWeight: visualObject.fontWeight[value],
             scale: visualObject.scale[value],
         })
@@ -91,7 +109,7 @@ function Landing(props) {
         const difficultyBoxes = layoutRef.current.querySelectorAll('.difficulty');
         for(let difficulty_box_no = 0; difficulty_box_no < difficultyBoxes.length; difficulty_box_no++) {
             difficultyBoxes[difficulty_box_no].classList.remove('chosen_difficulty');
-            if(difficultyBoxes[difficulty_box_no].classList.contains(`${props.difficulty}`)) {
+            if(difficultyBoxes[difficulty_box_no].classList.contains(`${difficulty}`)) {
                 difficultyBoxes[difficulty_box_no].classList.add('chosen_difficulty');
                 changeVisuals(difficultyBoxes[difficulty_box_no], 1);
             } else {
@@ -100,11 +118,11 @@ function Landing(props) {
         
         }
 
-    }, [props.difficulty]);
+    }, [difficulty]);
 
     useEffect(() => {
         // Start from here
-        const newTheme = themesBoxRef.current.querySelector(`[data-theme=${props.theme}]`);
+        const newTheme = themesBoxRef.current.querySelector(`[data-theme=${theme}]`);
 
         const allContentBoxes = layoutRef.current.querySelectorAll('.content-box');
         const allInputs = layoutRef.current.querySelectorAll('.items-vis');
@@ -117,12 +135,14 @@ function Landing(props) {
         const modesArr = [...allModes];
 
         for(let i=0; i<allModes.length; i++) {
-            if(allModes[i] === newTheme) { modesArr.splice(i, 1); changeThemes(newTheme, modesArr, props.theme, props.difficulty, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes);}
+            if(allModes[i] === newTheme) { modesArr.splice(i, 1); changeThemes(newTheme, modesArr, theme, difficulty, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes);}
         }
 
-    }, [props.theme])
+    }, [theme])
 
     function changeThemes(newTheme, modesArr, theme, difficulty, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes) {
+
+        //console.warn('Performing side effect ... ')
 
         anime({
             targets: [modesArr, layoutRef.current, allContentBoxes, allInputs, allLabels],
@@ -174,10 +194,10 @@ function Landing(props) {
 
                         <div className="content-box">
                             <div className="box-difficulty">
-                                <div className="difficulty difficulty-easy easy" ref={easyRef} onClick={() => {props.setDifficulty('easy')}}> EASY </div>
-                                <div className="difficulty difficulty-medium medium" ref={mediumRef} onClick={() => {props.setDifficulty('medium')}}> MEDIUM </div>
-                                <div className="difficulty difficulty-hard hard" ref={hardRef} onClick={() => {props.setDifficulty('hard')}}> HARD </div>
-                                <div className="difficulty difficulty-master master" ref={masterRef} onClick={() => {props.setDifficulty('master')}}> INSANE </div>
+                                <div data-difficulty="easy" className="difficulty difficulty-easy easy" ref={easyRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))/* props.setDifficulty('easy') */}}> EASY </div>
+                                <div data-difficulty="medium" className="difficulty difficulty-medium medium" ref={mediumRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))/* props.setDifficulty('medium') */}}> MEDIUM </div>
+                                <div data-difficulty="hard" className="difficulty difficulty-hard hard" ref={hardRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))/* props.setDifficulty('hard') */}}> HARD </div>
+                                <div data-difficulty="master" className="difficulty difficulty-master master" ref={masterRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))/* props.setDifficulty('master') */}}> INSANE </div>
                             </div>
                         </div>
                     </div>
@@ -189,14 +209,14 @@ function Landing(props) {
                             <div className="box-items">
                                 <div className="items-vis">
                                     <input className="item-option" type="checkbox" value="false"  id="choose"/>
-                                    <label htmlFor="choose" className="label-item" onClick={() => props.setOptions(options => ({...options, timer: !props.options.timer}))}> </label>
+                                    <label htmlFor="choose" className="label-item" onClick={() => {dispatch(toggleExtras({name: 'timer'}))} /* props.setOptions(options => ({...options, timer: !props.options.timer})) */}> </label>
                                 </div>
                                 <span className="items-text"> Add Timer </span>
                             </div>
                             <div className="box-items">
                                 <div className="items-vis">
                                     <input className="item-option" type="checkbox" value="true" id="choose2"/>
-                                    <label htmlFor="choose2" className="label-item" onClick={() => props.setOptions(options => ({...options, backlit: !props.options.backlit}))}> </label>
+                                    <label htmlFor="choose2" className="label-item" onClick={() => {dispatch(toggleExtras({name: 'backlit'}))} /* props.setOptions(options => ({...options, backlit: !props.options.backlit})) */}> </label>
                                 </div>
                                 <span className="items-text"> Tile backlit </span>
                             </div>
@@ -208,10 +228,10 @@ function Landing(props) {
                         
                         <div className="content-box">
                             <div className="box-items" ref={themesBoxRef}> 
-                                <div className="items-icons" data-theme="day" onClick={() => {props.setTheme('day')}} >
+                                <div className="items-icons" data-theme="day" onClick={(e) => {console.log(e.target); dispatch(switchTheme({theme_name: e.target.dataset['theme']})) /* props.setTheme('day') */}} >
                                     <FontAwesomeIcon icon={faSun}  className="icon"></FontAwesomeIcon>
                                 </div>
-                                <div className="items-icons" data-theme="night" onClick={() => {props.setTheme('night')}} >
+                                <div className="items-icons" data-theme="night" onClick={(e) => {dispatch(switchTheme({theme_name: e.target.dataset['theme']})) /* props.setTheme('night') */}} >
                                     <FontAwesomeIcon icon={faMoon} className="icon"></FontAwesomeIcon>
                                 </div>
                             </div>
@@ -221,8 +241,8 @@ function Landing(props) {
 
                 </div>
 
-                {props.difficulty && (
-                    <PlayButton playSudoku={props.playSudoku} />
+                {difficulty && (
+                    <PlayButton playSudoku={() => dispatch(changeView({newViewName: 'sudoku'}))} /* playSudoku={props.playSudoku} */ />
                 )}
 
             </div>

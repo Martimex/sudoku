@@ -128,6 +128,7 @@
 
 .option-blank {
     opacity: .3;
+    pointer-events: none !important;
 }
 
 /* When we append a number to a given tile with pencilmark option turn on*/

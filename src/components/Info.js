@@ -6,11 +6,21 @@ import '../styles/reset.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {  faInfo, faCalendar, faStar, faFile, faTrophy  } from '@fortawesome/free-solid-svg-icons';
 
+import { useDispatch } from 'react-redux';
+import {
+    addExtraView,
+} from '../features/appView/appViewSlice.js';
+import {
+    stopTimer
+} from '../features/options/optionsSlice.js';
+
 function Info(props) {
 
-    useEffect(() => {
-        props.setStopTimer(!props.stopTimer);
+    const dispatch = useDispatch();
 
+    useEffect(() => {
+        //props.setStopTimer(!props.stopTimer);
+        dispatch(stopTimer(true));
         document.body.scrollTop = 0; // Safari
         document.documentElement.scrollTop = 0; // Chrome, Firefox, IE and Opera
         document.body.style.overflow = 'hidden';
@@ -68,7 +78,7 @@ function Info(props) {
                 </div>
 
                 <div className={`info-box info-${props.theme} info-box-new-sizing`} datatype="outro">
-                    <div className="info-close" onClick={() => {document.documentElement.requestFullscreen(); props.setCheckInfo(false);}}> Close </div>
+                    <div className="info-close" onClick={() => {document.documentElement.requestFullscreen(); document.body.style.overflow = 'auto'; dispatch(addExtraView({extraViewName: ''})); dispatch(stopTimer(false)); /* props.setCheckInfo(false); */}}> Close </div>
                 </div>
             </div>
         </div>

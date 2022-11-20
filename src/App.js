@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import Landing from './Landing';
 import Sudoku from './components/Sudoku';
 import ErrorBoundary from './components/ErrorBoundary';
+
+import { useSelector } from 'react-redux';
+
 import './App.css';
 
 function App() {
 
+  const appView = useSelector(state => state.appView.currentView);
   const [state, setState] = useState('landing');
 
   const [difficulty, setDifficulty] = useState(null); // string
@@ -32,13 +36,13 @@ function App() {
   return(
     <div className="App">
       <ErrorBoundary>
-        {state === 'landing' && (
+        {appView === 'landing' && (
           <Landing playSudoku={triggerPlay} difficulty={difficulty} setDifficulty={setDifficulty}
           options={options} setOptions={setOptions}
           theme={theme} setTheme={setTheme} />
         )}
 
-        {state === 'sudoku' && (
+        {appView === 'sudoku' && (
           <Sudoku backToLanding={triggerBack}  difficulty={difficulty} options={options} theme={theme} />
         )}
       </ErrorBoundary>

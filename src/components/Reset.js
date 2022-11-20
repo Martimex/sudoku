@@ -4,9 +4,17 @@ import '../styles/reset.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faBackspace } from '@fortawesome/free-solid-svg-icons';
 
+import { useDispatch } from 'react-redux';
+import {
+    addExtraView
+} from '../features/appView/appViewSlice.js';
+import {
+    RESET_STATE 
+} from '../features/sudoku/sudokuSlice.js';
 
 function Reset(props) {
 
+    const dispatch = useDispatch();
     const theme_ref = useRef(null);
 
     useEffect(() => {
@@ -26,10 +34,10 @@ function Reset(props) {
                     to replace it ? All progress will be lost
                 </div>
                 <div className="choose-box">
-                    <div className="choose-button choose-decline" onClick={() => {document.body.style.overflow = 'auto'; props.setconfirmReset(false); }}>
+                    <div className="choose-button choose-decline" onClick={() => {document.body.style.overflow = 'auto'; dispatch(addExtraView({extraViewName: ''}));/* props.setconfirmReset(false); */ }}>
                         <FontAwesomeIcon icon={faBackspace} />
                     </div>
-                    <div className="choose-button choose-confirm" onClick={() => {props.proceedReset()}}>
+                    <div className="choose-button choose-confirm" onClick={() => { props.proceedReset()}}>
                         <FontAwesomeIcon icon={faCheck} />
                     </div> 
                 </div>

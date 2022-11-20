@@ -69,7 +69,7 @@ const rules = {
 }
 
 const initial_board = [];
-const success_board = [];
+let success_board = [];
 
 const store = {
     sudoku_easy: [],
@@ -205,8 +205,11 @@ const engine = {
     },
 
     setBoard: function() {
+        //console.log(success_board);
         if(success_board.length) {
-            while(success_board.length) success_board.pop();
+            //while(success_board.length) { success_board.pop(); console.log('rm one')};
+            //success_board.splice(0);
+            success_board = [];
         }
 
         for(let success_board_row = 0; success_board_row < 9; success_board_row++) {
@@ -305,7 +308,7 @@ const engine = {
         return arr;
     }, */
 
-    hideDigits: function({difficulty, theme, options}) {
+    hideDigits: function(difficulty, theme) {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
@@ -2304,7 +2307,7 @@ const engine = {
         })
     },
 
-    resetHighlightEffect: function({theme}) {
+    resetHighlightEffect: function(theme) {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
@@ -2319,7 +2322,7 @@ const engine = {
         }
     },
 
-    applyHighlightEffect: function(e_target, finalDifficulty, props) {
+    applyHighlightEffect: function(e_target, finalDifficulty, theme) {
         const activeTile_row = parseInt(Math.floor(e_target.dataset.order - 1) / 9);
         const activeTile_col = parseInt((e_target.dataset.order - 1) % 9);
 
@@ -2330,21 +2333,21 @@ const engine = {
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
 
-        this.applyHighlightForRowAndCol(ordered, activeTile_row, activeTile_col, finalDifficulty, props);
-        this.applyHighlightForSquare(ordered, activeTileSquare_row, activeTileSquare_col, finalDifficulty, props);
+        this.applyHighlightForRowAndCol(ordered, activeTile_row, activeTile_col, finalDifficulty, theme);
+        this.applyHighlightForSquare(ordered, activeTileSquare_row, activeTileSquare_col, finalDifficulty, theme);
     },
 
-    applyHighlightForRowAndCol: function(ordered, this_row, this_col, finalDifficulty, props) {
+    applyHighlightForRowAndCol: function(ordered, this_row, this_col, finalDifficulty, theme) {
         for(let iir=0; iir<9; iir++) {
-            ordered[(this_row * 9) + iir].style.backgroundColor = this.colors['highlight'][props.theme][finalDifficulty];  // For row
-            ordered[(iir * 9) + this_col].style.backgroundColor = this.colors['highlight'][props.theme][finalDifficulty];  // For col
+            ordered[(this_row * 9) + iir].style.backgroundColor = this.colors['highlight'][theme][finalDifficulty];  // For row
+            ordered[(iir * 9) + this_col].style.backgroundColor = this.colors['highlight'][theme][finalDifficulty];  // For col
         }
     },
 
-    applyHighlightForSquare: function(ordered, this_square_row, this_square_col, finalDifficulty, props) {
+    applyHighlightForSquare: function(ordered, this_square_row, this_square_col, finalDifficulty, theme) {
         for(let sq_row=0; sq_row<3; sq_row++) {
             for(let sq_col=0; sq_col<3; sq_col++) {
-                ordered[((this_square_row + sq_row) * 9) + (this_square_col + sq_col)].style.backgroundColor = this.colors['highlight'][props.theme][finalDifficulty]; // For square
+                ordered[((this_square_row + sq_row) * 9) + (this_square_col + sq_col)].style.backgroundColor = this.colors['highlight'][theme][finalDifficulty]; // For square
             }
         }
     },

@@ -5,7 +5,14 @@ import '../styles/reset.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faPlus } from '@fortawesome/free-solid-svg-icons';
 
+import { RESET_STATE } from '../features/sudoku/sudokuSlice.js';
+import { RESET_EXTRAS } from "../features/options/optionsSlice";
+import { useDispatch, useSelector } from 'react-redux';
+
 function Win(props) {
+
+    const dispatch = useDispatch();
+    const isTimeEnabled = useSelector(state => state.options.extras[`timer`].isEnabled);
 
     useEffect(() => {
         document.body.scrollTop = 0; // Safari
@@ -22,7 +29,7 @@ function Win(props) {
 
                 <div className={`screen-description screen-description-${props.final_difficulty}`} >
                     Congratulations! You've just solved Sudoku {props.final_difficulty} !
-                    {props.isTimeEnabled === true && (
+                    {isTimeEnabled === true && (
                         <div className="time-summary"> 
                             <div className="time-text"> Solving time:  </div>
                             <div className="time-value">
@@ -33,7 +40,7 @@ function Win(props) {
                 </div>
 
                 <div className="choose-box">
-                    <div className={`choose-button win-icon-${props.final_difficulty}`} onClick={() => {document.body.style.overflow = 'auto'; props.goHome()}} > 
+                    <div className={`choose-button win-icon-${props.final_difficulty}`} onClick={() => {dispatch(RESET_STATE()); dispatch(RESET_EXTRAS()); document.body.style.overflow = 'auto'; props.goHome()}} > 
                         <FontAwesomeIcon icon={faHome} />
                     </div>
                     <div className={`choose-button win-icon-${props.final_difficulty}`} onClick={() => {props.getNewSudoku()}}> 
