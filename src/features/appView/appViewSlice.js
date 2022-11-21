@@ -15,7 +15,7 @@ export const appViewSlice = createSlice({
         },
         addExtraView(state, action) {
             const { extraViewName } = action.payload;
-            /* extraViewName && */ (state.extraView = extraViewName);
+            (state.extraView = extraViewName);
         }
     }
 })

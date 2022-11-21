@@ -14,9 +14,6 @@ import {
 import {
     changeView
 } from './features/appView/appViewSlice.js';
-import {
-    RESET_STATE
-} from './features/sudoku/sudokuSlice.js';
 
 import anime from 'animejs/lib/anime.es.js';
 
@@ -76,7 +73,7 @@ const themeObject = {
     }
 }
 
-function Landing(props) {
+function Landing() {
 
     const dispatch = useDispatch();
     const theme = useSelector(state => state.options.theme);
@@ -121,7 +118,6 @@ function Landing(props) {
     }, [difficulty]);
 
     useEffect(() => {
-        // Start from here
         const newTheme = themesBoxRef.current.querySelector(`[data-theme=${theme}]`);
 
         const allContentBoxes = layoutRef.current.querySelectorAll('.content-box');
@@ -141,8 +137,6 @@ function Landing(props) {
     }, [theme])
 
     function changeThemes(newTheme, modesArr, theme, difficulty, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes) {
-
-        //console.warn('Performing side effect ... ')
 
         anime({
             targets: [modesArr, layoutRef.current, allContentBoxes, allInputs, allLabels],
@@ -194,10 +188,10 @@ function Landing(props) {
 
                         <div className="content-box">
                             <div className="box-difficulty">
-                                <div data-difficulty="easy" className="difficulty difficulty-easy easy" ref={easyRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))/* props.setDifficulty('easy') */}}> EASY </div>
-                                <div data-difficulty="medium" className="difficulty difficulty-medium medium" ref={mediumRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))/* props.setDifficulty('medium') */}}> MEDIUM </div>
-                                <div data-difficulty="hard" className="difficulty difficulty-hard hard" ref={hardRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))/* props.setDifficulty('hard') */}}> HARD </div>
-                                <div data-difficulty="master" className="difficulty difficulty-master master" ref={masterRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))/* props.setDifficulty('master') */}}> INSANE </div>
+                                <div data-difficulty="easy" className="difficulty difficulty-easy easy" ref={easyRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))}}> EASY </div>
+                                <div data-difficulty="medium" className="difficulty difficulty-medium medium" ref={mediumRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))}}> MEDIUM </div>
+                                <div data-difficulty="hard" className="difficulty difficulty-hard hard" ref={hardRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))}}> HARD </div>
+                                <div data-difficulty="master" className="difficulty difficulty-master master" ref={masterRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))}}> INSANE </div>
                             </div>
                         </div>
                     </div>
@@ -209,14 +203,14 @@ function Landing(props) {
                             <div className="box-items">
                                 <div className="items-vis">
                                     <input className="item-option" type="checkbox" value="false"  id="choose"/>
-                                    <label htmlFor="choose" className="label-item" onClick={() => {dispatch(toggleExtras({name: 'timer'}))} /* props.setOptions(options => ({...options, timer: !props.options.timer})) */}> </label>
+                                    <label htmlFor="choose" className="label-item" onClick={() => {dispatch(toggleExtras({name: 'timer'}))}}> </label>
                                 </div>
                                 <span className="items-text"> Add Timer </span>
                             </div>
                             <div className="box-items">
                                 <div className="items-vis">
                                     <input className="item-option" type="checkbox" value="true" id="choose2"/>
-                                    <label htmlFor="choose2" className="label-item" onClick={() => {dispatch(toggleExtras({name: 'backlit'}))} /* props.setOptions(options => ({...options, backlit: !props.options.backlit})) */}> </label>
+                                    <label htmlFor="choose2" className="label-item" onClick={() => {dispatch(toggleExtras({name: 'backlit'}))}}> </label>
                                 </div>
                                 <span className="items-text"> Tile backlit </span>
                             </div>
@@ -228,10 +222,10 @@ function Landing(props) {
                         
                         <div className="content-box">
                             <div className="box-items" ref={themesBoxRef}> 
-                                <div className="items-icons" data-theme="day" onClick={(e) => {console.log(e.target); dispatch(switchTheme({theme_name: e.target.dataset['theme']})) /* props.setTheme('day') */}} >
+                                <div className="items-icons" data-theme="day" onClick={(e) => {dispatch(switchTheme({theme_name: e.target.dataset['theme']}))}} >
                                     <FontAwesomeIcon icon={faSun}  className="icon"></FontAwesomeIcon>
                                 </div>
-                                <div className="items-icons" data-theme="night" onClick={(e) => {dispatch(switchTheme({theme_name: e.target.dataset['theme']})) /* props.setTheme('night') */}} >
+                                <div className="items-icons" data-theme="night" onClick={(e) => {dispatch(switchTheme({theme_name: e.target.dataset['theme']}))}} >
                                     <FontAwesomeIcon icon={faMoon} className="icon"></FontAwesomeIcon>
                                 </div>
                             </div>
@@ -242,7 +236,7 @@ function Landing(props) {
                 </div>
 
                 {difficulty && (
-                    <PlayButton playSudoku={() => dispatch(changeView({newViewName: 'sudoku'}))} /* playSudoku={props.playSudoku} */ />
+                    <PlayButton playSudoku={() => dispatch(changeView({newViewName: 'sudoku'}))} />
                 )}
 
             </div>

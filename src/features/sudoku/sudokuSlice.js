@@ -12,16 +12,6 @@ const initialState = {
     gameHistory: [], // array of objects
 }
 
-// example:
-/* gameHistory = [
-    {
-        numbers: { 1: {timesUsed: 0}, 2: {timesUsed: 0}, 3: {timesUsed: 0}, 4: {timesUsed: 0}, 5: {timesUsed: 0},
-                   6: {timesUsed: 0}, 7: {timesUsed: 0}, 8: {timesUsed: 0}, 9: {timesUsed: 0},
-        }
-    }
-]
-*/
-
 export const sudokuSlice = createSlice({
     name: 'sudoku',
     initialState,
@@ -51,9 +41,7 @@ export const sudokuSlice = createSlice({
             });
         },
         updateGameHistory(state, action) {
-            // to do
             const { tileRow, tileColumn, digit } = action.payload;
-            console.log(' column: ', tileColumn, ' row: ', tileRow, ' digit: ', digit);
 
             const isPencilmarkOn = state.isPencilmarkOn;
             const gameHistory_lastTurn_copy__numbers = {...state.gameHistory[state.gameHistory.length - 1].numbers};
@@ -69,7 +57,7 @@ export const sudokuSlice = createSlice({
                 appliedDigit: digit,
                 extraData: {
                     removedPencilmarks_TileCords: helpers.checkRemovedPencilmarks(gameHistory_lastTurn_copy__board__UNMODIFIED, tileRow, tileColumn, digit, isPencilmarkOn)
-                    
+                    // more extra functionalities update pattern can be added below
                 },
             })
         },
@@ -85,7 +73,7 @@ export const sudokuSlice = createSlice({
             state.currentStep = state.currentStep += 1;
         },
         overRideHistory(state, action) {
-            // Invoke order is IMPORTANT HERE ! - TODO: CREATE "HISTORY OVERRIDING" WORKS PROPERLY, W/O THROWING ERRORS
+            // Invoke order is IMPORTANT HERE !
             state.gameHistory.splice(state.currentStep + 1);
             state.step = state.currentStep;
         },

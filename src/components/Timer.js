@@ -11,7 +11,6 @@ function Timer({hours, minutes, seconds, setTime}) {
     const timer_isStopped = useSelector(state => state.options.extras['timer'].isStopped);
 
     const tick = () => {
-        //console.log(props)
         if(minutes === 59 && seconds === 59) {
             setTime([hours + 1, 0, 0])
         }

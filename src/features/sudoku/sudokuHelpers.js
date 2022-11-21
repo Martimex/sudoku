@@ -1,7 +1,6 @@
 const removeAdjacentPencilmarks = (boardCopyArr, tileRow, tileColumn, digit) => {
-    //console.log('here we go');
+
     const modifiedBoard = [...boardCopyArr];
-    //modifiedBoard[tileRow][tileColumn] = digit;
     
     // Focus on removing pencilmarks
     for(let i=0; i<9; i++) {
@@ -97,12 +96,10 @@ export const helpers = {
             state_numberObj[digit] = state_numberObj[digit] -= 1
         }
         return state_numberObj;
-        //return  {...state_numberObj, [`${digit}`]: state_numberObj[digit] -= 1}; // one line declaration ! same as below
     },
 
     updateBoard: function(state_boardArr, tileRow, tileColumn, digit, isPencilmarkOn) {
         const tile_state = (typeof(state_boardArr[tileRow][tileColumn]) === 'object')? 'pencilmark' : 'normal';
-        console.warn(tile_state, state_boardArr);
         if(tile_state === 'normal') {
             return (isPencilmarkOn)?
                 [...state_boardArr, state_boardArr[tileRow][tileColumn] = [digit] ] 
@@ -110,17 +107,16 @@ export const helpers = {
                 (digit === state_boardArr[tileRow][tileColumn])?
                     [...state_boardArr, state_boardArr[tileRow][tileColumn] = '']
                     :
-                    removeAdjacentPencilmarks(state_boardArr, tileRow, tileColumn, digit) /* [...state_boardArr, state_boardArr[tileRow][tileColumn] = digit] */ // + remove adjacent pencilmarks
-                    // Almost working: [...state_boardArr, state_boardArr[tileRow][tileColumn] = digit] - it's ok
+                    removeAdjacentPencilmarks(state_boardArr, tileRow, tileColumn, digit)
         } 
         else if(tile_state === 'pencilmark') {
             return (!isPencilmarkOn)?
-                removeAdjacentPencilmarks(state_boardArr, tileRow, tileColumn, digit) // + remove adjacent pencilmarks -TO DO...
+                removeAdjacentPencilmarks(state_boardArr, tileRow, tileColumn, digit)
                 :
                 (state_boardArr[tileRow][tileColumn].includes(digit)) ?
                     [...state_boardArr, state_boardArr[tileRow][tileColumn] = (state_boardArr[tileRow][tileColumn].length > 1)? state_boardArr[tileRow][tileColumn].filter((el, ind) => el !== digit) : '']
                     :
-                    [...state_boardArr, state_boardArr[tileRow][tileColumn].push(digit)/* .sort() */]
+                    [...state_boardArr, state_boardArr[tileRow][tileColumn].push(digit)]
         }
         else {
             // This should never happen
@@ -132,14 +128,12 @@ export const helpers = {
     // EXTRA DATA FUNCTION
 
     checkRemovedPencilmarks: function(state_boardArr_UNMODIFIED, tileRow, tileColumn, digit, isPencilmarkOn) {
-        // Conditions first 
         // (Boolean digit) prevents from function running when rubber is used
 
         const tile_state = (typeof(state_boardArr_UNMODIFIED[tileRow][tileColumn]) === 'object')? 'pencilmark' : 'normal';
 
         if(!((tile_state === 'normal' && !isPencilmarkOn && !(digit === state_boardArr_UNMODIFIED[tileRow][tileColumn] && Boolean(digit))) || (tile_state === 'pencilmark' && !isPencilmarkOn))) return [];
         else {
-            console.log('CHECKING FOR REMOVED PENCILMARKS');
             const removedPencilmarks = getRemovedPencilmarks(state_boardArr_UNMODIFIED, tileRow, tileColumn, digit);
             return removedPencilmarks;  // array of objects
         }

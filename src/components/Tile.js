@@ -7,11 +7,8 @@ function Tile(props) {
     (Math.floor((props.id / props.squareRows)) * props.mainColumns) +  // detect square row
     ((props.parentId % props.squareColumns) * props.squareColumns) +
     (props.id % 3) + 1
-    
-   // const row = Math.floor((props.parentId % 3) * props.squareRows) + Math.floor(props.id / props.squareRows); // tile cord => row
-   // const column =  (props.squareColumns * Math.floor(props.parentId / 3)) + Math.floor((props.id % 3)); // tile cord => column
 
-   const column =   (pattern - 1) % (props.squareColumns * props.squareRows);
+   const column = (pattern - 1) % (props.squareColumns * props.squareRows);
    const row = Math.floor((pattern - 1) / (props.squareColumns * props.squareRows));
 
     return(

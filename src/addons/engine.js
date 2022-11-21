@@ -433,7 +433,7 @@ const engine = {
         return difficulty_name;
     },
 
-    setInitialClassToChosenTiles: function({theme}) {
+    setInitialClassToChosenTiles: function(theme) {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
 
@@ -2188,114 +2188,7 @@ const engine = {
         })
     },
 
-    // This one is a Toolbox specific function, which repaints the board whenever player 'travels in time'
-    travelInTime: function(current_step, game_history, activeTiles_history, setActive, finalDifficulty, props) {    
-
-        // 2. History - board repainting
-        const allTiles = document.querySelectorAll('.tile');
-        const allTilesArray = [...allTiles];
-        const ordered = this.orderTiles(allTilesArray);
-
-        for(let tile = 0; tile<ordered.length; tile++) {
-            let row = Math.floor(tile / 9); 
-            let column = tile%9;
-
-            // During "time travelling" change the position of "active" class pointer
-             if(ordered[(row * 9) + column].classList.contains('active')) {   
-                ordered[(row * 9) + column].classList.remove('active');
-            } 
-
-            if((ordered[(row * 9) + column].classList.contains('pencilmark_tile')) && (typeof(game_history[current_step][row][column]) === 'object')) {
-            
-                let orderedPencilmarks = [];
-                for(let y=0; y<ordered[(row * 9) + column].childNodes.length; y++) {
-                    if(parseInt(ordered[(row * 9) + column].childNodes[y].textContent)) {  // ☢️
-                        orderedPencilmarks.push(parseInt(ordered[(row * 9) + column].childNodes[y].textContent));  // ☢️
-                    }
-                }
-
-                if(orderedPencilmarks.length !== game_history[current_step][row][column].length) {
-                    let pencilmarkToModify;
-                    let longerArray = (orderedPencilmarks.length > game_history[current_step][row][column].length) ? orderedPencilmarks : game_history[current_step][row][column];
-                    let shorterArray = (orderedPencilmarks.length > game_history[current_step][row][column].length) ? game_history[current_step][row][column] : orderedPencilmarks;
-                    // In this tile pencilmarks has received an update. Identify the change in the tile
-                    longerArray.some((val, ind) => {
-                        if(!shorterArray.includes(val)) {
-                            pencilmarkToModify = val;
-                            return val;
-                        }
-                    })
-
-                    let pencilmark_tile = ordered[(row * 9) + column].querySelector(`.no-${pencilmarkToModify}`);
-                    (parseInt(pencilmark_tile.textContent)) ? pencilmark_tile.textContent = '' : pencilmark_tile.textContent = pencilmarkToModify;  // ☢️ ☢️ ☢️
-                }
-            }
-
-            // When player change tile role from "pencilmark" to "single digit" and vice versa
-            else if(ordered[(row * 9) + column].classList.contains('pencilmark_tile') || typeof(game_history[current_step][row][column]) === 'object') {
-
-                if(ordered[(row * 9) + column].classList.contains('pencilmark_tile')) {
-                    // "Pencilmark tile" -> "Single digit tile"
-                    ordered[(row * 9) + column].classList.remove('pencilmark_tile');
-                    while(ordered[(row * 9) + column].childNodes.length) {
-                        ordered[(row * 9) + column].childNodes[ordered[(row * 9) + column].childNodes.length - 1].remove();
-                    }
-                    // At last append before existent number to the tile
-                    ordered[(row * 9) + column].textContent = game_history[current_step][row][column];  // ☢️
-                }
-
-                else if(typeof(game_history[current_step][row][column]) === 'object') {
-                    // "Single digit tile -> Pencilmark tile"
-                    ordered[(row * 9) + column].textContent = '';   // ☢️
-                    ordered[(row * 9) + column].classList.add('pencilmark_tile');
-                    // Append divs to pencilmark tile
-                    for(let x=1; x<=9; x++) {
-                        let el = document.createElement('div');
-                        if(game_history[current_step][row][column] === null) {game_history[current_step][row][column] = ''}
-                        if(game_history[current_step][row][column].includes(x)) {
-                            let ind = game_history[current_step][row][column].indexOf(x);
-                            el.textContent = game_history[current_step][row][column][ind];  // ☢️
-                        }
-                        el.classList.add('xd', `no-${x}`);
-                        ordered[(row * 9) + column].appendChild(el);
-                    }
-                }
-            }
-
-            // This statements will not work for pencilmarks !
-            else if(ordered[(row * 9) + column].textContent !== game_history[current_step][row][column]) {  // ☢️
-                ordered[(row * 9) + column].textContent = game_history[current_step][row][column];   // ☢️
-            }
-
-            if(!game_history[current_step][row][column]) {
-                // If we used rubber, this might happen. Instead of appending 'NaN', let's append ''
-                ordered[(row * 9) + column].textContent = ''; // ☢️
-                
-            }
-        }
-
-        // At the very end update active class
-        if(ordered[activeTiles_history[current_step] - 1]) {
-            ordered[activeTiles_history[current_step] - 1].classList.add('active'); // For undo & redo 
-            setActive(ordered[activeTiles_history[current_step] - 1])
-            // And apply proper highlighting
-            if(props.options['backlit']) {
-                this.resetHighlightEffect(props);
-                this.applyHighlightEffect(ordered[activeTiles_history[current_step] - 1], finalDifficulty, props);
-            }
-        } else {
-            // When we move forward to the very recent move  (prevents from errors !)
-            ordered[activeTiles_history[current_step - 1] - 1].classList.add('active');
-            setActive(ordered[activeTiles_history[current_step - 1] - 1])
-            // And apply proper highlighting
-            if(props.options['backlit']) {
-                this.resetHighlightEffect(props);
-                this.applyHighlightEffect(ordered[activeTiles_history[current_step - 1] - 1], finalDifficulty, props);
-            }
-        }
-    },
-
-    resetSudoku: function(final_difficulty) {
+    resetSudoku: function() {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
