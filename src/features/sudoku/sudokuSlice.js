@@ -36,15 +36,17 @@ export const sudokuSlice = createSlice({
                 extraData: {
                     // HERE EXTRA FUNCTIONALITY CAN BE ADDED, WHICH IS TRACKED AND UPDATED EACH TIME PLAYER CHANGES THE BOARD STATE
                     removedPencilmarks_TileCords: [], // [{row: NUMBER, column: NUMBER}, ...] stores row and col of tile, where pencilmark of ${appliedDigit} was removed
-                    //contradictingDigits_TileCords: [],
+                    digitConflicts: {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: []},
                 },
             });
         },
         updateGameHistory(state, action) {
             const { tileRow, tileColumn, digit } = action.payload;
 
+            // Grab some copies
             const isPencilmarkOn = state.isPencilmarkOn;
             const gameHistory_lastTurn_copy__numbers = {...state.gameHistory[state.gameHistory.length - 1].numbers};
+            const gameHistory_lastTurn_digitConflicts = JSON.parse(JSON.stringify({...state.gameHistory[state.gameHistory.length - 1].extraData[`digitConflicts`]}));
             const gameHistory_lastTurn_copy__board = JSON.parse(JSON.stringify([...state.gameHistory[state.gameHistory.length - 1].board]));
 
             // UNMODIFIED version lets us work on a unchanged copy of an object, which would be useful for extraData updates
@@ -56,7 +58,8 @@ export const sudokuSlice = createSlice({
                 targetTile: {row: tileRow, column: tileColumn},
                 appliedDigit: digit,
                 extraData: {
-                    removedPencilmarks_TileCords: helpers.checkRemovedPencilmarks(gameHistory_lastTurn_copy__board__UNMODIFIED, tileRow, tileColumn, digit, isPencilmarkOn)
+                    removedPencilmarks_TileCords: helpers.checkRemovedPencilmarks(gameHistory_lastTurn_copy__board__UNMODIFIED, tileRow, tileColumn, digit, isPencilmarkOn),
+                    digitConflicts: helpers.checkDigitConflicts(gameHistory_lastTurn_copy__board__UNMODIFIED, tileRow, tileColumn, gameHistory_lastTurn_digitConflicts, digit, isPencilmarkOn),
                     // more extra functionalities update pattern can be added below
                 },
             })
