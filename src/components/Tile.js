@@ -7,10 +7,13 @@ function Tile(props) {
     (Math.floor((props.id / props.squareRows)) * props.mainColumns) +  // detect square row
     ((props.parentId % props.squareColumns) * props.squareColumns) +
     (props.id % 3) + 1
-    
-    return(
-        <div className={`tile tile-${props.difficulty}`} data-order={pattern}>
 
+   const column = (pattern - 1) % (props.squareColumns * props.squareRows);
+   const row = Math.floor((pattern - 1) / (props.squareColumns * props.squareRows));
+
+    return(
+        <div className={`tile tile-${props.difficulty}`} data-row={row} data-column={column} data-order={pattern}>
+        
         </div>
     );
 }

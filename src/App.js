@@ -1,45 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Landing from './Landing';
 import Sudoku from './components/Sudoku';
 import ErrorBoundary from './components/ErrorBoundary';
+
+import { useSelector } from 'react-redux';
+
 import './App.css';
 
 function App() {
 
-  const [state, setState] = useState('landing');
-
-  const [difficulty, setDifficulty] = useState(null); // string
-  const [theme, setTheme] = useState('night');
-
-  const [options, setOptions] = useState({
-    timer: false,
-    backlit: false,
-  })
-
-  const triggerPlay = (...args) => {
-    document.documentElement.requestFullscreen();
-    setState('sudoku');
-  }
-
-  const triggerBack = () => {
-    setState('landing');
-    setOptions({
-      timer: false,
-      backlit: false,
-    })
-  }
+  const appView = useSelector(state => state.appView.currentView);
 
   return(
     <div className="App">
       <ErrorBoundary>
-        {state === 'landing' && (
-          <Landing playSudoku={triggerPlay} difficulty={difficulty} setDifficulty={setDifficulty}
-          options={options} setOptions={setOptions}
-          theme={theme} setTheme={setTheme} />
+        {appView === 'landing' && (
+          <Landing />
         )}
 
-        {state === 'sudoku' && (
-          <Sudoku backToLanding={triggerBack}  difficulty={difficulty} options={options} theme={theme} />
+        {appView === 'sudoku' && (
+          <Sudoku />
         )}
       </ErrorBoundary>
     </div>
