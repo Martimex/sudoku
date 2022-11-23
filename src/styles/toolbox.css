@@ -46,11 +46,12 @@
 }
 
 .pencilmark_on {
-    border: .3rem dotted #535;
+    border-width: .3rem;
+    border-style: dotted;
     animation: borderSpin 4s infinite linear;
 }
 
-.animation-box-easy {
+/* .animation-box-easy {
     border: .3rem solid hsl(116, 73%, 40%);
 }
 
@@ -64,7 +65,7 @@
 
 .animation-box-master {
     border: .3rem solid hsl(182, 73%, 40%);
-}
+} */
 
 .animation-box-easy::before, .animation-box-medium::before,
 .animation-box-hard::before, .animation-box-master::before {
@@ -81,27 +82,27 @@
 
 @keyframes borderSpin {
     0% {
-        border: .3rem dotted hsl(12, 60%, 45%);
+        /* border: .3rem dotted hsl(12, 60%, 45%); */
         border-radius: 30%;
     }
 
     25% {
-        border: .3rem dotted hsl(82, 60%, 45%);
+        /* border: .3rem dotted hsl(82, 60%, 45%); */
         border-radius: 40%;
     }
 
     50% {
-        border: .3rem dotted  hsl(152, 60%, 45%);
+        /* border: .3rem dotted  hsl(152, 60%, 45%); */
         border-radius: 50%;
     }
 
     75% {
-        border: .3rem dotted hsl(222, 60%, 45%);
+       /*  border: .3rem dotted hsl(222, 60%, 45%); */
         border-radius: 40%;
     }
 
     100% {
-        border: .3rem dotted  hsl(292, 60%, 45%);
+       /*  border: .3rem dotted  hsl(292, 60%, 45%); */
         border-radius: 30%;
     }
 }

@@ -1,6 +1,7 @@
 .tile {
-    width: 90%;
-    height: 90%;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,17 +13,17 @@
 }
 
 .tile-easy {
-    border: .1rem solid hsla(116, 73%, 40%, .75); 
+    border: .12rem solid hsla(116, 73%, 40%, .75); 
 }
 
 .tile-medium {
-    border: .1rem solid hsla(55, 73%, 40%, .75); 
+    border: .12rem solid hsla(55, 73%, 40%, .75); 
 }
 
 .tile-hard {
-    border: .1rem solid hsla(12, 73%, 40%, .75); 
+    border: .12rem solid hsla(12, 73%, 40%, .75); 
 }
 
 .tile-master {
-    border: .1rem solid hsla(182, 73%, 40%, .75); 
+    border: .12rem solid hsla(182, 73%, 40%, .75); 
 }

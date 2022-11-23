@@ -125,6 +125,7 @@ function Sudoku() {
         markTile(document.querySelector(`.tile[data-row="${row}"][data-column="${column}"]`));
 
         checkNumberBoxUpdates();
+        updateDigitConflicts();
 
         if(sudoku_state.playerAction !== 'add') {
             // so it's either back or forth
@@ -138,7 +139,7 @@ function Sudoku() {
 
         repaintBoard([{row: row, column: column}], [prevTileValue], [newTileValue]);
 
-        // Lastly, check if Sudku is solved
+        // Lastly, check if Sudoku is solved
         checkSudokuSolved(sudoku_gameHistory[current_step].board, sudoku_state.win_board);
 
         // Finally, animate stuff
@@ -169,6 +170,40 @@ function Sudoku() {
             (sudoku_gameHistory[current_step].numbers[key] > 0)? numberBox_el.classList.remove('option-blank') : numberBox_el.classList.add('option-blank');
         }
 
+    }
+
+    const updateDigitConflicts = () => {
+        removeDigitConflicts(); // uncomment later on
+        markDigitConflicts();
+    }
+
+    const removeDigitConflicts = () => {
+        for(let row = 0; row < 9; row++) {
+            for(let col = 0; col < 9; col++) {
+                document.querySelector(`.tile[data-row="${row}"][data-column="${col}"]`).classList.remove(`conflict-tile__${final_Difficulty}--${theme}`);
+            }
+        }
+    }
+
+    const markDigitConflicts = () => {
+        for(let key=1; key<=Object.keys(sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`]).length; key++) { // key = 1 to 9
+            if(sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`][key].length) {
+                //console.warn(sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`][key]);
+                for(let conflict_no = 0; conflict_no<sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`][key].length; conflict_no++) {
+                    let [creator_row, creator_column] = [sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`][key][conflict_no].creator[`row`],
+                        sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`][key][conflict_no].creator[`column`]];
+                    // add creator color
+                    document.querySelector(`.tile[data-row="${creator_row}"][data-column="${creator_column}"]`).classList.add(`conflict-tile__${final_Difficulty}--${theme}`);
+                
+                    for(let member_no = 0; member_no < sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`][key][conflict_no].members.length; member_no++) {
+                        let [member_row, member_column] = [sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`][key][conflict_no].members[member_no][`row`],
+                            sudoku_gameHistory[thisCurrentStep].extraData[`digitConflicts`][key][conflict_no].members[member_no][`column`]]
+                        // add member color
+                        document.querySelector(`.tile[data-row="${member_row}"][data-column="${member_column}"]`).classList.add(`conflict-tile__${final_Difficulty}--${theme}`);
+                    }       
+                }
+            }
+        }
     }
 
     const travelInTime = (newBoard, oldBoard) => {
@@ -465,19 +500,18 @@ function Sudoku() {
             anime({
                 targets: rubber.current,
                 duration: 800,
-                backgroundColor: [`#0000`, `${difficultyColors[theme][final_Difficulty]}`], // props.difficulty 💡
+                //backgroundColor: [`#0000`, `${difficultyColors[theme][final_Difficulty]}`], // props.difficulty 💡
                 easing: 'easeInSine',
-                border: `${difficultyColors[theme][final_Difficulty]}`,  
-                opacity: .5,
+                //border: `${difficultyColors[theme][final_Difficulty]}`,
+                opacity: 0,
             })
         } else {
             anime({
                 targets: rubber.current,
                 duration: 800,
-                backgroundColor: [`#000`], // props.difficulty 💡
+                //backgroundColor: [`#000`], // props.difficulty 💡
                 easing: 'easeOutSine',
-                border: 'none',
-                opacity: 0,
+                opacity: 1,
             })
         }
     }, [isPencilmarkEnabled]);

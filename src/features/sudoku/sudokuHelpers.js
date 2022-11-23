@@ -143,7 +143,7 @@ export const helpers = {
 
         console.log(state_boardArr_UNMODIFIED[tileRow][tileColumn], parseInt(digit));
         if(typeof(state_boardArr_UNMODIFIED[tileRow][tileColumn]) !== 'number' && (!parseInt(digit) || isPencilmarkOn)) {
-            console.warn('neither old nor new value is a digit');
+           // console.warn('neither old nor new value is a digit');
             return digitConflicts;
         }
 
@@ -152,7 +152,7 @@ export const helpers = {
             // to do...
             // Now check if we have some conflicts for a digit that we removed / replaced
             if(digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`].length) {
-                console.warn('Check if we can help !');
+                //console.warn('Check if we can help !');
 
                 for(let conflict_no = 0; conflict_no < digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`].length; conflict_no++) {
                     // Usuwamy każde wystąpienie tej cyfry z każdego konfliktu. 
@@ -162,7 +162,7 @@ export const helpers = {
                     // Try to remove creator
                     if((digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`][conflict_no].creator.row === parseInt(tileRow)) &&
                         (digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`][conflict_no].creator.column === parseInt(tileColumn))) {
-                            console.warn(' WE ARE REMOVING CONFLICT CREATOR ~!');
+                            //console.warn(' WE ARE REMOVING CONFLICT CREATOR ~!');
                         digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`][conflict_no].creator = null;
                     }
 

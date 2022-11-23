@@ -47,10 +47,11 @@
 }
 
 .sudoku-board {
+    box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(3, 7rem);
-    grid-template-rows: repeat(3, 7rem);
-    border: .2rem solid #000;
+    grid-template-columns: repeat(3, 7rem); /* grid-template-columns: repeat(3, 7rem) */
+    grid-template-rows: repeat(3, 7rem); /* grid-template-rows: repeat(3, 7rem) */
+    /* border: .2rem solid #000; */
 }
 
 .initial {
@@ -75,39 +76,39 @@
 }
 
 .numbers-night-easy {
-    border: .2rem solid hsl(116, 73%, 30%);
+    border:  hsl(116, 73%, 30%);
 }
 
 .numbers-day-easy {
-    border: .2rem solid hsl(116, 60%, 40%);
+    border:  hsl(116, 60%, 40%);
 }
 
 .numbers-night-medium {
-    border: .2rem solid hsl(55, 73%, 30%);
+    border:  hsl(55, 73%, 30%);
 }
 
 .numbers-day-medium {
-    border: .2rem solid hsl(55, 60%, 40%);
+    border:  hsl(55, 60%, 40%);
 }
 
 .numbers-night-hard {
-    border: .2rem solid hsl(12, 73%, 30%);
+    border:  hsl(12, 73%, 30%);
 }
 
 .numbers-day-hard {
-    border: .2rem solid hsl(12, 60%, 40%);
+    border:  hsl(12, 60%, 40%);
 }
 
 .numbers-night-master {
-    border: .2rem solid hsl(182, 73%, 30%);
+    border:  hsl(182, 73%, 30%);
 } 
 
 .numbers-day-master {
-    border: .2rem solid hsl(182, 60%, 40%);
+    border: hsl(182, 60%, 40%);
 }
 
 .numbers-box .option {
-    border: .1rem solid;
+    border: .15rem double;
     border-color: inherit;
 }
 
@@ -122,6 +123,10 @@
     border-radius: 10%;
 }
 
+.option-0 {
+    padding: 1.3rem;
+}
+
 .option:hover {
     cursor: pointer;
 }
@@ -129,6 +134,43 @@
 .option-blank {
     opacity: .3;
     pointer-events: none !important;
+}
+
+/*conflict tile */
+
+/* DAY: background-image: radial-gradient(hsl(116, 75%, 75%), #0000 ) !important; */
+/* NIGHT:     background-image: radial-gradient(hsl(116, 45%, 35%), #0000 70%) !important; */
+
+.conflict-tile__easy--day {
+    background-image: radial-gradient(hsl(116, 75%, 75%), #0000 ) !important;
+}
+
+.conflict-tile__easy--night {
+    background-image: radial-gradient(hsl(116, 45%, 35%), #0000 70%) !important;
+}
+
+.conflict-tile__medium--day {
+    background-image: radial-gradient(hsl(55, 75%, 75%), #0000 ) !important;
+}
+
+.conflict-tile__medium--night {
+    background-image: radial-gradient(hsl(55, 45%, 35%), #0000 70%) !important;
+}
+
+.conflict-tile__hard--day {
+    background-image: radial-gradient(hsl(12, 75%, 75%), #0000 ) !important;
+}
+
+.conflict-tile__hard--night {
+    background-image: radial-gradient(hsl(12, 45%, 35%), #0000 70%) !important;
+}
+
+.conflict-tile__master--day {
+    background-image: radial-gradient(hsl(182, 75%, 75%), #0000 ) !important;
+}
+
+.conflict-tile__master--night {
+    background-image: radial-gradient(hsl(182, 45%, 35%), #0000 70%) !important;
 }
 
 /* When we append a number to a given tile with pencilmark option turn on*/

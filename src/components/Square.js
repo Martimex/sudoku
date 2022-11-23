@@ -3,7 +3,7 @@ import Tile from './Tile.js';
 
 function Square(props) {
 
-    const squareGridStyle =  {gridTemplateRows: `repeat(${props.squareRows}, 33%)`, gridTemplateColumns: `repeat(${props.squareColumns}, 33%)`}
+    const squareGridStyle =  {gridTemplateRows: `repeat(${props.squareRows}, 33.33%)`, gridTemplateColumns: `repeat(${props.squareColumns}, 33.33%)`}
 
     let renderArray = [];
     for(let i=0; i<(props.squareRows * props.squareColumns); i++) {
