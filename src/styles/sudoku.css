@@ -49,8 +49,8 @@
 .sudoku-board {
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(3, 7rem); /* grid-template-columns: repeat(3, 7rem) */
-    grid-template-rows: repeat(3, 7rem); /* grid-template-rows: repeat(3, 7rem) */
+    grid-template-columns: repeat(3, 7rem); /* grid-template-columns: repeat(3, 7rem) grid-template-columns: repeat(3, 33vw); */
+    grid-template-rows: repeat(3, 7rem); /* grid-template-rows: repeat(3, 7rem) grid-template-rows: repeat(3, 33vw); */
     /* border: .2rem solid #000; */
 }
 
@@ -327,7 +327,7 @@
     }
 
     .tile {
-        font-size: .8rem;
+        font-size: .9rem;
     }
 
     .sudoku-map {
@@ -395,7 +395,7 @@
     }
 
     .tile {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     .sudoku-map {

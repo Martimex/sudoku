@@ -6,7 +6,7 @@ const removeAdjacentPencilmarks = (boardCopyArr, tileRow, tileColumn, digit) => 
     for(let i=0; i<9; i++) {
         // Row
         if(typeof(modifiedBoard[tileRow][i]) === 'object') {
-            console.log(modifiedBoard[tileRow][i])
+            //console.log(modifiedBoard[tileRow][i])
             modifiedBoard[tileRow][i] = (modifiedBoard[tileRow][i].includes(digit))?
                 (modifiedBoard[tileRow][i].length === 1) ?
                     ''
@@ -141,7 +141,7 @@ export const helpers = {
 
     checkDigitConflicts: function(state_boardArr_UNMODIFIED, tileRow, tileColumn, digitConflicts, digit, isPencilmarkOn) {
 
-        console.log(state_boardArr_UNMODIFIED[tileRow][tileColumn], parseInt(digit));
+        //console.log(state_boardArr_UNMODIFIED[tileRow][tileColumn], parseInt(digit));
         if(typeof(state_boardArr_UNMODIFIED[tileRow][tileColumn]) !== 'number' && (!parseInt(digit) || isPencilmarkOn)) {
            // console.warn('neither old nor new value is a digit');
             return digitConflicts;
@@ -196,7 +196,7 @@ export const helpers = {
         // if new value is a digit - check if it involves new conflict
         if(parseInt(digit) && !isPencilmarkOn && (parseInt(state_boardArr_UNMODIFIED[tileRow][tileColumn]) !== parseInt(digit))) {
             // If player uses same digit twice = rubber, so this SHOULD NOT happen 
-            console.log('new value is non-pencilmark digit and we dont accept rubber effect');
+            //console.log('new value is non-pencilmark digit and we dont accept rubber effect');
             //digitConflicts[`1`].push(152);
             const conflict = getPossibleConflict(state_boardArr_UNMODIFIED, tileRow, tileColumn, digit); // will return an array of conflicted digit tile cords or else an empty array
             //console.log(conflict);
@@ -224,14 +224,14 @@ export const helpers = {
             for(let i=0; i<9; i++) {
                 // Row
                 if(typeof(parseInt(board_UNMODIFIED[tileRow][i])) === 'number' && (i !== parseInt(tileColumn))) {
-                    if(parseInt(board_UNMODIFIED[tileRow][i]) === parseInt(digit)) { 
+                    if(parseInt(board_UNMODIFIED[tileRow][i]) === parseInt(digit) && !Array.isArray(board_UNMODIFIED[tileRow][i])) { 
                         conflictArr.push({row: parseInt(tileRow), column: i});
                     }
                 }
                 
                 // Column
                 if(typeof(parseInt(board_UNMODIFIED[i][tileColumn])) === 'number' && (i !== parseInt(tileRow))) {
-                    if(parseInt(board_UNMODIFIED[i][tileColumn]) === parseInt(digit)) { 
+                    if(parseInt(board_UNMODIFIED[i][tileColumn]) === parseInt(digit) && !Array.isArray(board_UNMODIFIED[i][tileColumn])) { 
                         conflictArr.push({row: i, column: parseInt(tileColumn)});
                     }
                 }
@@ -242,7 +242,9 @@ export const helpers = {
                 // 3x3 Square
                 if(typeof(parseInt(board_UNMODIFIED[(Math.floor(tileRow / 3) * 3) + Math.floor(j / 3)][(Math.floor(tileColumn / 3) * 3) + (j % 3)])) === 'number' 
                     && ((Math.floor(tileRow / 3) * 3) + Math.floor(j / 3) !== parseInt(tileRow)  || (Math.floor(tileColumn / 3) * 3) + (j % 3) !== parseInt(tileColumn)))  {
-                        if(parseInt(board_UNMODIFIED[(Math.floor(tileRow / 3) * 3) + Math.floor(j / 3)][(Math.floor(tileColumn / 3) * 3) + (j % 3)]) === parseInt(digit)) {
+                        if(parseInt(board_UNMODIFIED[(Math.floor(tileRow / 3) * 3) + Math.floor(j / 3)][(Math.floor(tileColumn / 3) * 3) + (j % 3)]) === parseInt(digit) 
+                            && !Array.isArray(board_UNMODIFIED[(Math.floor(tileRow / 3) * 3) + Math.floor(j / 3)][(Math.floor(tileColumn / 3) * 3) + (j % 3)]))
+                        {
                             // Lastly, before pushing, check if tile in this array is NOT already inside the conflictArr
                             const isNewElDuplicate = checkNewElDuplicate(conflictArr, parseInt((Math.floor(tileRow / 3) * 3) + Math.floor(j / 3)), parseInt((Math.floor(tileColumn / 3) * 3) + (j % 3)));
                             if(!isNewElDuplicate) {
