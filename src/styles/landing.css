@@ -157,8 +157,8 @@ input[type="checkbox"]:checked+input {
 }
 
 .start-play {
-    height: 2.5rem;
-    width: 6rem;
+    padding: .6rem;
+    width: 40vw;
     font-size: 1.2rem;
     font-weight: 550;
     border-radius: 20%;
@@ -203,7 +203,7 @@ input[type="checkbox"]:checked+input {
 }
 
 /* Landscape orientation - any size mobiles from small to large viewports */ 
-@media screen and (orientation: landscape) and (max-width: 1100px) { 
+@media screen and (orientation: landscape) and (max-width: 1000px) { 
     /* Transform portrait (default) flow into horizontal grid */
 
     .app-section-box[data-type="difficulty"] {
@@ -221,9 +221,8 @@ input[type="checkbox"]:checked+input {
     .app-section-main {
         display: grid;
         grid-template-rows: 1;
-        grid-template-columns: repeat(3, 25% 50% 25%);
+        grid-template-columns: repeat(3, 30% 40% 30%);
         grid-template-areas: "theme-section   difficulty-section   options-section";
-        padding: .3rem;
     }
 
     /* and... some styling ! */
@@ -241,13 +240,18 @@ input[type="checkbox"]:checked+input {
         font-size: .8rem;
     }
 
+    .items-text {
+        padding: .45rem 0;
+        display: inline;
+    }
+
     .difficulty {
         padding: 1.5rem;
     }
 
     .box-difficulty {
-        grid-template-columns: repeat(2, 10vw);
-        grid-template-rows: repeat(2, 10vw);
+        grid-template-columns: repeat(2, 16vw);
+        grid-template-rows: repeat(2, 11vw);
     }
 
     .box-items {
@@ -263,15 +267,15 @@ input[type="checkbox"]:checked+input {
 
     .content-box[data-type="content-options"] {
         display: grid;
-        grid-template-columns: 1;
-        grid-template-rows: auto;
+        grid-template-columns: 1fr; /* Add extra 1fr there once option box grows - it'll make option box two-column */
+        grid-template-rows: 12vw 12vw;
         align-items: center;
         justify-items: center;
     }
 
     .items-icons {
-        width: 5vw;
-        height: 5vw;
+        width: 6.2vw;
+        height: 6.2vw;
     }
 
     .items-vis {
@@ -298,8 +302,9 @@ input[type="checkbox"]:checked+input {
     }
 
     .start-play {
-        width: 12vw;
-        height: 5vw;
+        width: 20vw;
+        padding: .3rem;
+        margin: .2rem;
     }
 }
 
@@ -307,7 +312,7 @@ input[type="checkbox"]:checked+input {
 
 
 /* Huge sized screens with landscape (non-mobiles) - ideal for desktops*/
-@media screen and (orientation: landscape) and (min-width: 1101px) { 
+@media screen and (orientation: landscape) and (min-width: 1001px) { 
 
     /* Transform portrait (default) flow into horizontal grid */
 
@@ -326,7 +331,7 @@ input[type="checkbox"]:checked+input {
     .app-section-main {
         display: grid;
         grid-template-rows: 1;
-        grid-template-columns: repeat(3, 25% 50% 25%);
+        grid-template-columns: repeat(3, 30% 40% 30%);
         grid-template-areas: "theme-section   difficulty-section   options-section";
         padding: .8rem;
     }
@@ -335,7 +340,7 @@ input[type="checkbox"]:checked+input {
 
     .content-title-text {
         font-size: 2rem;
-        padding-top: 1rem;
+        padding-top: .5rem;
     }
 
     .app-text {
@@ -347,8 +352,8 @@ input[type="checkbox"]:checked+input {
     }
 
     .box-difficulty {
-        grid-template-columns: repeat(2, 10vw);
-        grid-template-rows: repeat(2, 10vw);
+        grid-template-columns: repeat(2, 15vw);
+        grid-template-rows: repeat(2, 9vw);
     }
 
     .box-items {
@@ -394,8 +399,41 @@ input[type="checkbox"]:checked+input {
         font-size: 3rem;
     }
 
-    .start-play {
-        width: 10vw;
-        height: 4vw;
+    .start {
+        padding: 0;
     }
+
+    .start-play {
+        width: 20vw;
+        padding: .75rem;
+        margin: .1rem 0 .6rem 0;
+    }
+}
+
+@media screen and (orientation: portrait) and (min-height: 540px) and (min-width: 540px) {
+    /* Portrait-oriented tablets */
+
+    .box-difficulty {
+        grid-template-columns: repeat(2, 15vw);
+        grid-template-rows: repeat(2, 15vw);
+    }
+
+    .items-icons {
+        width: 8.5vw;
+        height: 8.5vw;
+    }
+
+    .app-text, .items-text  {
+        font-size: 1.3rem;
+        font-weight: 550;
+    }
+
+    .items-vis {
+        scale: 120%;
+    }
+
+    .difficulty {
+        font-size:  1rem;
+    }
+    
 }

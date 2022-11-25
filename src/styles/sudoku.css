@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Audiowide|Sofia');
 
+
+/* Default styles goes for portrait-oriented mobile devices */
+
+body {
+    overflow-x: hidden !important; 
+}
+
 .all {
     width: 100%;
     height: 100%;
@@ -49,8 +56,8 @@
 .sudoku-board {
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(3, 7rem); /* grid-template-columns: repeat(3, 7rem) grid-template-columns: repeat(3, 33vw); */
-    grid-template-rows: repeat(3, 7rem); /* grid-template-rows: repeat(3, 7rem) grid-template-rows: repeat(3, 33vw); */
+    grid-template-columns: repeat(3, 33vw); /* grid-template-columns: repeat(3, 7rem) grid-template-columns: repeat(3, 33vw); */
+    grid-template-rows: repeat(3, 33vw); /* grid-template-rows: repeat(3, 7rem) grid-template-rows: repeat(3, 33vw); */
     /* border: .2rem solid #000; */
 }
 
@@ -70,8 +77,8 @@
 .numbers-box {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    width: 80%;
+/*     grid-template-rows: repeat(3, 1fr); */
+    width: 90%;
     border-radius: 10%;
 }
 
@@ -116,15 +123,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: .2rem;
     font-weight: 600;
     border: .2rem dotted hsla(124, 5%, 5%, .6);
     font-weight: 700;
     border-radius: 10%;
-}
-
-.option-0 {
-    padding: 1.3rem;
+    padding: .5rem;
 }
 
 .option:hover {
@@ -207,12 +210,11 @@
 }
 
 .new-sudoku {
-    width: 6rem;
-    margin: 1rem;
-    padding: .4rem;
-    height: 2.5rem;
+    width: 40vw;
+    margin: 1.6rem 0 1.1rem 0;
+    padding: .6rem;
     color: #000;
-    border-radius: 25%;
+    border-radius: 15%;
 }
 
 .new-sudoku:hover {
@@ -315,6 +317,7 @@
 }
 
 @media screen and (orientation: landscape) and (max-width: 1000px) {
+    /* Landscape oriented screen for mobiles */
 
     .game-elems {
         display: grid;
@@ -335,29 +338,31 @@
     }
 
     .sudoku-board {
-        grid-template-rows: repeat(3, 6rem);
-        grid-template-columns: repeat(3, 6rem);
+        grid-template-rows:    repeat(3, 15.2vw);                /* repeat(3, 6rem);  */
+        grid-template-columns: repeat(3, 15.2vw);               /* repeat(3, 6rem); */
     }
 
     .numbers-box {
         display: grid;
-        grid-template-columns: repeat(3, 7.3vw);
-        grid-template-rows: repeat(3, 7.3vw);
-        grid-template-areas: 
-            "digit   digit   digit"
-            "digit   digit   digit"
-            "digit   digit   digit"
-            "rubber  rubber  rubber"
-        ;
+        grid-template-columns:none;
+        grid-template-rows: repeat(3, 1fr);
+        width: 80%;
     }
 
     .option {
-        padding: .8rem;
+        height: 4.8vw;
     }
 
     .option-0 { /*aka. the rubber*/
         grid-area: rubber;
     }
+
+    .new-sudoku {
+        width: 30vw;
+        margin: .4rem 0 1.1rem 0;
+        padding: .55rem;
+    }
+    
 }
 
 
@@ -403,14 +408,15 @@
     }
 
     .sudoku-board {
-        grid-template-rows: repeat(3, 8rem);
-        grid-template-columns: repeat(3, 8rem);
+        grid-template-rows: repeat(3, 11vw); /* 8 rem */
+        grid-template-columns: repeat(3, 11vw); /* 8 rem */
+        max-width: 45vw;
     }
 
     .numbers-box {
         display: grid;
-        grid-template-columns: repeat(3, 7.3vw);
-        grid-template-rows: repeat(3, 7.3vw);
+        grid-template-columns: repeat(3, 8vw); /* 7.3vw */
+        grid-template-rows: repeat(3, 8vw); /* 7.3vw */
         grid-template-areas: 
             "digit   digit   digit"
             "digit   digit   digit"
@@ -420,11 +426,43 @@
     }
 
     .option {
-        font-size: 1.8rem;
+        font-size: 2rem;
         padding: .8rem;
     }
 
     .option-0 { /*aka. the rubber*/
         grid-area: rubber;
+        padding: 1.3rem;
+    }
+
+    .new-sudoku {
+        width: 25vw;
+        margin: .4rem 0 1.1rem 0;
+        padding: .55rem;
+        font-size: 1.15rem;
+    }
+}
+
+@media screen and (orientation: portrait) and (min-height: 620px) and (min-width: 620px) {
+    /* Portrait-oriented tablets */
+    html{
+        font-size: 1.3rem;
+    }
+    .sudoku-board {
+        font-size: 1.6rem;
+        grid-template-columns: repeat(3, 30vw); /* grid-template-columns: repeat(3, 7rem) grid-template-columns: repeat(3, 33vw); */
+        grid-template-rows: repeat(3, 30vw); /* grid-template-rows: repeat(3, 7rem) grid-template-rows: repeat(3, 33vw); */
+    }
+
+    .option {
+        font-size: 1.4rem;
+        padding: .5rem;
+    }
+    
+    .new-sudoku {
+        width: 40vw;
+        margin: 1.6rem 0 1.1rem 0;
+        padding: .7rem;
+        font-size: 1.4rem;
     }
 }
