@@ -6,6 +6,52 @@
 
 <br><hr>
 
+**[1.2.1] Improve layout across different device types**
+<br>
+_25.11.2022_
+
+* This commit provides another layout update. The main changes regards
+the layout for tablets (which is finally out) and for landscape-oriented
+devices. Furthermore, app for huge screens and portrait-oriented devices
+received a bit of changes in this regard, but less impactful.
+
+Sudoku view:
+1. Adjusted Toolbox elements sizing, to better fit for screens, which has
+relatively similiar viewport width and height (f.e.: tablets);
+2. Maximized Sudoku board size and increased board digits size for
+better solving experience;
+3. Signifficantly changed a Toolbox and NumbersBox layout for
+landscape-oriented devices (to make them fit that type of screen well);
+4. Modified a "New Sudoku" button to make it more spacious and placed
+the text inside single line;
+
+Landing Page view:
+1. Changed play button size to make it longer;
+2. Changed difficulty box sizing and slightly modified size for theme box
+buttons (accross all device types);
+3. Extra size modify and layout modifications for all elements (for
+tablets and landscape-oriented devices);
+
+<br><hr>
+
+**[1.2.0] Add a digit conflict mechanism**
+<br>
+_23.11.2022_
+
+* This update contains following changes:
+
+1. Added digit conflict check mechanism.
+When player places the same digit, that has already been placed within
+the same row, column or 3x3 square, a slight background gradient applies
+for all conflict tiles. The main idea of conflict mechanism is to warn
+player whenever his action (adding a digit) is contradictory with Sudoku
+rules.
+
+2. Minor design changes to pencilmark Toolbox option, updated Sudoku
+board borders and rubber.
+
+<br><hr>
+
 **[1.1.1] Change info tab reference links**
 <br>
 _06.08.2022_
