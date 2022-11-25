@@ -9,9 +9,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 4rem;
-    margin: .4rem;
-    width: 4rem;
+    margin: .3rem;
+   /*  height: 4rem; */ min-height: 20vw;
+   /*  width: 4rem; */ min-width: 20vw;
     border: .3rem double #fff;
     border-radius:  30%;
 }
@@ -108,7 +108,7 @@
 }
 
 
-@media screen and (orientation: landscape) and (max-width: 1100px) {
+@media screen and (orientation: landscape) and (max-width: 1000px) {
     .tool-box-all {
         display: flex;
         align-items: center;
@@ -118,19 +118,23 @@
     .tool-box {
         margin: 0 auto;
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+        gap: .15rem;
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: repeat(4, 1fr);
         grid-template-areas: 
-            "option-info       option-pencilmark"
-            "option-btn-back   option-btn-forth";
+            "option-info"       
+            "option-pencilmark"
+            "option-btn-back"   
+            "option-btn-forth";
         align-items: center;
         justify-content: center;
         justify-items: center;
     }
     
     .tool {
-        width: 10vw;
-        height: 10vw;
+        width: 14.4vw;
+        height: 7.2vw;
+        min-height: 0; min-width: 0; /* set temporarily, get rid of during dev*/
     }
 
     .tool[data-name="info"] {
@@ -154,7 +158,7 @@
 
 
 
-@media screen and (orientation: landscape) and (min-width: 1101px) {
+@media screen and (orientation: landscape) and (min-width: 1001px) {
 
     .tool-box-all {
         display: flex;
@@ -176,12 +180,13 @@
     }
     
     .tool-icon {
-        font-size: 1.8rem;
+        font-size: 2.1rem;
     }
 
     .tool {
-        width: 10vw;
-        height: 10vw;
+        width: 11vw;
+        height: 11vw;
+        min-height: 0; min-width: 0; /* set temporarily, get rid of during dev*/
     }
 
     .tool[data-name="info"] {
@@ -198,5 +203,14 @@
 
     .tool[data-name="pencil"] {
         grid-area: option-pencilmark;
+    }
+}
+
+@media screen and (orientation: portrait) and (min-height: 540px) and (min-width: 540px) {
+    /* Portrait-oriented tablets */
+    .tool {
+        width: 20vw;
+        height: 12vw;
+        min-height: 0; min-width: 0; /* set temporarily, get rid of during dev*/
     }
 }
