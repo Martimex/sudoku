@@ -6,6 +6,37 @@
 
 <br><hr>
 
+**[1.2.2] Correct dialog boxes sizing**
+<br>
+_26.11.2022_
+
+Another and probably last changes regarding size adjustments for now.
+This time a Win, Reset and Info screen received some modifications:
+
+1. Win Screen:
+- Received proper sizing for Win box. Also Win Screen includes its'
+fixed sizing version for tablets. Very minor text modification.
+
+2. Reset screen:
+- Received new  individual sizing, targeted for tablets.
+
+3. Info screen:
+- Received fixed sizing for huge screens and also landscape-oriented
+mobile devices. Added fixed version for tablets aswell. Furthermore,
+changed logo to a brand new one (in the "created by" section).
+
+And some minor improvements/fixes:
+
+1. Once Sudoku game is loaded, a full screen mode is requested (could
+be disabled). The main purpose is to enchance solving experience,
+especially for mobile devices.
+
+2. Fixed an issue, where dialog boxes allowed to use horizontal
+scrollbar. Using it is now temporarily disabled, until such dialog box
+is closed.
+
+<br><hr>
+
 **[1.2.1] Improve layout across different device types**
 <br>
 _25.11.2022_
