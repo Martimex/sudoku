@@ -20,7 +20,6 @@ function Reset(props) {
     useEffect(() => {
         document.body.scrollTop = 0; // Safari
         document.documentElement.scrollTop = 0; // Chrome, Firefox, IE and Opera
-        document.body.style.overflow = 'hidden';
     })
 
     return (

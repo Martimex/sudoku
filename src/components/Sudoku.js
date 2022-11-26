@@ -364,6 +364,7 @@ function Sudoku() {
         if(isSudokuSolved) {
             dispatch(stopTimer(true));
             dispatch(sudokuSolved(true));
+            dispatch(addExtraView({extraViewName: 'win'}));
         }
 
         function checkIfSolved(current_board, win_board) {
@@ -433,6 +434,9 @@ function Sudoku() {
             function fireAsync() {
                 difficulty = engine.hideDigits(queried_difficulty, theme);
                 clearTimeout(timeOut);
+
+                // Last but not least - force a full screen mode
+                document.documentElement.requestFullscreen();
             }
 
             function checkAsyncCompletion() {
@@ -483,6 +487,17 @@ function Sudoku() {
                 }
             }
         }
+
+        else if(extra_view) {
+            // If there is a top-level extra window layer
+            document.body.style.overflowY = 'hidden';
+        }
+
+        else if(!extra_view) {
+            // When user closes extra window
+            document.body.style.overflowY = 'auto';
+        }
+
     }, [extra_view])
 
     // Perform engine operations

@@ -22,7 +22,6 @@ function Info(props) {
         dispatch(stopTimer(true));
         document.body.scrollTop = 0; // Safari
         document.documentElement.scrollTop = 0; // Chrome, Firefox, IE and Opera
-        document.body.style.overflow = 'hidden';
     }, [])
 
     return (
@@ -69,7 +68,7 @@ function Info(props) {
                         <div className="info-box-author-text"> Created by: </div>
                         <div className="info-box-author-logo">
                             <a className="author-logo-box" href="https://github.com/Martimex" target='_blank' rel="noreferrer">
-                                <img className="author-logo" alt="author_logo" src="author.svg" ></img>
+                                <img className="author-logo" alt="author_logo" src="logo_new.svg" ></img>
                             </a> 
                         </div>
                     </div>
@@ -77,7 +76,7 @@ function Info(props) {
                 </div>
 
                 <div className={`info-box info-${props.theme} info-box-new-sizing`} datatype="outro">
-                    <div className="info-close" onClick={() => {document.documentElement.requestFullscreen(); document.body.style.overflow = 'auto'; dispatch(addExtraView({extraViewName: ''})); dispatch(stopTimer(false)); /* props.setCheckInfo(false); */}}> Close </div>
+                    <div className="info-close" onClick={() => {document.documentElement.requestFullscreen(); dispatch(addExtraView({extraViewName: ''})); dispatch(stopTimer(false)); /* props.setCheckInfo(false); */}}> Close </div>
                 </div>
             </div>
         </div>
