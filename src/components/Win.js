@@ -17,7 +17,6 @@ function Win(props) {
     useEffect(() => {
         document.body.scrollTop = 0; // Safari
         document.documentElement.scrollTop = 0; // Chrome, Firefox, IE and Opera
-        document.body.style.overflow = 'hidden';
     })
 
     return(
@@ -28,7 +27,7 @@ function Win(props) {
                 </div>
 
                 <div className={`screen-description screen-description-${props.final_difficulty}`} >
-                    Congratulations! You've just solved Sudoku {props.final_difficulty} !
+                    Congratulations! You've just solved Sudoku {props.final_difficulty}!
                     {isTimeEnabled === true && (
                         <div className="time-summary"> 
                             <div className="time-text"> Solving time:  </div>
