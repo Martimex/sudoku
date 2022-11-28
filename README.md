@@ -29,11 +29,7 @@ There are a couple of requirements that need to be fulfilled to make sudoku solv
 
 ***1) Stable internet connection*** – since it is a browser application, it works the same way as usual websites. That means You will definitely need constant Internet access. It does not necessarily have to be a very good connection (in fact, the app works fine even for weak ones), but consistency is the key.
 
-***2) Avoid tablets*** – currently, it is not recommended to use the app for tablet-like devices (more specifically: machines that their screen height value is relatively close to its’ screen width value). The reason is the app on a square-like screen would cover close to half of the whole available surface, making an unpleasant experience. While it is not a strict requirement to avoid playing on tablets, I highly recommend using mobile devices or laptops / desktops instead.
-
-_Quick note: Above issue will hopefully be fixed soon._
-
-***3) Learn Sudoku fundamentals*** – as mentioned before, it is highly recommended to get a grasp of Sudoku rules and solving methods. Even if you feel like a veteran-level Sudoku solver, I still encourage you to check the **detailed Sudoku guide** (at least for its' comprehensively explained ‘techniques’ section). All methods covered there are essential in order to solve all kinds of Sudoku puzzles – from simplest up to the most complex ones.
+***2) Learn Sudoku fundamentals*** – as mentioned before, it is highly recommended to get a grasp of Sudoku rules and solving methods. Even if you feel like a veteran-level Sudoku solver, I still encourage you to check the **detailed Sudoku guide** (at least for its' comprehensively explained ‘techniques’ section). All methods covered there are essential in order to solve all kinds of Sudoku puzzles – from simplest up to the most complex ones.
 
 ## History
 
@@ -247,13 +243,18 @@ By clicking the ‘plus’ icon, a new Sudoku is rendered – with the same, pre
 
 While ‘Sudoku World’ has already received a bunch of updates, it cannot be denied that there are parts that still need some sort of improvements.
 
-The major issue concerns non-guaranteed Sudoku difficulty. Picking a difficulty box from the Landing page only increases the chance to obtain a respective puzzle. The goal here is to update the rendering part, so that you can always get Sudoku with desired difficulty, and also it has to happen in a very short, reasonable time. At very least, increasing the chance of obtaining medium and hard Sudokus could be a significant improvement, since those types of puzzles are beyond the rarest ones to receive at the moment.
+🎯 The major issue concerns non-guaranteed Sudoku difficulty. Picking a difficulty box from the Landing page only increases the chance to obtain a respective puzzle. The goal here is to update the rendering part, so that you can always get Sudoku with desired difficulty, and also it has to happen in a very short, reasonable time. At very least, increasing the chance of obtaining medium and hard Sudokus could be a significant improvement, since those types of puzzles are beyond the rarest ones to receive at the moment.
 
-Important change that needs to be delivered is preparing the good-looking layout for tablets. Those devices have the screen almost square-shaped, which stands as an exception to mobile devices, laptops and desktops, which screens are rectangle-shaped. On account of this difference, a new layout should be prepared across all Views in the application. That might mean creating a very individual approach, which could involve changing the position of elements, some sizing modifications and more.
+🎯 Last, but not least – options. Landing page still has just two options to customize, which does not seem like enough. There could be more of them, although it is a matter of brilliant ideas to implement a new customizable feature, which is an actual option - not something that every player has to click to make the gameplay enjoyable.
 
-Maximizing the grid size might make a huge difference for user experience. That is especially true for mobile device users. Portrait-oriented screens are quite okay in this matter (but still imperfect), however „landscape screens” have the Sudoku grid a bit too small. Restoring some space for Sudoku board would shrink adjacent – already spacious - sections (Toolbox and Number box) a little bit, so that playing Sudoku could be more enjoyable.
 
-Last, but not least – options. Landing page still has just two options to customize, which does not seem like enough. There could be more of them, although it is a matter of brilliant ideas to implement a new customizable feature, which is an actual option - not something that every player has to click to make the gameplay enjoyable.
+**Patch 1.2.2 update**
+
+**Those improvement tasks has been done so far:**
+
+✔️ Important change that needs to be delivered is preparing the good-looking layout for tablets. Those devices have the screen almost square-shaped, which stands as an exception to mobile devices, laptops and desktops, which screens are rectangle-shaped. On account of this difference, a new layout should be prepared across all Views in the application. That might mean creating a very individual approach, which could involve changing the position of elements, some sizing modifications and more.
+
+✔️ Maximizing the grid size might make a huge difference for user experience. That is especially true for mobile device users. Portrait-oriented screens are quite okay in this matter (but still imperfect), however „landscape screens” have the Sudoku grid a bit too small. Restoring some space for Sudoku board would shrink adjacent – already spacious - sections (Toolbox and Number box) a little bit, so that playing Sudoku could be more enjoyable.
 
 ## Conclusion
 
