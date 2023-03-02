@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css?family=Audiowide&effect=neon');
 
 :root {
-    --bg-easy: 'linear-gradient(75deg, hsl(112, 40%, 60%), hsl(132, 50%, 70%))';
-    --bg-medium: 'linear-gradient(75deg, hsl(46, 40%, 60%), hsl(66, 50%, 70%))';
-    --bg-hard: 'linear-gradient(75deg, hsl(2, 40%, 60%), hsl(22, 50%, 70%))';
-    --bg-insane: 'linear-gradient(75deg, hsl(244, 40%, 60%), hsl(264, 50%, 70%))';
+    --bg-easy: 'linear-gradient(315deg, hsl(144, 57%, 33%), hsla(144, 57%, 33%, 0))';
+    --bg-medium: 'linear-gradient(45deg, hsl(55, 57%, 33%), hsla(55, 57%, 33%, 0))';
+    --bg-hard: 'linear-gradient(225deg, hsl(12, 57%, 33%), hsla(12, 57%, 33%, 0))';
+    --bg-insane: 'linear-gradient(135deg, hsl(248, 57%, 33%), hsla(348, 57%, 33%, 0))';
 }
 
 .layout {
@@ -13,7 +13,8 @@
     top: 0%; left: 0%;
     width: 100%;
     height: 100%;
-    background-color: #000;
+    background-color: #222;
+    box-shadow: inset 0rem 0rem 7rem 1rem #111;
     color: #ddd;
 }
 
@@ -24,6 +25,9 @@
 
 .content-title-text {
     font-size: 2rem;
+    letter-spacing: .09rem;
+    text-shadow: 0 0 0.1em #fff, 0 0 0.2em #fff, 0 0 0.3em #fff, 0 0 0.4em
+    hsl(180, 100%, 73%), 0 0 0.6em hsl(280, 100%, 50%), 0 0 0.8em hsl(222, 100%, 50%), 0 0 1.5em hsl(281, 100%, 50%), 0 0 1.2em hsl(181, 100%, 50%);
 }
 
 .content-box {
@@ -31,12 +35,14 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    border: .1rem solid #ddd;
+    border: .075rem solid #ddd;
+    border-left-color: #0000;
+    border-right-color: #0000;
 }
 
 .box-difficulty {
     display: grid;
-    grid-template-columns: repeat(2, 5rem);
+    grid-template-columns: repeat(2, 7.5rem);
     grid-template-rows: repeat(2, 5rem);
     padding: .75rem;
 }
@@ -58,31 +64,35 @@
 
 .difficulty-easy {
     background-image: var(--bg-easy);
-    border-color: hsl(142, 75%, 35%);
+    border-color: hsl(142, 75%, 25%);
     border-style: solid none none solid;
+    box-shadow: inset .2rem .2rem .1rem .1rem hsl(142, 55%, 45%);
 }
 
 .difficulty-medium {
     background-image: var(--bg-medium);
-    border-color: hsl(66, 75%, 45%);
+    border-color: hsl(66, 75%, 35%);
     border-style: solid solid none none;
+    box-shadow: inset -.2rem .2rem .1rem .1rem hsl(66, 55%, 55%);
 }
 
 .difficulty-hard {
     background-image: var(--bg-hard);
-    border-color: hsl(22, 75%, 35%);
+    border-color: hsl(22, 75%, 25%);
     border-style: none none solid solid;
+    box-shadow: inset .2rem -.2rem .1rem .1rem hsl(22, 55%, 45%);
 }
 
 .difficulty-master {
     background-image: var(--bg-insane);
-    border-color: hsl(274, 75%, 35%);
+    border-color: hsl(274, 75%, 25%);
     border-style: none solid solid none;
+    box-shadow: inset -.2rem -.2rem .1rem .1rem hsl(274, 55%, 45%);
 }
 
 .box-items {
     width: 40%;
-    padding: .4rem;
+    /* padding: .4rem; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -91,7 +101,8 @@
 .items-text {
     display: block;
     padding: .25rem .3rem;
-
+    margin: .15rem 0 .65rem 0;
+    word-wrap: break-word;
 }
 
 .items-vis {
@@ -101,6 +112,7 @@
     position: relative;
     margin: .15rem;
     border-radius: 20%;
+    background: transparent !important;
 }
 
 .items-vis label {
@@ -118,7 +130,7 @@
 
 .items-vis input[type=checkbox]:checked+label {
     left: 2rem;
-    background-image: radial-gradient(hsl(112, 40%, 60%), hsl(133, 50%, 50%));
+    background-image: radial-gradient( hsl(133, 50%, 45%), hsl(112, 45%, 60%));
     border-radius: 20%;
     border: .1rem solid hsl(112, 40%, 60%);    
 }
@@ -140,15 +152,24 @@ input[type="checkbox"]:checked+input {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
-    border: .1rem solid #ddd;
-    border-radius: 50%;
+    padding: 1rem 2rem;
+    border: .1rem solid;
+    border-radius: 30%;
     margin: .3rem;
+    width: 30vw;
+    box-shadow: inset 2rem 1rem 1rem 1rem #222;
+    background-image: radial-gradient(#444, #111 75%);
+}
+
+.items-icons[data-theme="day"] {
+    filter: invert(100%);
 }
 
 .icon {
     font-size: 1.5rem;
     pointer-events: none;
+   /*  box-shadow: 0 1rem 2rem 3rem #444; */
+    border-radius: 30%;
 }
 
 .start {  
@@ -157,12 +178,18 @@ input[type="checkbox"]:checked+input {
 }
 
 .start-play {
+    margin-top: 1rem;
     padding: .6rem;
     width: 40vw;
     font-size: 1.2rem;
     font-weight: 550;
-    border-radius: 20%;
+    border-radius: 555px;
     font-family: 'Audiowide', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: inset 0 0 2.6rem .1rem #7777, 0 0 1rem .1rem #777;
+}
+
+.start-play:hover {
+    border-style: dotted;
 }
 
 .difficulty:hover, .items-icons:hover, .start-play:hover {
@@ -414,7 +441,7 @@ input[type="checkbox"]:checked+input {
     /* Portrait-oriented tablets */
 
     .box-difficulty {
-        grid-template-columns: repeat(2, 15vw);
+        grid-template-columns: repeat(2, 22.5vw);
         grid-template-rows: repeat(2, 15vw);
     }
 

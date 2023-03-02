@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     theme: 'night',
     difficulty: '',
+    difficulty_History: [], //only for proper landing page animation
     extras: {
         timer: {
             isEnabled: false,
@@ -32,7 +33,10 @@ export const optionsSlice = createSlice({
             const {difficulty_name} = action.payload;
             difficulty_name && (state.difficulty = difficulty_name);
         },
-
+        addDifficultyHistory(state, action) {
+            state.difficulty_History = [...state.difficulty_History, action.payload];
+        },
+        
         // For extras functionality 
 
         stopTimer(state, action) {
@@ -46,6 +50,6 @@ export const optionsSlice = createSlice({
 
 })
 
-export const { toggleExtras, switchTheme, switchDifficulty, stopTimer, RESET_EXTRAS } = optionsSlice.actions;
+export const { toggleExtras, switchTheme, switchDifficulty, addDifficultyHistory, stopTimer, RESET_EXTRAS } = optionsSlice.actions;
 export default optionsSlice.reducer;
 

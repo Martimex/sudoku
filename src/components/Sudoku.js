@@ -65,13 +65,13 @@ function Sudoku() {
     const numbox = useRef(null);
     const rubber = useRef(null);
 
-    let renderArray = [];
+/*     let renderArray = [];
     
     for(let i=0; i<(squareRows * squareColumns); i++) {
         renderArray.push('');
-    }
+    } */
 
-    const allSquares = renderArray.map((square, index) => 
+    const allSquares = Array.from(new Array(squareRows * squareColumns)).map((square, index) => 
         <Square key={index.toString()} id={index} theme={theme} difficulty={final_Difficulty}
          mainRows={rows} mainColumns={columns} squareRows={squareRows} squareColumns={squareColumns} />
     );

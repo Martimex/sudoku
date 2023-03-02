@@ -9,7 +9,8 @@ import {useSelector, useDispatch} from 'react-redux';
 import {
     toggleExtras,
     switchTheme,
-    switchDifficulty
+    switchDifficulty,
+    addDifficultyHistory
 } from './features/options/optionsSlice.js';
 import {
     changeView
@@ -35,29 +36,44 @@ const visualObject = {
 
 const themeObject = {
 
+    boxShadow: {
+        day: '#222',
+        night: '#000',
+    },
+
     backgroundColor: {
         day: '#eee',
-        night: '#000',   
+        night: '#222',   
     },
     
     btnBgColor: {
-        day: '#000',
-        night: '#eee',
+        day: '#222',
+        night: '#ddd',
     },
 
     color: {
         day: '#000',
-        night: '#eee',
+        night: '#ddd',
     },
 
     btnColor: {
-        day: '#eee',
-        night: '#000',
+        day: '#ddd',
+        night: '#222',
     },
 
     borderColor: {
-        day: '#000',
+        day: '#222',
+        night: '#ddd',
+    },
+
+    themeBorderColor: {
+        day: '#eee',
         night: '#eee',
+    },
+
+    themeIconColor: {
+        day: '#ccc',
+        night: '#ccc',
     },
 
     difficultyBoxesColor: {
@@ -70,6 +86,44 @@ const themeObject = {
         medium: ['hsl(55, 57%, 53%)'],
         hard: ['hsl(12, 57%, 53%)'],
         master: ['hsl(248, 57%, 53%)'],
+    },
+
+    difficultyActiveBoxBackgroundColor: {
+        easy: ['hsl(144, 57%, 23%)'],
+        medium: ['hsl(55, 57%, 23%)'],
+        hard: ['hsl(12, 57%, 23%)'],
+        master: ['hsl(248, 57%, 23%)'],
+    },
+
+    difficultyActiveBox: {
+        day: {
+            backgroundImage:  {
+                easy: ['315deg', 'hsl(144, 57%, 53%)', 'hsla(144, 57%, 33%, 0)'],
+                medium: ['45deg', 'hsl(55, 57%, 53%)', 'hsla(55, 57%, 33%, 0)'],
+                hard: ['225deg', 'hsl(12, 57%, 53%)', 'hsla(12, 57%, 33%, 0)'],
+                master: ['135deg', 'hsl(248, 57%, 53%)', 'hsla(248, 57%, 33%, 0)'],
+            },
+        },
+        night: {
+            backgroundImage:  {
+                easy: ['315deg', 'hsl(144, 57%, 53%)', 'hsla(144, 57%, 33%, 0)'],
+                medium: ['45deg', 'hsl(55, 57%, 53%)', 'hsla(55, 57%, 33%, 0)'],
+                hard: ['225deg', 'hsl(12, 57%, 53%)', 'hsla(12, 57%, 33%, 0)'],
+                master: ['135deg', 'hsl(248, 57%, 53%)', 'hsla(248, 57%, 33%, 0)'],
+            },
+        }
+        
+    },
+
+    logo: {
+        color: {
+            day: '#666',
+            night: '#aaa',
+        },
+        saturate: {
+            day: '160%',
+            night: '120%',
+        },
     }
 }
 
@@ -78,6 +132,7 @@ function Landing() {
     const dispatch = useDispatch();
     const theme = useSelector(state => state.options.theme);
     const difficulty = useSelector(state => state.options.difficulty);
+    const recentDifficulty = useSelector(state => state.options.difficulty_History);
 
     const layoutRef = useRef(null);
 
@@ -89,15 +144,19 @@ function Landing() {
     const themesBoxRef = useRef(null);
 
     function changeVisuals(refEl, value) {
-
         anime({
             targets: refEl,
-            duration: 600,
-            easing: 'easeInOutSine',
+            duration: 420,
+            easing: 'easeInExpo',
             borderRadius: visualObject.borderRadius[value],
             color: (value === 1)? visualObject.color_active[`${difficulty}`] : (theme === 'night') ? visualObject.color_inactive[0] : visualObject.color_inactive[1],
             fontWeight: visualObject.fontWeight[value],
             scale: visualObject.scale[value],
+            backgroundImage: (value === 1)?
+                [`linear-gradient(${themeObject.difficultyActiveBox[theme].backgroundImage[difficulty][0]}, ${themeObject.difficultyActiveBox[theme].backgroundImage[difficulty][2]}, hsla(144, 57%, 33%, 0))`, `linear-gradient(${themeObject.difficultyActiveBox[theme].backgroundImage[difficulty][0]},  hsla(0, 0%, 0%, 0) 73%, ${themeObject.difficultyActiveBox[theme].backgroundImage[difficulty][1]} 100%)`]
+                :
+                (recentDifficulty.length > 1) &&
+                [`linear-gradient(${themeObject.difficultyActiveBox[theme].backgroundImage[recentDifficulty[recentDifficulty.length - 2]][0]}, hsla(0, 0%, 0%, 0) 75%, hsla(0, 0%, 0%, 0)  100%)`, `linear-gradient(${themeObject.difficultyActiveBox[theme].backgroundImage[recentDifficulty[recentDifficulty.length - 2]][0]}, hsla(0, 0%, 0%, 0) 75%, hsla(0, 0%, 0%, 0)  100%)`],
         })
     }
 
@@ -119,7 +178,6 @@ function Landing() {
 
     useEffect(() => {
         const newTheme = themesBoxRef.current.querySelector(`[data-theme=${theme}]`);
-
         const allContentBoxes = layoutRef.current.querySelectorAll('.content-box');
         const allInputs = layoutRef.current.querySelectorAll('.items-vis');
         const allLabels = layoutRef.current.querySelectorAll('.label-item');
@@ -131,46 +189,74 @@ function Landing() {
         const modesArr = [...allModes];
 
         for(let i=0; i<allModes.length; i++) {
-            if(allModes[i] === newTheme) { modesArr.splice(i, 1); changeThemes(newTheme, modesArr, theme, difficulty, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes);}
+            if(allModes[i] === newTheme) { modesArr.splice(i, 1); changeThemes([newTheme, Array.from(allModes).filter((el) => el !== newTheme)], theme, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes);}
         }
 
     }, [theme])
 
-    function changeThemes(newTheme, modesArr, theme, difficulty, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes) {
+    function changeThemes([newTheme, oldThemes], theme, allContentBoxes, allInputs, allLabels, playButton, inactiveBoxes) {
+
+        const baseTiming = 1900;
 
         anime({
-            targets: [modesArr, layoutRef.current, allContentBoxes, allInputs, allLabels],
-            duration: 1300,
-            easing: 'easeInSine',
+            targets: [layoutRef.current,  allInputs, allLabels],
+            duration: baseTiming,
+            easing: 'easeInOutSine',
             backgroundColor: themeObject.backgroundColor[theme],
             color: themeObject.color[theme],
             borderColor: themeObject.borderColor[theme],
         })
 
         anime({
-            targets: [newTheme, playButton],
-            duration: 1300,
-            easing: 'easeInSine',
-            backgroundColor: themeObject.btnBgColor[theme],
-            color: themeObject.btnColor[theme],
+            targets: allContentBoxes,
+            duration: baseTiming,
+            borderTopColor: themeObject.borderColor[theme],
+            borderBottomColor: themeObject.borderColor[theme],
+            easing: 'easeInOutSine',
         })
 
         anime({
-            targets: inactiveBoxes,
-            duration: 1300,
+            targets: [newTheme],
+            duration: baseTiming,
+            easing: 'easeInSine',
+            filter: 'invert(0%)',
+            borderColor: themeObject.themeBorderColor[theme],
+            color: themeObject.themeIconColor[theme],
+        })
+
+        anime({
+            targets: [oldThemes],
+            duration: baseTiming,
+            easing: 'easeOutSine',
+            filter: 'invert(100%)',
+            borderColor: themeObject.themeBorderColor[theme],
+            color: themeObject.themeIconColor[theme],
+        })
+
+        anime({
+            targets: playButton,
+            duration: baseTiming,
+            backgroundColor: themeObject.btnBgColor[theme],
+            color: themeObject.btnColor[theme],
+            easing: 'easeInSine',
+        })
+
+        anime({
+            targets: [inactiveBoxes],
+            duration: baseTiming,
             easing: 'easeInSine',
             color: themeObject.difficultyBoxesColor[theme],
         })
 
         anime({
-            targets: '.chosen_difficulty',
-            duration: 1300,
-            easing: 'easeInSine',
-            color: themeObject.difficultyActiveBoxColor[difficulty],
+            targets: ['.content-title-text'],
+            duration: baseTiming,
+            color: themeObject.logo.color[theme],
+            easing: 'linear',
+            filter: `saturate(${themeObject.logo.saturate[theme]})`,
         })
 
     }
-
 
     return (
 
@@ -188,10 +274,10 @@ function Landing() {
 
                         <div className="content-box">
                             <div className="box-difficulty">
-                                <div data-difficulty="easy" className="difficulty difficulty-easy easy" ref={easyRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))}}> EASY </div>
-                                <div data-difficulty="medium" className="difficulty difficulty-medium medium" ref={mediumRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))}}> MEDIUM </div>
-                                <div data-difficulty="hard" className="difficulty difficulty-hard hard" ref={hardRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))}}> HARD </div>
-                                <div data-difficulty="master" className="difficulty difficulty-master master" ref={masterRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']}))}}> INSANE </div>
+                                <div data-difficulty="easy" className="difficulty difficulty-easy easy" ref={easyRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']})); dispatch(addDifficultyHistory(e.target.dataset['difficulty']))}}> EASY </div>
+                                <div data-difficulty="medium" className="difficulty difficulty-medium medium" ref={mediumRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']})); dispatch(addDifficultyHistory(e.target.dataset['difficulty'])) }}> MEDIUM </div>
+                                <div data-difficulty="hard" className="difficulty difficulty-hard hard" ref={hardRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']})); dispatch(addDifficultyHistory(e.target.dataset['difficulty']))}}> HARD </div>
+                                <div data-difficulty="master" className="difficulty difficulty-master master" ref={masterRef} onClick={(e) => {dispatch(switchDifficulty({difficulty_name: e.target.dataset['difficulty']})); dispatch(addDifficultyHistory(e.target.dataset['difficulty']))}}> INSANE </div>
                             </div>
                         </div>
                     </div>
@@ -236,7 +322,7 @@ function Landing() {
                 </div>
 
                 {difficulty && (
-                    <PlayButton playSudoku={() => dispatch(changeView({newViewName: 'sudoku'}))} />
+                    <PlayButton  playSudoku={() => dispatch(changeView({newViewName: 'sudoku'}))} />
                 )}
 
             </div>

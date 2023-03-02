@@ -1,8 +1,16 @@
 .loading {
     position: absolute; top: 0%; left: 0%;
     height: 100%; width: 100%;
-    background:#000;
     pointer-events: none;
+    box-shadow: inset 0rem 0rem 7rem 1rem #111;
+}
+
+.loading[data-theme="day"] {
+    background:#111;
+}
+
+.loading[data-theme="night"] {
+    background:#111;
 }
 
 .loading-content {
@@ -23,8 +31,15 @@
 
 .loading-spinner {
     width: 12rem; height: 12rem;
-    color: #ddd;
     font-size: 10rem;
+}
+
+.loading-spinner[data-theme="day"] {
+    color: #ddd;
+}
+
+.loading-spinner[data-theme="night"] {
+    color: #ddd;
 }
 
 .loading-text {
@@ -32,6 +47,14 @@
     font-size: 3.8rem;
     flex-wrap: wrap;
     margin-top: 2.5rem;
+}
+
+.loading-text[data-theme="day"] {
+    color: #ddd;
+}
+
+.loading-text[data-theme="night"] {
+    color: #ddd;
 }
 
 
