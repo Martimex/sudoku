@@ -157,7 +157,7 @@ export const helpers = {
                 for(let conflict_no = 0; conflict_no < digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`].length; conflict_no++) {
                     // Usuwamy każde wystąpienie tej cyfry z każdego konfliktu. 
                     // Jeśli po usunięciu, któryś konflikt nie posiada CREATORA, lub konfilkt nie posiada żadnych MEMBERS, możemy go usunąć (RESOLVED)
-                    console.log(digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`][conflict_no].creator, parseInt(tileRow), '  ', parseInt(tileColumn));
+                    //console.log(digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`][conflict_no].creator, parseInt(tileRow), '  ', parseInt(tileColumn));
                     
                     // Try to remove creator
                     if((digitConflicts[`${state_boardArr_UNMODIFIED[tileRow][tileColumn]}`][conflict_no].creator.row === parseInt(tileRow)) &&

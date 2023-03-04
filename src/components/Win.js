@@ -39,10 +39,10 @@ function Win(props) {
                 </div>
 
                 <div className="choose-box">
-                    <div className={`choose-button win-icon-${props.final_difficulty}`} onClick={() => {dispatch(RESET_STATE()); dispatch(RESET_EXTRAS()); document.body.style.overflow = 'auto'; props.goHome()}} > 
+                    <div className={`choose-button win-icon win-icon-${props.final_difficulty}`} onClick={() => {dispatch(RESET_STATE()); dispatch(RESET_EXTRAS()); document.body.style.overflow = 'auto'; props.goHome()}} > 
                         <FontAwesomeIcon icon={faHome} />
                     </div>
-                    <div className={`choose-button win-icon-${props.final_difficulty}`} onClick={() => {props.getNewSudoku()}}> 
+                    <div className={`choose-button win-icon win-icon-${props.final_difficulty}`} onClick={() => {props.getNewSudoku()}}> 
                         <FontAwesomeIcon icon={faPlus} />
                     </div>
                 </div>

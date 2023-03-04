@@ -2188,15 +2188,16 @@ const engine = {
         })
     },
 
-    resetSudoku: function() {
+    resetSudoku: function(difficulty, theme) {
         const allTiles = document.querySelectorAll('.tile');
         const allTilesArray = [...allTiles];
         const ordered = this.orderTiles(allTilesArray);
 
+        //console.warn(difficulty, theme);
         ordered.forEach(el => {
             el.textContent = '';  // ☢️
             el.style.color = '';
-            el.classList.remove(`active`, `initial`, `initial-night`, `initial-day`, `pencilmark_tile`);
+            el.classList.remove(`active`, `initial`, `initial-night`, `initial-day`, `pencilmark_tile`, `conflict-tile__${difficulty}--${theme}`);
         })
     },
 
@@ -2206,11 +2207,11 @@ const engine = {
         const ordered = this.orderTiles(allTilesArray);
         if(theme === 'night') {
             for(let tile_no = 0; tile_no<ordered.length; tile_no++) {
-                ordered[tile_no].style.backgroundColor = `#000`;
+                ordered[tile_no].style.backgroundColor = `#2220`;
             }
         } else if(theme === 'day') {
             for(let tile_no = 0; tile_no<ordered.length; tile_no++) {
-                ordered[tile_no].style.backgroundColor = `#eee`;
+                ordered[tile_no].style.backgroundColor = `#ddd0`;
             }
         }
     },

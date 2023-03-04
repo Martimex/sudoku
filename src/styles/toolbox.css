@@ -78,6 +78,7 @@
 
 .tool-blocked {
     filter: grayscale(100%);
+    pointer-events: none;
 }
 
 @keyframes borderSpin {

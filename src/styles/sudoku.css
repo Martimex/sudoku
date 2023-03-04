@@ -12,15 +12,29 @@ body {
     height: 100%;
     font-family: 'Audiowide', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     overflow-x: hidden;
+    /* box-shadow: inset 0rem 0rem 7rem 1rem #111; */
+    background-color: #0000;
+}
+
+.sudoku-main {
+    min-height: 100vh;
+}
+
+.sudoku-day {
+    box-shadow: inset 0rem 0rem 7rem 1rem #777;
+    background: #ddd;
 }
 
 .sudoku-day, .all-day {
-    background: #ddd;
-    color: #000;
+    color: #222;
+}
+
+.sudoku-night {
+    box-shadow: inset 0rem 0rem 7rem 1rem #000;
+    background: #111;
 }
 
 .sudoku-night, .all-night {
-    background: #000;
     color: #ddd;
 }
 
@@ -44,6 +58,38 @@ body {
 .sudoku-title {
     padding: .6rem;
     font-size: 2rem;
+}
+
+.title-easy--day {
+    text-shadow: -.1rem .2rem hsl(116, 65%, 45%);
+}
+
+.title-easy--night {
+    text-shadow: -.1rem .2rem hsl(116, 45%, 40%);
+}
+
+.title-medium--day {
+    text-shadow: -.1rem .2rem hsl(55, 65%, 45%);
+}
+
+.title-medium--night {
+    text-shadow: -.1rem .2rem hsl(55, 45%, 40%);
+}
+
+.title-hard--day {
+    text-shadow: -.1rem .2rem hsl(12, 65%, 45%);
+}
+
+.title-hard--night {
+    text-shadow: -.1rem .2rem hsl(12, 45%, 40%);
+}
+
+.title-master--day {
+    text-shadow: -.1rem .2rem hsl(182, 65%, 45%);
+}
+
+.title-master--night {
+    text-shadow: -.1rem .2rem hsl(182, 45%, 40%);
 }
 
 .sudoku-map {
@@ -130,6 +176,38 @@ body {
     padding: .5rem;
 }
 
+.option-easy--day {
+    text-shadow: .11rem .11rem hsl(116, 65%, 45%);
+}
+
+.option-easy--night {
+    text-shadow: .11rem .11rem hsl(116, 45%, 40%);
+}
+
+.option-medium--day {
+    text-shadow: .11rem .11rem hsl(55, 65%, 45%);
+}
+
+.option-medium--night {
+    text-shadow: .11rem .11rem hsl(55, 45%, 40%);
+}
+
+.option-hard--day {
+    text-shadow: .11rem .11rem hsl(12, 65%, 45%);
+}
+
+.option-hard--night {
+    text-shadow: .11rem .11rem hsl(12, 45%, 40%);
+}
+
+.option-master--day {
+    text-shadow: .11rem .11rem hsl(182, 65%, 45%);
+}
+
+.option-master--night {
+    text-shadow: .11rem .11rem hsl(182, 45%, 40%);
+}
+
 .option:hover {
     cursor: pointer;
 }
@@ -214,11 +292,12 @@ body {
     margin: 1.6rem 0 1.1rem 0;
     padding: .6rem;
     color: #000;
-    border-radius: 15%;
+    border-radius: 777px;
 }
 
 .new-sudoku:hover {
     cursor: pointer;
+    filter: brightness(115%);
 }
 
 .new-sudoku-night-easy {

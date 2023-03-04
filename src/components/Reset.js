@@ -36,7 +36,7 @@ function Reset(props) {
                     <div className="choose-button choose-decline" onClick={() => {document.body.style.overflow = 'auto'; dispatch(addExtraView({extraViewName: ''}));/* props.setconfirmReset(false); */ }}>
                         <FontAwesomeIcon icon={faBackspace} />
                     </div>
-                    <div className="choose-button choose-confirm" onClick={() => { props.proceedReset()}}>
+                    <div className="choose-button choose-confirm"  onClick={() => { props.proceedReset()}}>
                         <FontAwesomeIcon icon={faCheck} />
                     </div> 
                 </div>

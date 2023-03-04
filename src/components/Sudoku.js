@@ -19,10 +19,10 @@ let isGameHistoryInitialized = false; // Do not removethis variable, since it ke
 
 const difficultyColors = {
     day: {
-        easy: 'hsl(116, 40%, 40%)',
-        medium: 'hsl(55, 40%, 40%)',
-        hard: 'hsl(12, 40%, 40%)',
-        master: 'hsl(182, 40%, 40%)',
+        easy: 'hsl(116, 50%, 40%)',
+        medium: 'hsl(55, 50%, 40%)',
+        hard: 'hsl(12, 50%, 40%)',
+        master: 'hsl(182, 50%, 40%)',
     },
     
     night: {
@@ -414,7 +414,7 @@ function Sudoku() {
             setActive(0);
             setTime([0, 0, 0]);
 
-            engine.resetSudoku(final_Difficulty);
+            engine.resetSudoku(final_Difficulty, theme);
             isGameHistoryInitialized = false;
 
             engine.cleanBlankNumberBoxes();
@@ -524,7 +524,7 @@ function Sudoku() {
             anime({
                 targets: rubber.current,
                 duration: 800,
-                //backgroundColor: [`#000`], // props.difficulty 💡
+                //backgroundColor: [`#000`], // props.difficulty 💡/
                 easing: 'easeOutSine',
                 opacity: 1,
             })
@@ -534,7 +534,7 @@ function Sudoku() {
     return (
         <div className={`sudoku-${theme} sudoku-main`} ref={sudoku}>
             <div className={`all all-${theme}`} ref={all}>
-                <div className="sudoku-title">
+                <div className={`sudoku-title title-${final_Difficulty}--${theme}`}>
                     Sudoku {final_Difficulty}
                 </div>
                 {extras['timer'].isEnabled === true && (
@@ -549,16 +549,16 @@ function Sudoku() {
                     </div>
                     <div className="palette">
                         <div className={`numbers-box numbers-${theme}-${final_Difficulty}`} ref={numbox} onClick={(e) => { if(conditionsPassed(e)) { dispatch(updatePlayerAction({action_type: 'add'})); updateHistory(e); } }}>
-                            <div data-number="1" className="option option-1"> 1 </div>
-                            <div data-number="2" className="option option-2"> 2 </div>
-                            <div data-number="3" className="option option-3"> 3 </div>
-                            <div data-number="4" className="option option-4"> 4 </div>
-                            <div data-number="5" className="option option-5"> 5 </div>
-                            <div data-number="6" className="option option-6"> 6 </div>
-                            <div data-number="7" className="option option-7"> 7 </div>
-                            <div data-number="8" className="option option-8"> 8 </div>
-                            <div data-number="9" className="option option-9"> 9 </div>
-                            <div data-number="0" className="option option-0" ref={rubber}>  </div>
+                            <div data-number="1" className={`option option-1 option-${final_Difficulty}--${theme}`}> 1 </div>
+                            <div data-number="2" className={`option option-2 option-${final_Difficulty}--${theme}`}> 2 </div>
+                            <div data-number="3" className={`option option-3 option-${final_Difficulty}--${theme}`}> 3 </div>
+                            <div data-number="4" className={`option option-4 option-${final_Difficulty}--${theme}`}> 4 </div>
+                            <div data-number="5" className={`option option-5 option-${final_Difficulty}--${theme}`}> 5 </div>
+                            <div data-number="6" className={`option option-6 option-${final_Difficulty}--${theme}`}> 6 </div>
+                            <div data-number="7" className={`option option-7 option-${final_Difficulty}--${theme}`}> 7 </div>
+                            <div data-number="8" className={`option option-8 option-${final_Difficulty}--${theme}`}> 8 </div>
+                            <div data-number="9" className={`option option-9 option-${final_Difficulty}--${theme}`}> 9 </div>
+                            <div data-number="0" className={`option option-0 option-${final_Difficulty}--${theme}`} ref={rubber}>  </div>
                         </div> 
                     </div>
                 </div>

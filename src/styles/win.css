@@ -18,6 +18,7 @@
     box-shadow: 0px 14px 16px 8px hsla(116, 40%, 35%, 0.75);
     -webkit-box-shadow: 0px 14px 16px 8px hsla(116, 35%, 40%, 0.75);
     -moz-box-shadow: 0px 14px 16px 8px hsla(116, 40%, 35%, 0.75);
+    filter: saturate(80%);
 }
 
 .screen-title-easy, .win-icon-easy {
@@ -36,7 +37,6 @@
     color:hsl(116, 40%, 40%);
 }
 
-
 /* MEDIUM */
 
 .win-medium {
@@ -45,6 +45,7 @@
     box-shadow: 0px 14px 16px 8px hsla(55, 40%, 35%, 0.75);
     -webkit-box-shadow: 0px 14px 16px 8px hsla(55, 35%, 40%, 0.75);
     -moz-box-shadow: 0px 14px 16px 8px hsla(55, 40%, 35%, 0.75);
+    filter: saturate(80%);
 }
 
 .screen-title-medium, .win-icon-medium {
@@ -71,6 +72,7 @@
     box-shadow: 0px 14px 16px 8px hsla(12, 40%, 35%, 0.75);
     -webkit-box-shadow: 0px 14px 16px 8px hsla(12, 35%, 40%, 0.75);
     -moz-box-shadow: 0px 14px 16px 8px hsla(12, 40%, 35%, 0.75);
+    filter: saturate(80%);
 }
 
 .screen-title-hard, .win-icon-hard {
@@ -97,6 +99,7 @@
     box-shadow: 0px 14px 16px 8px hsla(182, 40%, 35%, 0.75);
     -webkit-box-shadow: 0px 14px 16px 8px hsla(182, 35%, 40%, 0.75);
     -moz-box-shadow: 0px 14px 16px 8px hsla(182, 40%, 35%, 0.75);
+    filter: saturate(80%);
 }
 
 .screen-title-master, .win-icon-master {
@@ -123,6 +126,16 @@
     font-family: 'PT';
     font-weight: 750;
     font-size: 1.3rem;
+}
+
+.choose-button.win-icon:hover {
+    cursor: pointer;
+    background: hsla(0, 0%, 45%, 0);  /*This declaration overrides default grey highlight on hover*/
+    box-shadow: 0 0 .75rem .75rem hsla(0, 0%, 45%, 0); /*This declaration overrides default grey highlight on hover*/
+    border-radius: 50%;
+    filter: brightness(130%) saturate(150%);
+    scale: 1.2;
+    transition: all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @media screen and (orientation: landscape) and (max-width: 1000px) {

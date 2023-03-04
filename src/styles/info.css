@@ -10,21 +10,21 @@
 
 .info-day {
     color: #222;
-    background-image: linear-gradient(30deg, #bbb, #eee, #bbb);
+    background-image: linear-gradient(30deg, #bbb, #ddd, #bbb);
 }
 
 .info-day[datatype='title'], .info-day[datatype='outro'] {
-    background-image: linear-gradient(90deg, #bbb, #eee, #bbb);
+    background-image: linear-gradient(90deg, #bbb, #ddd, #bbb);
 }
 
 .info-night {
     color: #ddd;
-    background-image: linear-gradient(30deg, #000, #222, #000);
+    background-image: linear-gradient(30deg, #111, #222, #111);
     border: .3rem solid #222;
 }
 
 .info-night[datatype='title'] {
-    background-image: linear-gradient(90deg, #000, #222, #000);
+    background-image: linear-gradient(90deg, #111, #222, #111);
 }
 
 
@@ -145,6 +145,9 @@
 
 .info-close:hover {
     cursor: pointer;
+    text-decoration: underline;
+    scale: 1.1;
+    transition: .9s cubic-bezier(0.215, 0.610, 0.355, 1);
 }
 
 .info-box-desc-icon[datatype='trophy'] {
