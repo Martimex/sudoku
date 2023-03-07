@@ -6,6 +6,94 @@
 
 <br><hr>
 
+**[1.3.0] Update design pattern for Sudoku World**
+<br>
+_04.03.2023_
+
+Here is the next visual improvement to Landing page design, as well as
+for Sudoku page, which got some new design changes to give it a
+refreshed, more fancy styling. The update modifies also a look of
+dialog boxes to a minor extent. Also resolved some bugs on the way. The
+following parts has changed:
+
+<br>
+
+LANDING PAGE
+
+1. Dark and light mode backgrounds - changed backgotund color to have
+less contrast than before,  tuning down their hues. Also a slender
+shadow appears as a tiny frame for both type of backgrounds.
+
+2. Modifed design for theme buttons - replaced the circular shape for
+more rectangle-based figure with slightly rounded corners. background
+colors got also affected here, just to make them fit better for new
+color of backgrounds.
+
+3. Changed appearance for difficulty buttons - difficulty boxes borders
+are thicker. Once a difficulty box is pressed, it runs a new animation,
+which outlines the picked difficulty with a representative color.
+
+4. Minor color adjustments to checkbox icon once a given option is picked
+
+5. Play button got their borders completely rounded. Replaced it base
+color with less intensive one (for both theme modes). Gave a light,
+shadow around and applied fancy animation on hover.
+
+6. Changed main Sudoku World logo - made it a bit more eye pleasant and
+adjustable based on picked theme. Changed the text shadow color from
+initial pink to a strong, blue one.
+
+<br>
+
+SUDOKU PAGE:
+
+1. Both Sudoku title and Numbebox digit icons received a slight shadow,
+which color is based on a Sudoku difficulty;
+
+2. Fixed the background colors for both light and dark modes. The main
+goal was to lower their intensity and to cast a light, contrast shadow
+around the screen borders;
+
+3. Affected Sudoku reset button by rounding it left and right borders,
+and hovering over this button light it up a bit;
+
+4. Timer (when enabled) has received a bigger font size;
+
+<br>
+
+DIALOG BOXES:
+
+1. All the dialog boxes got their borders less rounded (to just 5%), to
+revert them back to their original, rectangle-based shape.
+
+2. For Info dialog box, a change was made to a close button - once it is
+hovered, it fires a slight animation that scales the text by a minor
+amount and also applies an underline to it. Moreover, the background
+for dark and light themes got changed to be less intensive.
+
+3. For Reset dialog box, a fancy hover effect is added to both action
+buttons (lighting and scaleing them up, when the cursor is on them);
+
+4. For Wind (completion) box, applied a light & scale effect (very
+similiar to what is changed for Reset box), and furthermore lower
+the background intensity - applied to all difficulty colors.
+
+<br>
+
+RESOLVED BUGS:
+
+1. Fixed the issue, when hovering over currently inactive history travel
+button caused cursor to change it look to pointer. This caused a
+misleading perspective, that an inactive history button is still
+clickable;
+
+2. When player wanted to replace a Sudoku with a new one (while keeping
+some conflicted tiles), the visual mark was still seen on affected tiles
+in new board. That mentioned issue got resolved.
+
+<br><hr>
+
+
 **[1.2.2] Correct dialog boxes sizing**
 <br>
 _26.11.2022_
