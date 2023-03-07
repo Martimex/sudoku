@@ -21,7 +21,7 @@ body {
 }
 
 .sudoku-day {
-    box-shadow: inset 0rem 0rem 7rem 1rem #777;
+    /* box-shadow: inset 0rem 0rem 7rem 1rem #777; */
     background: #ddd;
 }
 
@@ -30,7 +30,7 @@ body {
 }
 
 .sudoku-night {
-    box-shadow: inset 0rem 0rem 7rem 1rem #000;
+    /*box-shadow: inset 0rem 0rem 7rem 1rem #000; */    
     background: #111;
 }
 
@@ -460,6 +460,14 @@ body {
         overflow-y: hidden;
     }
 
+    .sudoku-day {
+        box-shadow: inset 0rem 0rem 7rem 1rem #777;
+    }
+
+    .sudoku-night {
+        box-shadow: inset 0rem 0rem 7rem 1rem #000;
+    }
+
     .sudoku-title {
         font-size: 2.5rem;
     }
@@ -527,6 +535,15 @@ body {
     html{
         font-size: 1.3rem;
     }
+
+    .sudoku-day {
+        box-shadow: inset 0rem 0rem 7rem 1rem #777;
+    }
+
+    .sudoku-night {
+        box-shadow: inset 0rem 0rem 7rem 1rem #000;
+    }
+    
     .sudoku-board {
         font-size: 1.6rem;
         grid-template-columns: repeat(3, 30vw); /* grid-template-columns: repeat(3, 7rem) grid-template-columns: repeat(3, 33vw); */

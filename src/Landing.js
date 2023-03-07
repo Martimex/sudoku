@@ -245,7 +245,7 @@ function Landing() {
             targets: [inactiveBoxes],
             duration: baseTiming,
             easing: 'easeInSine',
-            color: themeObject.difficultyBoxesColor[theme],
+            color: difficulty && themeObject.difficultyBoxesColor[theme],
         })
 
         anime({
