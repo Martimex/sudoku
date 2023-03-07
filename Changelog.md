@@ -6,6 +6,24 @@
 
 <br><hr>
 
+**[1.3.1] Minor visual fixes**
+<br>
+_07.03.2023_
+
+This short patch is a follow up for the previous design update. The
+main goal is to correct some issues caused by some recent changes made:
+
+- For mobile devices, a shadow for Day and Night themes for Sudoku
+screen got removed, leaving a solid, one-color  background. That change
+is not added for tablets and laptops/desktops (for those, the shadow
+remain  unmodified);
+
+- Fixed an issue, when quickly picking a difficulty box (the moment
+Landing page is loaded), was not displaying a text color for a
+chosen box;
+
+<br><hr>
+
 **[1.3.0] Update design pattern for Sudoku World**
 <br>
 _04.03.2023_
